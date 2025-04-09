@@ -1,10 +1,13 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import StudyGroupForm from 'features/StudyGroupForm';
+import 'assets/style/_flex.scss';
+import 'assets/style/_typography.scss';
 
 const MainPage = () => {
 	const navigate = useNavigate();
+	const [isStudyGroupFormOpen, setIsStudyGroupFormOpen] = useState(false);
 
-	// 임시 로그인 여부 (나중엔 전역 상태나 토큰 검사로 대체 가능)
 	const isLoggedIn = false;
 
 	const goToLogin = () => {
@@ -16,27 +19,83 @@ const MainPage = () => {
 	};
 
 	const goToGroup = () => {
-		navigate('/group-detail/:id'); // 그룹 ID는 나중에 동적으로 설정
+		navigate('/group-detail/:id');
+	};
+
+	const openStudyGroupForm = () => {
+		setIsStudyGroupFormOpen(true);
+	};
+
+	const closeStudyGroupForm = () => {
+		setIsStudyGroupFormOpen(false);
 	};
 
 	return (
-		<div>
-			{/* 임시 작성 */}
-			<h1>메인 페이지</h1>
+		<div className="flex-center min-h-screen">
+			<div>
+				<h1>메인 페이지</h1>
 
-			{!isLoggedIn && <button onClick={goToLogin}>로그인</button>}
-			<button onClick={goToMyPage}>마이페이지</button>
-			{isLoggedIn && <p>환영합니다! 😄</p>}
-			<p
-				onClick={goToGroup}
-				style={{
-					cursor: 'pointer',
-					color: 'blue',
-					textDecoration: 'underline',
-				}}
-			>
-				스터디 그룹 보러 가기
-			</p>
+				{!isLoggedIn && <button onClick={goToLogin}>로그인</button>}
+				<button onClick={goToMyPage}>마이페이지</button>
+				{isLoggedIn && <p>환영합니다! 😄</p>}
+				<p
+					onClick={goToGroup}
+					style={{
+						cursor: 'pointer',
+						color: 'blue',
+						textDecoration: 'underline',
+					}}
+				>
+					스터디 그룹 보러 가기
+				</p>
+
+				<button onClick={openStudyGroupForm}>스터디 그룹 생성</button>
+
+				{/* 모달 조건부 렌더링 */}
+				{isStudyGroupFormOpen && (
+					<div
+						style={{
+							position: 'fixed',
+							top: 0,
+							left: 0,
+							width: '100%',
+							height: '100%',
+							backgroundColor: 'rgba(0,0,0,0.5)',
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'center',
+							zIndex: 1000,
+						}}
+					>
+						<div
+							style={{
+								background: 'white',
+								borderRadius: '16px',
+								padding: '32px',
+								width: '400px',
+								position: 'relative',
+								boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
+							}}
+						>
+							<button
+								onClick={closeStudyGroupForm}
+								style={{
+									position: 'absolute',
+									top: '16px',
+									right: '16px',
+									fontSize: '24px',
+									background: 'none',
+									border: 'none',
+									cursor: 'pointer',
+								}}
+							>
+								✕
+							</button>
+							<StudyGroupForm />
+						</div>
+					</div>
+				)}
+			</div>
 		</div>
 	);
 };
