@@ -1,0 +1,55 @@
+.login-container {
+	max-width: 360px;
+	padding: 30px;
+	margin: auto;
+}
+
+.login-title {
+	font-size: 20px;
+	font-weight: bold;
+	margin-bottom: 20px;
+}
+
+.login-input {
+	width: 240px;
+	padding: 14px 8px;
+	margin: 8px auto;
+	border: 1px solid #73e177;
+}
+
+.login-button {
+	margin-top: 24px;
+	margin-bottom: 8px;
+	padding: 14px 8px;
+	width: 260px;
+	background-color: #73e177;
+	color: white;
+	border: none;
+}
+
+.login-button:hover {
+	background-color: #bebebe;
+	cursor: pointer;
+}
+
+.signup-page-btn {
+	font-size: 12px;
+	color: rgb(112, 112, 112);
+	cursor: pointer;
+}
+
+.signup-page-btn:hover {
+	text-decoration: underline;
+}
+
+.login-error {
+	color: red;
+	font-size: 12px;
+	margin-top: 8px;
+	width: 260px;
+}
+
+.auto-login-checkbox {
+	font-size: 12px;
+	color: rgb(112, 112, 112);
+}

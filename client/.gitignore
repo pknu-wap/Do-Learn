@@ -21,3 +21,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# SCSS 컴파일 결과물 무시
+*.css
+*.css.map
