@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import StudyGroupForm from 'features/StudyGroupForm';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
+import StudyGroupsList from 'features/studyGroupList/StudyGroupsList';
 
 const MainPage = () => {
 	const navigate = useNavigate();
@@ -12,14 +13,6 @@ const MainPage = () => {
 
 	const goToLogin = () => {
 		navigate('/login');
-	};
-
-	const goToMyPage = () => {
-		navigate('/mypage');
-	};
-
-	const goToGroup = () => {
-		navigate('/group-detail/:id');
 	};
 
 	const openStudyGroupForm = () => {
@@ -33,21 +26,13 @@ const MainPage = () => {
 	return (
 		<div className="flex-center min-h-screen">
 			<div>
-				<h1>메인 페이지</h1>
+				{/* 헤더 컴포넌트 */}
+				{/* 검색 컴포넌트 */}
+				<StudyGroupsList />
+				{/* 하단바 컴포넌트 */}
 
 				{!isLoggedIn && <button onClick={goToLogin}>로그인</button>}
-				<button onClick={goToMyPage}>마이페이지</button>
 				{isLoggedIn && <p>환영합니다! 😄</p>}
-				<p
-					onClick={goToGroup}
-					style={{
-						cursor: 'pointer',
-						color: 'blue',
-						textDecoration: 'underline',
-					}}
-				>
-					스터디 그룹 보러 가기
-				</p>
 
 				<button onClick={openStudyGroupForm}>스터디 그룹 생성</button>
 

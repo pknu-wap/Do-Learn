@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from 'api/auth/auth';
+import { login } from 'api/auth';
 import './LoginForm.scss';
 
 const LoginForm = () => {

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 import './SignupForm.scss';
-import { signup } from 'api/auth/auth';
+import { signup } from 'api/auth';
 
 const SignupForm = () => {
 	const [email, setEmail] = useState('');
