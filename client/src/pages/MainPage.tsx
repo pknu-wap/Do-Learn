@@ -24,7 +24,7 @@ const MainPage = () => {
 	};
 
 	return (
-		<div className="flex-center min-h-screen">
+		<div className="">
 			<div>
 				{/* 헤더 컴포넌트 */}
 				{/* 검색 컴포넌트 */}

@@ -1,5 +1,7 @@
 import React from 'react';
 import { useStudyGroups } from './useStudyGroups';
+import './StudyGroupsList.scss';
+import 'assets/style/_flex.scss';
 
 const StudyGroupsList = () => {
 	const { groups, loadMore, hasMore, loading } = useStudyGroups();
@@ -8,7 +10,7 @@ const StudyGroupsList = () => {
 		{
 			id: 1,
 			name: '프론트엔드 스터디',
-			meetingDays: '월, 수',
+			meetingDays: '주 2일',
 			meetingTime: '19:00',
 			department: '컴퓨터공학과',
 			meetingType: '온라인',
@@ -18,7 +20,7 @@ const StudyGroupsList = () => {
 		{
 			id: 2,
 			name: '백엔드 스터디',
-			meetingDays: '화, 목',
+			meetingDays: '주 2일',
 			meetingTime: '20:00',
 			department: '소프트웨어학과',
 			meetingType: '오프라인',
@@ -28,7 +30,7 @@ const StudyGroupsList = () => {
 		{
 			id: 3,
 			name: '코딩 테스트 대비',
-			meetingDays: '금',
+			meetingDays: '주 1일',
 			meetingTime: '18:00',
 			department: '전기전자공학과',
 			meetingType: '온라인',
@@ -38,7 +40,7 @@ const StudyGroupsList = () => {
 		{
 			id: 4,
 			name: 'CS 스터디',
-			meetingDays: '토',
+			meetingDays: '주 1일',
 			meetingTime: '10:00',
 			department: '정보보호학과',
 			meetingType: '오프라인',
@@ -48,7 +50,7 @@ const StudyGroupsList = () => {
 		{
 			id: 5,
 			name: '면접 준비 스터디',
-			meetingDays: '일',
+			meetingDays: '주 1일',
 			meetingTime: '14:00',
 			department: null,
 			meetingType: '온라인',
@@ -58,62 +60,69 @@ const StudyGroupsList = () => {
 		{
 			id: 6,
 			name: 'AI 논문 읽기',
-			meetingDays: '월, 금',
+			meetingDays: '주 2일',
 			meetingTime: '21:00',
 			department: '인공지능학과',
 			meetingType: null,
 			currentMembers: 3,
 			maxMembers: 5,
 		},
+		{
+			id: 7,
+			name: 'UX 리서치 스터디',
+			meetingDays: '주 3일',
+			meetingTime: '20:00',
+			department: '디자인학과',
+			meetingType: '오프라인',
+			currentMembers: 4,
+			maxMembers: 6,
+		},
+		{
+			id: 8,
+			name: '데이터 분석 스터디',
+			meetingDays: '주 5일',
+			meetingTime: '08:00',
+			department: '데이터사이언스학과',
+			meetingType: '온라인',
+			currentMembers: 6,
+			maxMembers: 6,
+		},
 	];
 
 	return (
-		<div style={{ padding: '16px' }}>
-			<h2>스터디 그룹 리스트</h2>
-			<div>
-				{dummyGroups.map((group) => (
-					<div
-						key={group.id}
-						style={{
-							border: '1px solid #ccc',
-							borderRadius: '8px',
-							padding: '12px',
-							marginBottom: '16px',
-						}}
-					>
-						<div style={{ fontSize: '18px', fontWeight: 'bold' }}>
-							{group.name}
-						</div>
-						<div style={{ marginTop: '4px' }}>
-							📅 {group.meetingDays} / 🕒 {group.meetingTime}
-						</div>
-						<div style={{ marginTop: '4px' }}>
-							👥 {group.currentMembers} / {group.maxMembers}
-						</div>
-						{group.department && (
-							<div style={{ marginTop: '4px' }}>🎓 {group.department}</div>
-						)}
+		<div className="list-container">
+			{/* 연동 후 -> groups.map */}
+			{dummyGroups.map((group) => (
+				<div className="list-box" key={group.id}>
+					<div className="top-row flex-between">
+						<div className="group-name">{group.name}</div>
 						{group.meetingType && (
-							<div style={{ marginTop: '4px' }}>📍 {group.meetingType}</div>
+							<div className="meeting-type">{group.meetingType}</div>
 						)}
 					</div>
-				))}
-			</div>
 
-			{/* <ul>
-				{groups.map((group) => (
-					<li key={group.id}>
-						<strong>{group.name}</strong> - {group.meetingDays}{' '}
-						{group.meetingTime}({group.currentMembers}/{group.maxMembers})
-					</li>
-				))}
-			</ul>
+					<div className="middle-row flex-row">
+						<div>
+							<span className="info-label">주기</span> {group.meetingDays}
+						</div>
+						<div>
+							<span className="info-label">시간</span> {group.meetingTime}
+						</div>
+					</div>
 
-			{hasMore && (
-				<button onClick={loadMore} disabled={loading}>
-					{loading ? '로딩 중...' : '더 보기'}
-				</button>
-			)} */}
+					<div className="bottom-row flex-row">
+						<div>
+							<span className="info-label">인원</span> {group.currentMembers} /{' '}
+							{group.maxMembers}명
+						</div>
+						{group.department && (
+							<div>
+								<span className="info-label">학과</span> {group.department}
+							</div>
+						)}
+					</div>
+				</div>
+			))}
 		</div>
 	);
 };

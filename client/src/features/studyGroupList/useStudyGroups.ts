@@ -21,7 +21,7 @@ export const useStudyGroups = () => {
 	};
 
 	useEffect(() => {
-		loadMore(); // 첫 페이지 로딩
+		loadMore();
 	}, []);
 
 	return { groups, loadMore, hasMore: nextCursor !== null, loading };
