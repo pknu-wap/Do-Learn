@@ -23,5 +23,5 @@ yarn-debug.log*
 yarn-error.log*
 
 # SCSS 컴파일 결과물 무시
-/src/styles/*.css
-/src/styles/*.css.map
+/src/css/*.css
+/src/css/*.css.map

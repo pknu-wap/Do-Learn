@@ -9,7 +9,7 @@
 		{
 			"format": "expanded",
 			"extensionName": ".css",
-			"savePath": "/src/styles"
+			"savePath": "/src/css"
 		}
 	],
 	"liveSassCompile.settings.generateMap": false,
