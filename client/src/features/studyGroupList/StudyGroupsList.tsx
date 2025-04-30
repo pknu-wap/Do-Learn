@@ -182,7 +182,7 @@ const StudyGroupsList = () => {
 			{loading && (
 				<div className="flex-center" style={{ padding: '20px 0' }}>
 					<img
-						src="/assets/style/spinner.gif"
+						src="/assets/spinner.gif"
 						alt="로딩 중"
 						style={{ width: '40px', height: '40px' }}
 					/>

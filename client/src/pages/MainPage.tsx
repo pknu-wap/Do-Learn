@@ -4,6 +4,9 @@ import StudyGroupForm from 'features/StudyGroupForm';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 import StudyGroupsList from 'features/studyGroupList/StudyGroupsList';
+import Header from 'features/header/Header';
+import SearchBar from 'features/searchBar/SearchBar';
+import NavBar from 'features/navBar/NavBar';
 
 const MainPage = () => {
 	const navigate = useNavigate();
@@ -26,10 +29,10 @@ const MainPage = () => {
 	return (
 		<div className="">
 			<div>
-				{/* 헤더 컴포넌트 */}
-				{/* 검색 컴포넌트 */}
+				<Header />
+				<SearchBar />
 				<StudyGroupsList />
-				{/* 하단바 컴포넌트 */}
+				<NavBar />
 
 				{!isLoggedIn && <button onClick={goToLogin}>로그인</button>}
 				{isLoggedIn && <p>환영합니다! 😄</p>}

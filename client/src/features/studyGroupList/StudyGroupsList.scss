@@ -1,14 +1,25 @@
 .list-container {
-	width: 75%;
+	width: 100%;
 	margin: auto;
+	background-color: white;
+	padding-bottom: 30px;
 }
 
 .list-box {
+	margin: auto;
+	width: 80%;
 	border: 2px solid #87cd37;
-	border-radius: 10px;
+	border-radius: 20px;
 	padding: 5%;
 	margin-bottom: 10%;
 	font-size: 14px;
+
+	&:hover {
+		cursor: pointer;
+		.group-name {
+			text-decoration: underline;
+		}
+	}
 
 	.top-row {
 		margin-bottom: 4%;

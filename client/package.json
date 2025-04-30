@@ -14,6 +14,7 @@
     "axios": "^1.8.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-icons": "^5.5.0",
     "react-intersection-observer": "^9.16.0",
     "react-router-dom": "^7.5.3",
     "react-scripts": "5.0.1",
@@ -47,6 +48,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.23.0",
+    "@types/aria-query": "^5.0.4",
     "@types/axios": "^0.14.4",
     "@types/estree": "^1.0.7",
     "@types/react-router-dom": "^5.3.3",
@@ -59,6 +61,7 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "globals": "^16.0.0",
     "prettier": "^3.5.3",
-    "typescript-eslint": "^8.28.0"
+    "typescript-eslint": "^8.28.0",
+    "webpack-env": "^0.8.0"
   }
 }
