@@ -125,7 +125,7 @@ const SignupForm = () => {
 	return (
 		<div className="flex-col-center" style={{ height: '100vh' }}>
 			<div className="form-container">
-				<div className="form-title">회원가입</div>
+				<div className="heading2 form-title">회원가입</div>
 
 				<div className="form-label">이메일*</div>
 				<input
@@ -135,9 +135,14 @@ const SignupForm = () => {
 					onChange={(e) => handleChange('email', e.target.value)}
 					onBlur={() => handleBlur('email', email)}
 				/>
-				{touched.email && errors.email && (
-					<div className="signup-error">{errors.email}</div>
-				)}
+				<div
+					className="signup-error"
+					style={{
+						visibility: touched.email && errors.email ? 'visible' : 'hidden',
+					}}
+				>
+					{errors.email || ' '}
+				</div>
 
 				<div className="form-label">비밀번호*</div>
 				<input
@@ -147,9 +152,15 @@ const SignupForm = () => {
 					onChange={(e) => handleChange('password', e.target.value)}
 					onBlur={() => handleBlur('password', password)}
 				/>
-				{touched.password && errors.password && (
-					<div className="signup-error">{errors.password}</div>
-				)}
+				<div
+					className="signup-error"
+					style={{
+						visibility:
+							touched.password && errors.password ? 'visible' : 'hidden',
+					}}
+				>
+					{errors.password || ' '}
+				</div>
 
 				<div className="form-label">비밀번호 확인*</div>
 				<input
@@ -159,9 +170,17 @@ const SignupForm = () => {
 					onChange={(e) => handleChange('passwordConfirm', e.target.value)}
 					onBlur={() => handleBlur('passwordConfirm', passwordConfirm)}
 				/>
-				{touched.passwordConfirm && errors.passwordConfirm && (
-					<div className="signup-error">{errors.passwordConfirm}</div>
-				)}
+				<div
+					className="signup-error"
+					style={{
+						visibility:
+							touched.passwordConfirm && errors.passwordConfirm
+								? 'visible'
+								: 'hidden',
+					}}
+				>
+					{errors.passwordConfirm || ' '}
+				</div>
 
 				<div className="form-label">닉네임*</div>
 				<input
@@ -171,22 +190,20 @@ const SignupForm = () => {
 					onChange={(e) => handleChange('nickname', e.target.value)}
 					onBlur={() => handleBlur('nickname', nickname)}
 				/>
-				{touched.nickname && errors.nickname && (
-					<div className="signup-error">{errors.nickname}</div>
-				)}
-
-				{submitError && (
-					<div
-						className="signup-error"
-						style={{ textAlign: 'center', marginBottom: '1rem' }}
-					>
-						{submitError}
-					</div>
-				)}
+				<div
+					className="signup-error"
+					style={{
+						visibility:
+							touched.nickname && errors.nickname ? 'visible' : 'hidden',
+					}}
+				>
+					{errors.nickname || ' '}
+				</div>
 
 				<button className="signup-btn" onClick={handleSignup}>
 					회원가입
 				</button>
+				{submitError && <div className="signup-error">{submitError}</div>}
 			</div>
 		</div>
 	);

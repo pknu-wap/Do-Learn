@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from 'api/auth';
 import './LoginForm.scss';
+import 'assets/style/_typography.scss';
+import 'assets/style/_flex.scss';
 
 const LoginForm = () => {
 	const navigate = useNavigate();
@@ -46,9 +48,9 @@ const LoginForm = () => {
 	};
 
 	return (
-		<div className="flex-col-center" style={{ height: '100vh' }}>
+		<div className="flex-col-center" style={{ height: '90vh' }}>
 			<div className="login-container">
-				<div className="login-title">로그인</div>
+				<div className="heading2 login-title">로그인</div>
 
 				<input
 					className="login-input"
@@ -74,7 +76,13 @@ const LoginForm = () => {
 					/>
 					<label htmlFor="autoLogin">자동 로그인</label>
 				</div>
-				{errorMsg && <div className="login-error">{errorMsg}</div>}
+				<div
+					className="login-error"
+					style={{ visibility: errorMsg ? 'visible' : 'hidden' }}
+				>
+					{errorMsg || '　'} {/* 전각 공백 등으로 높이 유지 */}
+				</div>
+				{/* {errorMsg && <div className="login-error">{errorMsg}</div>} */}
 
 				<button className="login-button" onClick={handleLogin}>
 					로그인

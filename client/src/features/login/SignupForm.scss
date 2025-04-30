@@ -15,17 +15,22 @@
 }
 
 .form-input {
-	width: 240px;
+	width: 260px;
 	padding: 14px 8px;
 	margin-top: 4px;
 	border: 1px solid #73e177;
+
+	&:focus {
+		outline: none;
+	}
 }
 
 .signup-error {
 	color: red;
 	font-size: 12px;
-	margin-top: 5px;
+	margin-top: 2px;
 	width: 260px;
+	min-height: 30px;
 }
 
 .signup-btn {
