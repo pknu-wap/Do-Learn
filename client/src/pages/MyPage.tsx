@@ -1,8 +1,11 @@
+import NavBar from 'components/NavBar';
+import LogoutButton from 'features/logoutButton/LogoutButton';
+
 const MyPage = () => {
 	return (
 		<div>
-			마이페이지 컨텐츠
-			{/* <MyPageForm /> */}
+			<LogoutButton />
+			<NavBar />
 		</div>
 	);
 };

@@ -5,11 +5,22 @@ import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 import './NavBar.scss';
 import StudyGroupForm from 'features/studyGroupForm/StudyGroupForm';
+import { isLoggedIn } from 'utils/auth';
+import LoginModal from 'components/LoginModal';
 
 const NavBar = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const [isStudyGroupFormOpen, setIsStudyGroupFormOpen] = useState(false);
+	const [showLoginModal, setShowLoginModal] = useState(false);
+
+	const handleMypageClick = () => {
+		if (isLoggedIn()) {
+			navigate('/mypage');
+		} else {
+			setShowLoginModal(true);
+		}
+	};
 
 	const isActive = (path: string) => location.pathname === path;
 
@@ -34,7 +45,7 @@ const NavBar = () => {
 					<Plus />
 				</button>
 				<button
-					onClick={() => navigate('/mypage')}
+					onClick={handleMypageClick}
 					className={isActive('/mypage') ? 'active' : ''}
 				>
 					<User />
@@ -42,6 +53,15 @@ const NavBar = () => {
 			</nav>
 
 			{/* 모달 */}
+			<LoginModal
+				visible={showLoginModal}
+				onClose={() => setShowLoginModal(false)}
+				onConfirm={() => {
+					setShowLoginModal(false);
+					navigate('/login'); // 로그인 페이지로 이동
+				}}
+			/>
+
 			{isStudyGroupFormOpen && (
 				<div
 					style={{

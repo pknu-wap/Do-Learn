@@ -19,9 +19,6 @@ const MainPage = () => {
 				<Header />
 				<SearchBar />
 				<StudyGroupsList />
-
-				{!isLoggedIn && <button onClick={goToLogin}>로그인</button>}
-				{isLoggedIn && <p>환영합니다! 😄</p>}
 			</div>
 		</div>
 	);

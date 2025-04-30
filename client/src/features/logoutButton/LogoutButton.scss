@@ -1,0 +1,9 @@
+.logout-text {
+	color: #888;
+	cursor: pointer;
+	font-size: 14px;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
