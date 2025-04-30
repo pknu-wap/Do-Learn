@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { isLoggedIn } from 'utils/auth';
 import { useNavigate } from 'react-router-dom';
+import LoginModal from 'components/LoginModal';
 
 interface StudyGroupItemProps {
 	group: {
@@ -18,10 +19,11 @@ interface StudyGroupItemProps {
 
 const StudyGroupItem: React.FC<StudyGroupItemProps> = ({ group }) => {
 	const navigate = useNavigate();
+	const [showModal, setShowModal] = useState(false);
 
 	const handleClick = () => {
 		if (!isLoggedIn()) {
-			navigate('/login');
+			setShowModal(true);
 		} else {
 			navigate(`/group-detail/${group.id}`);
 		}
@@ -54,6 +56,15 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({ group }) => {
 					</div>
 				)}
 			</div>
+
+			<LoginModal
+				visible={showModal}
+				onClose={() => setShowModal(false)}
+				onConfirm={() => {
+					setShowModal(false);
+					navigate('/login');
+				}}
+			/>
 		</div>
 	);
 };
