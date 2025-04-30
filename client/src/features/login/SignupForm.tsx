@@ -11,6 +11,7 @@ const SignupForm = () => {
 	const [passwordConfirm, setPasswordConfirm] = useState('');
 	const [nickname, setNickname] = useState('');
 	const navigate = useNavigate();
+	const [submitError, setSubmitError] = useState('');
 
 	const [errors, setErrors] = useState({
 		email: '',
@@ -98,19 +99,25 @@ const SignupForm = () => {
 		try {
 			const response = await signup(email, password, nickname);
 			console.log('회원가입 성공:', response.data);
-			alert('회원가입이 완료되었습니다!');
+			console.log('회원가입이 완료되었습니다!');
 			navigate('/login');
 		} catch (error: any) {
-			console.log('회원가입 실패:', error);
+			console.log('서버 응답 전체:', error.response?.data);
 
 			const serverErrors = error.response?.data?.errors;
+			const message = error.response?.data?.message;
+
 			if (serverErrors) {
 				setErrors((prev) => ({
 					...prev,
 					...serverErrors, // 서버에서 내려준 필드별 오류를 반영
 				}));
+				setSubmitError('');
+			} else if (message === 'Email is already registered') {
+				setSubmitError('이미 등록된 이메일입니다.');
 			} else {
-				alert('알 수 없는 오류가 발생했습니다.');
+				console.log('알 수 없는 오류:', error);
+				setSubmitError('이미 등록된 이메일입니다.');
 			}
 		}
 	};
@@ -167,8 +174,15 @@ const SignupForm = () => {
 				{touched.nickname && errors.nickname && (
 					<div className="signup-error">{errors.nickname}</div>
 				)}
-				<br />
-				<br />
+
+				{submitError && (
+					<div
+						className="signup-error"
+						style={{ textAlign: 'center', marginBottom: '1rem' }}
+					>
+						{submitError}
+					</div>
+				)}
 
 				<button className="signup-btn" onClick={handleSignup}>
 					회원가입

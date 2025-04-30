@@ -18,19 +18,25 @@ const LoginForm = () => {
 
 		try {
 			const res = await login(email, password);
+			const rawAccess = res.headers['authorization'];
+			const refreshToken = res.headers['refresh'];
 
-			if (autoLogin) {
-				localStorage.setItem('accessToken', res.data.accessToken);
-				localStorage.setItem('refreshToken', res.data.refreshToken);
-			} else {
-				sessionStorage.setItem('accessToken', res.data.accessToken);
-				sessionStorage.setItem('refreshToken', res.data.refreshToken);
+			const accessToken = rawAccess?.replace('Bearer ', '');
+
+			if (accessToken && refreshToken) {
+				if (autoLogin) {
+					localStorage.setItem('accessToken', accessToken);
+					localStorage.setItem('refreshToken', refreshToken);
+				} else {
+					sessionStorage.setItem('accessToken', accessToken);
+					sessionStorage.setItem('refreshToken', refreshToken);
+				}
+
+				setErrorMsg('');
+				navigate('/');
 			}
-
-			setErrorMsg('');
-			navigate('/');
 		} catch (err: any) {
-			console.error('로그인 실패:', err);
+			console.log('에러 응답 데이터:', err.response?.data);
 			setErrorMsg('이메일 또는 비밀번호가 올바르지 않습니다.');
 		}
 	};
