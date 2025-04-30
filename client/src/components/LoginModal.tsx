@@ -29,6 +29,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
 			}}
 		>
 			<div
+				onClick={(e) => e.stopPropagation()}
 				style={{
 					backgroundColor: '#fff',
 					padding: '2rem',
@@ -44,7 +45,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
 						onClick={onConfirm}
 						style={{
 							padding: '0.5rem 1rem',
-							backgroundColor: '#98D387',
+							backgroundColor: '#ACEE64',
 							color: '#fff',
 							border: 'none',
 							borderRadius: '5px',
