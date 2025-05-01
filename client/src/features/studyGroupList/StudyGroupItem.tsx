@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { isLoggedIn } from 'utils/auth';
 import { useNavigate } from 'react-router-dom';
 import LoginModal from 'components/LoginModal';
+import GroupInfoModal from './GroupInfoModal';
+import joinGroupApi from 'api/joinGroupApi';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 
@@ -23,13 +25,25 @@ interface StudyGroupItemProps {
 const StudyGroupItem: React.FC<StudyGroupItemProps> = ({ group }) => {
 	const navigate = useNavigate();
 	const [showModal, setShowModal] = useState(false);
+	const [showGroupModal, setShowGroupModal] = useState(false);
 
 	const handleClick = () => {
 		if (!isLoggedIn()) {
 			setShowModal(true);
 		} else {
-			navigate(`/group-detail/${group.id}`);
+			setShowGroupModal(true);
 		}
+	};
+
+	const handleJoin = async () => {
+		navigate(`/group-detail/${group.id}`);
+		// try {
+		// 	const message = await joinGroupApi(group.id);
+		// 	alert(message);
+		// 	setShowGroupModal(false);
+		// } catch (error) {
+		// 	alert('가입 요청 중 오류가 발생했습니다.');
+		// }
 	};
 
 	return (
@@ -74,6 +88,14 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({ group }) => {
 					navigate('/login');
 				}}
 			/>
+
+			{showGroupModal && (
+				<GroupInfoModal
+					group={group}
+					onClose={() => setShowGroupModal(false)}
+					onJoin={handleJoin}
+				/>
+			)}
 		</div>
 	);
 };

@@ -1,0 +1,80 @@
+@import 'assets/style/_colors.scss';
+
+.group-modal-backdrop {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+}
+
+.group-modal-content {
+	background-color: #fff;
+	padding: 2rem;
+	border-radius: 10px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+	min-width: 320px;
+	text-align: center;
+}
+
+.group-name-info {
+	font-size: 1.2rem;
+	font-weight: bold;
+	margin-bottom: 1.5rem;
+	text-align: center;
+}
+
+.group-modal-label {
+	color: #555;
+	font-weight: 500;
+}
+
+.group-modal-value {
+	color: #222;
+	font-weight: 400;
+}
+
+.group-modal-divider {
+	height: 1px;
+	background-color: #ddd;
+	margin: 1rem 0;
+}
+
+.group-modal-notice {
+	font-size: 0.9rem;
+	color: #555;
+	background-color: #f3f3f3;
+	padding: 0.8rem;
+	border-radius: 6px;
+	margin-bottom: 1.5rem;
+}
+
+.group-modal-button {
+	padding: 0.6rem 1.2rem;
+	border-radius: 5px;
+	font-weight: 500;
+	cursor: pointer;
+	text-align: center;
+	width: 100px;
+}
+
+.group-modal-button.join {
+	background-color: $main-color-dark-green;
+	color: #fff;
+	&:hover {
+		background-color: $main-color-deep-green;
+	}
+}
+
+.group-modal-button.cancel {
+	background-color: #ccc;
+	color: #333;
+	&:hover {
+		background-color: #b6b6b6;
+	}
+}
