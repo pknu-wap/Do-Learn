@@ -25,7 +25,11 @@ const NavBar = () => {
 	const isActive = (path: string) => location.pathname === path;
 
 	const openStudyGroupForm = () => {
-		setIsStudyGroupFormOpen(true);
+		if (isLoggedIn()) {
+			setIsStudyGroupFormOpen(true);
+		} else {
+			setShowLoginModal(true);
+		}
 	};
 
 	const closeStudyGroupForm = () => {
