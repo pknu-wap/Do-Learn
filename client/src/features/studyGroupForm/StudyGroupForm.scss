@@ -6,10 +6,13 @@
 	gap: 1rem;
 	width: 100%;
 
+	.title {
+		margin-bottom: 5px;
+	}
+
 	.group-name {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
 
 		.group-name-input {
 			width: 100%;
@@ -21,8 +24,8 @@
 	}
 
 	.meeting-period {
-		width: 4rem;
-		padding: 0.4rem;
+		width: 40px;
+		padding: 5px 0;
 		border: none;
 		border-bottom: 1px solid $main-color-green;
 		outline: none;
@@ -30,8 +33,8 @@
 	}
 
 	.meeting-period-input {
-		width: 5rem;
-		padding: 0.4rem;
+		width: 65px;
+		padding: 5px 0;
 		border: none;
 		border-bottom: 1px solid $main-color-green;
 		outline: none;
@@ -44,7 +47,7 @@
 
 		.meeting-method-button {
 			flex: 1;
-			padding: 0.5rem;
+			padding: 0.4rem;
 			border: 1px solid $main-color-green;
 			border-radius: 8px;
 			background-color: white;
@@ -52,7 +55,8 @@
 			cursor: pointer;
 
 			&.bg-green-300 {
-				background-color: $main-color-green;
+				background-color: $main-color-dark-green;
+				border: 1px solid $main-color-dark-green;
 				color: white;
 			}
 		}
@@ -64,14 +68,15 @@
 		gap: 0.5rem;
 
 		.time-option-button {
-			padding: 0.5rem;
+			padding: 0.4rem;
 			border: 1px solid $main-color-green;
 			border-radius: 8px;
 			background-color: white;
 			cursor: pointer;
 
 			&.bg-green-300 {
-				background-color: $main-color-green;
+				background-color: $main-color-dark-green;
+				border: 1px solid $main-color-dark-green;
 				color: white;
 			}
 		}
@@ -79,7 +84,7 @@
 
 	.program-quota {
 		width: 100%;
-		padding: 0.5rem;
+		padding: 5px 0;
 		border: none;
 		border-bottom: 1px solid $main-color-green;
 		background-color: transparent;
@@ -88,7 +93,7 @@
 
 	.notice {
 		width: 100%;
-		padding: 0.5rem;
+		padding: 5px 4px;
 		border: none;
 		border-bottom: 1px solid $main-color-green;
 		outline: none;
@@ -100,13 +105,13 @@
 		margin-top: 0.5rem;
 		border: none;
 		border-radius: 8px;
-		background-color: $main-color-green;
+		background-color: $main-color-dark-green;
 		color: white;
 		font-weight: bold;
 		cursor: pointer;
 
 		&:hover {
-			background-color: darken($main-color-green, 10%);
+			background-color: darken($main-color-deep-green, 10%);
 		}
 	}
 }

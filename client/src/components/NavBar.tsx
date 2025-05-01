@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Home, Plus, User } from 'lucide-react';
+import { Home, Plus, User, ArrowLeftCircle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
@@ -13,6 +13,14 @@ const NavBar = () => {
 	const location = useLocation();
 	const [isStudyGroupFormOpen, setIsStudyGroupFormOpen] = useState(false);
 	const [showLoginModal, setShowLoginModal] = useState(false);
+
+	const isGroupDetail = location.pathname.startsWith('/group-detail');
+	const isMyPage = location.pathname === '/mypage';
+	const showBackButton = isGroupDetail || isMyPage;
+
+	const handleBack = () => {
+		navigate(-1);
+	};
 
 	const handleMypageClick = () => {
 		if (isLoggedIn()) {
@@ -45,9 +53,17 @@ const NavBar = () => {
 				>
 					<Home />
 				</button>
-				<button onClick={openStudyGroupForm} className="plus-button">
-					<Plus />
-				</button>
+
+				{showBackButton ? (
+					<button onClick={handleBack} className="back-button">
+						<ArrowLeftCircle />
+					</button>
+				) : (
+					<button onClick={openStudyGroupForm} className="plus-button">
+						<Plus />
+					</button>
+				)}
+
 				<button
 					onClick={handleMypageClick}
 					className={isActive('/mypage') ? 'active' : ''}
@@ -56,13 +72,12 @@ const NavBar = () => {
 				</button>
 			</nav>
 
-			{/* 모달 */}
 			<LoginModal
 				visible={showLoginModal}
 				onClose={() => setShowLoginModal(false)}
 				onConfirm={() => {
 					setShowLoginModal(false);
-					navigate('/login'); // 로그인 페이지로 이동
+					navigate('/login');
 				}}
 			/>
 

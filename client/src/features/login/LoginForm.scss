@@ -12,9 +12,10 @@
 
 .login-input {
 	width: 260px;
-	padding: 14px 8px;
+	padding: 14px 12px;
 	margin: 8px auto;
-	border: 1px solid $main-color-dark-green;
+	border: 1.5px solid $main-color-dark-green;
+	border-radius: 7px;
 
 	&:focus {
 		outline: none;
@@ -23,6 +24,7 @@
 
 .login-button {
 	margin-top: 8px;
+	border-radius: 7px;
 	margin-bottom: 8px;
 	padding: 14px 0;
 	width: 260px;

@@ -8,35 +8,20 @@
 
 .list-box {
 	margin: auto;
-	width: 80%;
-	border: 2px solid $main-color-green;
+	width: 78%;
+	border: 1.5px solid $main-color-dark-green;
 	border-radius: 20px;
 	padding: 5%;
-	margin-bottom: 10%;
-	font-size: 14px;
+	margin-bottom: 8%;
 
 	&:hover {
+		background-color: #f6ffed;
 		cursor: pointer;
-		.group-name {
-			text-decoration: underline;
-		}
 	}
 
 	.top-row {
-		margin-bottom: 4%;
-
-		.group-name {
-			font-weight: 500;
-			font-size: 14px;
-
-			&:hover {
-				cursor: pointer;
-				text-decoration: underline;
-			}
-		}
-
+		margin-bottom: 3%;
 		.meeting-type {
-			font-size: 10px;
 			color: #888;
 		}
 	}
@@ -44,9 +29,8 @@
 	.middle-row,
 	.bottom-row {
 		gap: 6%;
-		font-size: 12px;
 		font-weight: 400;
-		margin-bottom: 2%;
+		margin: 0.5% 0;
 		color: #545454;
 
 		white-space: nowrap;

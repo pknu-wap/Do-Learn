@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { isLoggedIn } from 'utils/auth';
 import { useNavigate } from 'react-router-dom';
 import LoginModal from 'components/LoginModal';
+import 'assets/style/_flex.scss';
+import 'assets/style/_typography.scss';
 
 interface StudyGroupItemProps {
 	group: {
@@ -33,9 +35,9 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({ group }) => {
 	return (
 		<div className="list-box" onClick={handleClick}>
 			<div className="top-row flex-between">
-				<div className="group-name">{group.name}</div>
+				<div className="group-name body3">{group.name}</div>
 				{group.meetingType && (
-					<div className="meeting-type">{group.meetingType}</div>
+					<div className="meeting-type button3">{group.meetingType}</div>
 				)}
 				<div>
 					<span className="meeting-type">
@@ -44,19 +46,20 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({ group }) => {
 				</div>
 			</div>
 
-			<div className="middle-row flex-row">
+			<div className="middle-row flex-row button1">
 				<div>
 					<span className="info-label">주기</span> {group.meetingDays}
 				</div>
 				<div>
-					<span className="info-label">시간</span> {group.meetingTime}
+					<span className="info-label"> &nbsp;&nbsp;시간</span>{' '}
+					{group.meetingTime}
 				</div>
 			</div>
 
-			<div className="bottom-row flex-row">
+			<div className="bottom-row flex-row button1">
 				<div>
-					<span className="info-label">인원</span> {group.currentMembers} /{' '}
-					{group.maxMembers}명
+					<span className="info-label button1">인원</span>{' '}
+					{group.currentMembers} / {group.maxMembers}명
 				</div>
 				<div>
 					<span className="info-label">{group.category}</span> {group.type}

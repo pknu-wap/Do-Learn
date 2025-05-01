@@ -15,7 +15,8 @@
 	width: 260px;
 	padding: 14px 8px;
 	margin: 8px auto;
-	border: 1px solid $main-color-dark-green;
+	border: 1.5px solid $main-color-dark-green;
+	border-radius: 7px;
 
 	&:focus {
 		outline: none;

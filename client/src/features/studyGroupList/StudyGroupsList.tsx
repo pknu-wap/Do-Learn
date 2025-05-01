@@ -3,6 +3,7 @@ import { useStudyGroups } from '../../hooks/useStudyGroups';
 import StudyGroupItem from './StudyGroupItem';
 import './StudyGroupsList.scss';
 import 'assets/style/_flex.scss';
+import 'assets/style/_typography.scss';
 
 const StudyGroupsList = () => {
 	const { groups, loadMore, hasMore, loading, message } = useStudyGroups();

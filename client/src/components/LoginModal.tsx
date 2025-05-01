@@ -1,4 +1,7 @@
 import React from 'react';
+import './LoginModal.scss';
+import 'assets/style/_flex.scss';
+import 'assets/style/_typography.scss';
 
 interface LoginModalProps {
 	visible: boolean;
@@ -14,57 +17,17 @@ const LoginModal: React.FC<LoginModalProps> = ({
 	if (!visible) return null;
 
 	return (
-		<div
-			style={{
-				position: 'fixed',
-				top: 0,
-				left: 0,
-				width: '100vw',
-				height: '100vh',
-				backgroundColor: 'rgba(0, 0, 0, 0.5)',
-				display: 'flex',
-				justifyContent: 'center',
-				alignItems: 'center',
-				zIndex: 1000,
-			}}
-		>
+		<div className="login-modal-overlay">
 			<div
+				className="login-modal-box flex-col-center"
 				onClick={(e) => e.stopPropagation()}
-				style={{
-					backgroundColor: '#fff',
-					padding: '2rem',
-					borderRadius: '10px',
-					boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
-					minWidth: '300px',
-					textAlign: 'center',
-				}}
 			>
-				<p style={{ marginBottom: '1.5rem' }}>로그인이 필요한 기능입니다.</p>
-				<div style={{ display: 'flex', justifyContent: 'space-around' }}>
-					<button
-						onClick={onConfirm}
-						style={{
-							padding: '0.5rem 1rem',
-							backgroundColor: '#ACEE64',
-							color: '#fff',
-							border: 'none',
-							borderRadius: '5px',
-							cursor: 'pointer',
-						}}
-					>
+				<p className="login-modal-message body3">로그인이 필요한 기능입니다.</p>
+				<div className="login-modal-buttons">
+					<button className="confirm-button body3" onClick={onConfirm}>
 						로그인 하러 가기
 					</button>
-					<button
-						onClick={onClose}
-						style={{
-							padding: '0.5rem 1rem',
-							backgroundColor: '#ccc',
-							color: '#333',
-							border: 'none',
-							borderRadius: '5px',
-							cursor: 'pointer',
-						}}
-					>
+					<button className="cancel-button body3" onClick={onClose}>
 						닫기
 					</button>
 				</div>
