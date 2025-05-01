@@ -5,23 +5,30 @@ export interface StudyGroup {
 	name: string;
 	meetingDays: string;
 	meetingTime: string;
-	department: string | null;
-	meetingType: string | null;
+	meetingType: string;
 	currentMembers: number;
 	maxMembers: number;
+	region: string;
+	category: string;
+	type: string;
 }
 
 export interface StudyGroupsResponse {
-	groups: StudyGroup[];
+	groups: StudyGroup[] | null;
 	nextCursor: number | null;
+	message?: string | null;
 }
 
 export const fetchStudyGroups = async (
 	cursor: number = 0,
 	size: number = 10,
+	categories?: string,
+	regions?: string,
 ): Promise<StudyGroupsResponse> => {
-	const response = await api.get('/api/main/grouplist', {
-		params: { cursor, size },
-	});
+	const params: any = { cursor, size };
+	if (categories) params.categories = categories;
+	if (regions) params.regions = regions;
+
+	const response = await api.get('/api/main/grouplist', { params });
 	return response.data;
 };

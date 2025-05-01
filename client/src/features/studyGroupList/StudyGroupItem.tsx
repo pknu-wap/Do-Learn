@@ -9,11 +9,12 @@ interface StudyGroupItemProps {
 		name: string;
 		meetingDays: string;
 		meetingTime: string;
-		department: string | null;
-		meetingType: string | null;
+		meetingType: string;
 		currentMembers: number;
 		maxMembers: number;
-		isJoined: boolean;
+		region: string;
+		category: string;
+		type: string;
 	};
 }
 
@@ -36,7 +37,13 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({ group }) => {
 				{group.meetingType && (
 					<div className="meeting-type">{group.meetingType}</div>
 				)}
+				<div>
+					<span className="meeting-type">
+						{group.region?.trim() ? group.region : '비대면'}
+					</span>
+				</div>
 			</div>
+
 			<div className="middle-row flex-row">
 				<div>
 					<span className="info-label">주기</span> {group.meetingDays}
@@ -45,17 +52,18 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({ group }) => {
 					<span className="info-label">시간</span> {group.meetingTime}
 				</div>
 			</div>
+
 			<div className="bottom-row flex-row">
 				<div>
 					<span className="info-label">인원</span> {group.currentMembers} /{' '}
 					{group.maxMembers}명
 				</div>
-				{group.department && (
-					<div>
-						<span className="info-label">학과</span> {group.department}
-					</div>
-				)}
+				<div>
+					<span className="info-label">{group.category}</span> {group.type}
+				</div>
 			</div>
+
+			<div className="bottom-row flex-row"></div>
 
 			<LoginModal
 				visible={showModal}
