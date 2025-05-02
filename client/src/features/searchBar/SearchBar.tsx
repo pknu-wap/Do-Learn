@@ -1,26 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Search } from 'lucide-react';
 import { searchGroups, SearchGroupResponse } from 'api/searchFilterApi';
 import './SearchBar.scss';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 
-const SearchBar = () => {
+interface SearchBarProps {
+	onSearchResult: (results: SearchGroupResponse | null) => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ onSearchResult }) => {
 	const [keyword, setKeyword] = useState('');
-	const [results, setResults] = useState<SearchGroupResponse | null>(null);
 
 	const handleSearch = async () => {
 		if (!keyword.trim()) {
-			alert('검색어를 입력해주세요.');
+			onSearchResult(null);
 			return;
 		}
 
 		try {
 			const response = await searchGroups({ keyword });
-			setResults(response);
-			console.log(response);
+			onSearchResult(response); // 부모(MainPage)로 결과 전달
 		} catch (error) {
-			console.error(error);
+			console.error('검색 중 오류 발생:', error);
+			onSearchResult(null);
 		}
 	};
 
@@ -39,20 +42,6 @@ const SearchBar = () => {
 					/>
 				</div>
 			</div>
-
-			{/* {results && results.groups && (
-				<div className="search-results">
-					{results.groups.map((group) => (
-						<div key={group.id} className="search-result-item">
-							{group.name}
-						</div>
-					))}
-				</div>
-			)} */}
-
-			{results && results.message && (
-				<div className="search-message">{results.message}</div>
-			)}
 		</div>
 	);
 };
