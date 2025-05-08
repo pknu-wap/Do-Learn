@@ -9,6 +9,8 @@ import {
 	StudyType,
 } from 'api/createGroupFormApi';
 
+const MAX_NOTICE_LENGTH = 1000;
+
 const StudyGroupForm = () => {
 	const [groupName, setGroupName] = useState('');
 	const [meetingType, setMeetingType] = useState<StudyType | ''>('');
@@ -18,8 +20,8 @@ const StudyGroupForm = () => {
 	const [memberCount, setMemberCount] = useState('');
 	const [studyTypeDetail, setStudyTypeDetail] = useState('');
 	const [notice, setNotice] = useState('');
-	const [region, setRegion] = useState<Region>(Region.해당없음);
-	const [category, setCategory] = useState<Category>(Category.기타);
+	const [region, setRegion] = useState<Region | ''>('');
+	const [category, setCategory] = useState<Category | ''>('');
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -39,6 +41,11 @@ const StudyGroupForm = () => {
 			return;
 		}
 
+		if (meetingType === StudyType.오프라인 && !region) {
+			alert('지역을 선택해주세요.');
+			return;
+		}
+
 		const day = Number(meetingDay);
 		if (!day || day < 1 || day > 31) {
 			alert('올바른 날짜(1~31)를 입력해주세요.');
@@ -48,6 +55,11 @@ const StudyGroupForm = () => {
 		const members = Number(memberCount);
 		if (!members || members < 2 || members > 10) {
 			alert('모집 인원은 2명 이상 10명 이하로 입력해주세요.');
+			return;
+		}
+
+		if (!category) {
+			alert('분야를 선택해주세요.');
 			return;
 		}
 
@@ -63,7 +75,7 @@ const StudyGroupForm = () => {
 			meetingDays: `${meetingCycle} ${meetingDay}일`,
 			meetingTime,
 			meetingType,
-			region,
+			region: region as Region,
 			category,
 			type: studyTypeDetail.trim(),
 		};
@@ -103,7 +115,7 @@ const StudyGroupForm = () => {
 					</select>
 					<input
 						type="number"
-						placeholder="숫자 입력"
+						placeholder="만남 횟수"
 						value={meetingDay}
 						onChange={(e) => setMeetingDay(e.target.value)}
 						className="meeting-period-input button2"
@@ -131,16 +143,16 @@ const StudyGroupForm = () => {
 
 			<div className="meeting-method">
 				<button
-					onClick={() => setMeetingType(StudyType.오프라인)}
-					className={`meeting-method-button button2 ${meetingType === StudyType.오프라인 ? 'bg-green-300' : ''}`}
-				>
-					대면
-				</button>
-				<button
 					onClick={() => setMeetingType(StudyType.온라인)}
 					className={`meeting-method-button button2 ${meetingType === StudyType.온라인 ? 'bg-green-300' : ''}`}
 				>
-					비대면
+					온라인
+				</button>
+				<button
+					onClick={() => setMeetingType(StudyType.오프라인)}
+					className={`meeting-method-button button2 ${meetingType === StudyType.오프라인 ? 'bg-green-300' : ''}`}
+				>
+					오프라인
 				</button>
 			</div>
 
@@ -163,11 +175,16 @@ const StudyGroupForm = () => {
 						onChange={(e) => setRegion(e.target.value as Region)}
 						className="region-select button2"
 					>
-						{Object.values(Region).map((r) => (
-							<option key={r} value={r}>
-								{r}
-							</option>
-						))}
+						<option value="" disabled hidden>
+							지역을 선택해주세요
+						</option>
+						{Object.values(Region)
+							.filter((r) => r !== Region.해당없음)
+							.map((r) => (
+								<option key={r} value={r}>
+									{r}
+								</option>
+							))}
 					</select>
 				</div>
 			)}
@@ -178,12 +195,16 @@ const StudyGroupForm = () => {
 					onChange={(e) => setCategory(e.target.value as Category)}
 					className="category-select button2"
 				>
+					<option value="" disabled hidden>
+						분야
+					</option>
 					{Object.values(Category).map((c) => (
 						<option key={c} value={c}>
 							{c}
 						</option>
 					))}
 				</select>
+
 				<div>
 					<input
 						type="text"
@@ -202,7 +223,11 @@ const StudyGroupForm = () => {
 					onChange={(e) => setNotice(e.target.value)}
 					className="notice button2"
 					rows={5}
+					maxLength={MAX_NOTICE_LENGTH}
 				/>
+				<div className="notice-length flex-right button3">
+					{notice.length} / {MAX_NOTICE_LENGTH}
+				</div>
 			</div>
 
 			<button className="create-button" onClick={handleSubmit}>
