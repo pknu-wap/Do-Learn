@@ -123,7 +123,7 @@ const SignupForm = () => {
 	};
 
 	return (
-		<div className="flex-col-center">
+		<div className="flex-col-center" style={{ height: '90vh' }}>
 			<div className="form-container body3">
 				<div className="heading2 form-title">회원가입</div>
 
