@@ -10,6 +10,7 @@ const SignupForm = () => {
 	const [password, setPassword] = useState('');
 	const [passwordConfirm, setPasswordConfirm] = useState('');
 	const [nickname, setNickname] = useState('');
+	const [nicknameDuplicateError, setNicknameDuplicateError] = useState('');
 	const navigate = useNavigate();
 	const [submitError, setSubmitError] = useState('');
 
@@ -64,6 +65,7 @@ const SignupForm = () => {
 				break;
 			case 'nickname':
 				setNickname(value);
+				setNicknameDuplicateError('');
 				break;
 		}
 
@@ -98,26 +100,35 @@ const SignupForm = () => {
 
 		try {
 			const response = await signup(email, password, nickname);
-			console.log('회원가입 성공:', response.data);
 			console.log('회원가입이 완료되었습니다!');
 			navigate('/login');
 		} catch (error: any) {
-			console.log('서버 응답 전체:', error.response?.data);
+			// console.log('서버 응답 전체:', error.response?.data);
 
-			const serverErrors = error.response?.data?.errors;
-			const message = error.response?.data?.message;
+			const data = error.response?.data;
+			const serverErrors = data?.errors;
+			const message = data?.message;
 
 			if (serverErrors) {
 				setErrors((prev) => ({
 					...prev,
-					...serverErrors, // 서버에서 내려준 필드별 오류를 반영
+					...serverErrors,
 				}));
 				setSubmitError('');
-			} else if (message === 'Email is already registered') {
+			} else if (
+				typeof data === 'string' &&
+				data.includes('Email is already registered')
+			) {
+				setErrors((prev) => ({ ...prev }));
 				setSubmitError('이미 등록된 이메일입니다.');
+			} else if (
+				typeof data === 'string' &&
+				data.includes('Nickname is already registered')
+			) {
+				setNicknameDuplicateError('이미 사용 중인 닉네임입니다.');
+				setSubmitError('');
 			} else {
-				console.log('알 수 없는 오류:', error);
-				setSubmitError('이미 등록된 이메일입니다.');
+				setSubmitError('알 수 없는 오류입니다.');
 			}
 		}
 	};
@@ -194,10 +205,10 @@ const SignupForm = () => {
 					className="signup-error"
 					style={{
 						visibility:
-							touched.nickname && errors.nickname ? 'visible' : 'hidden',
+							errors.nickname || nicknameDuplicateError ? 'visible' : 'hidden',
 					}}
 				>
-					{errors.nickname || ' '}
+					{nicknameDuplicateError || errors.nickname || ' '}
 				</div>
 
 				<button className="signup-btn body3" onClick={handleSignup}>
