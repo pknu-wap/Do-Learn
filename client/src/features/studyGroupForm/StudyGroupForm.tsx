@@ -76,16 +76,33 @@ const StudyGroupForm = () => {
 			meetingTime,
 			meetingType,
 			region: region as Region,
-			category,
+			category: category as Category,
 			type: studyTypeDetail.trim(),
+			startDate: new Date().toISOString().slice(0, 10), // 기본 시작 날짜 설정
 		};
 
 		try {
 			const response = await createStudyGroup(groupData);
 			alert(response.message);
-		} catch (error) {
-			console.error('스터디 그룹 생성 실패:', error);
+		} catch (error: any) {
+			const serverMessage = error?.response?.data;
+
+			if (
+				error.response?.status === 401 &&
+				serverMessage === 'access token expired'
+			) {
+				alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+				window.location.href = '/login';
+				return;
+			}
+
+			if (typeof serverMessage === 'string' && serverMessage.includes('존재')) {
+				alert('이미 존재하는 그룹명입니다.');
+				return;
+			}
+
 			alert('스터디 그룹 생성에 실패했습니다.');
+			console.error('스터디 그룹 생성 실패:', error);
 		}
 	};
 
