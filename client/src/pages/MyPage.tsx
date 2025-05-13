@@ -1,5 +1,5 @@
 import NavBar from 'components/NavBar';
-import LogoutButton from 'features/logoutButton/LogoutButton';
+import LogoutButton from 'features/myPage/LogoutButton';
 
 const MyPage = () => {
 	return (
