@@ -1,9 +1,13 @@
 import NavBar from 'components/NavBar';
 import LogoutButton from 'features/myPage/LogoutButton';
+import Profile from 'features/myPage/Profile';
+import JoinGroupList from 'features/myPage/JoinGroupList';
 
 const MyPage = () => {
 	return (
 		<div>
+			<Profile />
+			<JoinGroupList />
 			<LogoutButton />
 			<NavBar />
 		</div>
