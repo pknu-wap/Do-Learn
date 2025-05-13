@@ -135,11 +135,17 @@ const StudyGroupForm = () => {
 						placeholder="만남 횟수"
 						value={meetingDay}
 						onChange={(e) => setMeetingDay(e.target.value)}
+						onBlur={() => {
+							const day = Number(meetingDay);
+							if (day < 1) setMeetingDay('1');
+							else if (day > 31) setMeetingDay('31');
+						}}
 						className="meeting-period-input button2"
 						onWheel={(e) => e.currentTarget.blur()}
 						min={1}
 						step={1}
 					/>
+
 					<span className="button2">일</span>
 				</div>
 				<div>
@@ -148,12 +154,18 @@ const StudyGroupForm = () => {
 						placeholder="모집 인원"
 						value={memberCount}
 						onChange={(e) => setMemberCount(e.target.value)}
+						onBlur={() => {
+							const members = Number(memberCount);
+							if (members < 2) setMemberCount('2');
+							else if (members > 10) setMemberCount('10');
+						}}
 						className="member-count-input button2"
 						onWheel={(e) => e.currentTarget.blur()}
 						min={2}
 						max={10}
 						step={1}
 					/>
+
 					<span className="button2">명</span>
 				</div>
 			</div>
