@@ -93,7 +93,7 @@
 	.notice {
 		width: 100%;
 		height: 100px;
-		padding: 10px 4px;
+		padding: 10px 3px;
 		border: none;
 		border-bottom: 1px solid $main-color-green;
 		outline: none;
@@ -150,7 +150,14 @@
 	}
 
 	.notice-length {
-		margin-top: 4px;
 		color: #909090;
+	}
+	.start-date-section {
+		input[type='date'] {
+			border: none;
+			border-bottom: 1px solid $main-color-green;
+			padding: 3px;
+			width: 47%;
+		}
 	}
 }

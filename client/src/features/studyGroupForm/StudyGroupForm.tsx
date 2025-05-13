@@ -22,6 +22,7 @@ const StudyGroupForm = () => {
 	const [notice, setNotice] = useState('');
 	const [region, setRegion] = useState<Region | ''>('');
 	const [category, setCategory] = useState<Category | ''>('');
+	const [startDate, setStartDate] = useState('');
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -30,41 +31,38 @@ const StudyGroupForm = () => {
 			alert('스터디명을 2자 이상 입력해주세요.');
 			return;
 		}
-
 		if (!meetingType) {
 			alert('스터디 형태를 선택해주세요.');
 			return;
 		}
-
 		if (!meetingTime) {
 			alert('모임 시간을 선택해주세요.');
 			return;
 		}
-
 		if (meetingType === StudyType.오프라인 && !region) {
 			alert('지역을 선택해주세요.');
 			return;
 		}
-
 		const day = Number(meetingDay);
 		if (!day || day < 1 || day > 31) {
 			alert('올바른 날짜(1~31)를 입력해주세요.');
 			return;
 		}
-
 		const members = Number(memberCount);
 		if (!members || members < 2 || members > 10) {
 			alert('모집 인원은 2명 이상 10명 이하로 입력해주세요.');
 			return;
 		}
-
 		if (!category) {
 			alert('분야를 선택해주세요.');
 			return;
 		}
-
 		if (!studyTypeDetail.trim()) {
 			alert('세부 분야를 입력해주세요.');
+			return;
+		}
+		if (!startDate) {
+			alert('스터디 시작일을 선택해주세요.');
 			return;
 		}
 
@@ -78,7 +76,7 @@ const StudyGroupForm = () => {
 			region: region as Region,
 			category: category as Category,
 			type: studyTypeDetail.trim(),
-			startDate: new Date().toISOString().slice(0, 10), // 기본 시작 날짜 설정
+			startDate,
 		};
 
 		try {
@@ -110,6 +108,7 @@ const StudyGroupForm = () => {
 		<div className="study-group-form">
 			<div className="title heading2 flex-center">스터디 그룹 생성</div>
 
+			{/* 그룹 명 */}
 			<div className="group-name">
 				<input
 					type="text"
@@ -120,6 +119,7 @@ const StudyGroupForm = () => {
 				/>
 			</div>
 
+			{/* 만남 횟수 */}
 			<div className="flex-row-between">
 				<div>
 					<select
@@ -145,9 +145,10 @@ const StudyGroupForm = () => {
 						min={1}
 						step={1}
 					/>
-
 					<span className="button2">일</span>
 				</div>
+
+				{/* 모집 인원 */}
 				<div>
 					<input
 						type="number"
@@ -165,11 +166,11 @@ const StudyGroupForm = () => {
 						max={10}
 						step={1}
 					/>
-
 					<span className="button2">명</span>
 				</div>
 			</div>
 
+			{/* 만남 방식 */}
 			<div className="meeting-method">
 				<button
 					onClick={() => setMeetingType(StudyType.온라인)}
@@ -185,18 +186,7 @@ const StudyGroupForm = () => {
 				</button>
 			</div>
 
-			<div className="time-option">
-				{['오전', '오후', '저녁', '새벽'].map((time) => (
-					<button
-						key={time}
-						onClick={() => setMeetingTime(time)}
-						className={`time-option-button button2 ${meetingTime === time ? 'bg-green-300' : ''}`}
-					>
-						{time}
-					</button>
-				))}
-			</div>
-
+			{/* 오프라인 일 시 지역 선택 */}
 			{meetingType === StudyType.오프라인 && (
 				<div>
 					<select
@@ -218,6 +208,20 @@ const StudyGroupForm = () => {
 				</div>
 			)}
 
+			{/* 시간대 */}
+			<div className="time-option">
+				{['오전', '오후', '저녁', '새벽'].map((time) => (
+					<button
+						key={time}
+						onClick={() => setMeetingTime(time)}
+						className={`time-option-button button2 ${meetingTime === time ? 'bg-green-300' : ''}`}
+					>
+						{time}
+					</button>
+				))}
+			</div>
+
+			{/* 분야 */}
 			<div className="flex-row-between">
 				<select
 					value={category}
@@ -245,6 +249,19 @@ const StudyGroupForm = () => {
 				</div>
 			</div>
 
+			{/* 스터디 시작일 */}
+			<div className="start-date-section flex-between">
+				<label className="button2">스터디는</label>
+				<input
+					type="date"
+					value={startDate}
+					onChange={(e) => setStartDate(e.target.value)}
+					className="start-date-input button2"
+				/>
+				<label className="button2">부터 시작해요</label>
+			</div>
+
+			{/* 공지사항 */}
 			<div>
 				<textarea
 					placeholder="공지사항 입력"
