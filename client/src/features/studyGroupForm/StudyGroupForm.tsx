@@ -66,6 +66,12 @@ const StudyGroupForm = () => {
 			return;
 		}
 
+		const today = new Date().toISOString().slice(0, 10);
+		if (startDate < today) {
+			alert('스터디 시작일은 오늘 이후 날짜여야 합니다.');
+			return;
+		}
+
 		const groupData = {
 			name: groupName.trim(),
 			maxMembers: members,
