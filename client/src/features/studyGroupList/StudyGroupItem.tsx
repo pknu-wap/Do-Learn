@@ -37,14 +37,17 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({ group }) => {
 	};
 
 	const handleJoin = async () => {
-		navigate(`/group-detail/${group.id}`);
-		// try {
-		// 	const message = await joinGroupApi(group.id);
-		// 	alert(message);
-		// 	setShowGroupModal(false);
-		// } catch (error) {
-		// 	alert('가입 요청 중 오류가 발생했습니다.');
-		// }
+		try {
+			const message = await joinGroupApi(group.id);
+			alert(message);
+			setShowGroupModal(false);
+			navigate(`/group-detail/${group.id}`);
+		} catch (error: any) {
+			const msg =
+				error?.response?.data?.message ||
+				'가입 요청 중 예상치 못한 오류가 발생했습니다.';
+			alert(msg);
+		}
 	};
 
 	return (
