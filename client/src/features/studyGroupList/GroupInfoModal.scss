@@ -7,14 +7,14 @@
 	left: 0;
 	width: 100vw;
 	height: 100vh;
-	background-color: rgba(0, 0, 0, 0.5);
-	z-index: 1000;
+	background-color: rgba(0, 0, 0, 0.2);
+	z-index: 1001;
 }
 
 .group-modal-content {
 	background-color: #fff;
 	padding: 2rem;
-	border-radius: 10px;
+	border-radius: 12px;
 	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 	min-width: 320px;
 	max-width: 320px;
@@ -90,12 +90,13 @@
 }
 
 .group-modal-button {
-	padding: 0.6rem 1.2rem;
-	border-radius: 5px;
+	padding: 0.8rem 1.2rem;
+	border-radius: 8px;
 	font-weight: 500;
 	cursor: pointer;
 	text-align: center;
-	width: 100px;
+	font-weight: bold;
+	width: 100%;
 }
 
 .group-modal-button.join {
@@ -103,13 +104,5 @@
 	color: #fff;
 	&:hover {
 		background-color: $main-color-deep-green;
-	}
-}
-
-.group-modal-button.cancel {
-	background-color: #ccc;
-	color: #333;
-	&:hover {
-		background-color: #b6b6b6;
 	}
 }

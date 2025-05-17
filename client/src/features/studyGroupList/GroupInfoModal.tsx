@@ -41,11 +41,35 @@ const GroupInfoModal: React.FC<Props> = ({ group, onClose, onJoin }) => {
 	}, [group.id]);
 
 	return (
-		<div className="group-modal-backdrop flex-center" onClick={onClose}>
+		<div
+			className="group-modal-backdrop flex-center"
+			onClick={(e) => e.stopPropagation()}
+		>
 			<div
-				className="group-modal-content flex-col"
-				onClick={(e) => e.stopPropagation()}
+				style={{
+					background: 'white',
+					borderRadius: '16px',
+					padding: '32px',
+					width: '300px',
+					position: 'relative',
+					boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
+				}}
 			>
+				<button
+					onClick={onClose}
+					style={{
+						position: 'absolute',
+						top: '16px',
+						right: '16px',
+						fontSize: '24px',
+						background: 'none',
+						border: 'none',
+						cursor: 'pointer',
+					}}
+				>
+					✕
+				</button>
+
 				<div className="group-name-info body1">{group.name}</div>
 
 				<div className="group-meta-row-1 flex-row-center body3">
@@ -77,14 +101,14 @@ const GroupInfoModal: React.FC<Props> = ({ group, onClose, onJoin }) => {
 				</div>
 
 				<div className="group-modal-divider" />
-				<div className="group-modal-notice body3">{notice}</div>
+				<div className="group-modal-notice body3">
+					{/* <div style={{ marginBottom: '4px', color: 'black' }}>공지사항</div> */}
+					{notice}
+				</div>
 
-				<div className="group-modal-actions flex-row-between">
+				<div className="group-modal-actions">
 					<div className="group-modal-button join button1" onClick={onJoin}>
 						가입하기
-					</div>
-					<div className="group-modal-button cancel button1" onClick={onClose}>
-						취소
 					</div>
 				</div>
 			</div>
