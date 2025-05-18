@@ -51,14 +51,17 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({ group }) => {
 	};
 
 	return (
-		<div className="list-box" onClick={handleClick}>
+		<div
+			className={`list-box ${group.region === '해당없음' ? 'border-virtual' : ''}`}
+			onClick={handleClick}
+		>
 			<div className="top-row flex-between">
 				<div className="group-name body3">{group.name}</div>
-				<span className="meeting-type button3">
+				<div className="meeting-type button3">
 					{group.region?.trim() && group.region !== '해당없음'
 						? group.region
 						: '비대면'}
-				</span>
+				</div>
 			</div>
 			<div className="flex-left list">
 				<div className="first-col flex-col">

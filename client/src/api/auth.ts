@@ -34,7 +34,9 @@ const logout = () => {
 };
 
 const reissue = () => {
-	const refreshToken = localStorage.getItem('refreshToken');
+	const refreshToken =
+		localStorage.getItem('refreshToken') ||
+		sessionStorage.getItem('refreshToken');
 	return api.post('/auth/reissue', null, {
 		headers: {
 			Refresh: refreshToken || '',

@@ -35,7 +35,6 @@ const GroupInfoModal: React.FC<Props> = ({ group, onClose, onJoin }) => {
 				})
 				.catch((err) => {
 					setNotice('공지사항 불러오기 실패');
-					console.error(err);
 				});
 		}
 	}, [group.id]);

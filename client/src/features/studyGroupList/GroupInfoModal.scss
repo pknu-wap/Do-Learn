@@ -24,13 +24,19 @@
 .group-meta-row-1,
 .group-meta-row-2 {
 	gap: 1px;
-	margin-bottom: 0.5rem;
+	margin-bottom: 0.8rem;
 }
 
 .meta-item {
 	padding: 2px 6px;
 	white-space: nowrap;
 	gap: 5px;
+}
+
+.modal-info-label {
+	color: rgb(98, 98, 98);
+	font-weight: 500;
+	white-space: nowrap;
 }
 
 .category-type-item {
@@ -44,15 +50,15 @@
 	align-items: baseline;
 }
 
+.meta-item,
+.modal-info-label,
+.category-type-item {
+	font-size: 12px;
+}
+
 .group-name-info {
 	margin-bottom: 1.5rem;
 	text-align: center;
-}
-
-.modal-info-label {
-	color: rgb(98, 98, 98);
-	font-weight: 500;
-	white-space: nowrap;
 }
 
 .group-modal-label {
