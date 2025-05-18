@@ -72,18 +72,21 @@ const StudyGroupForm = () => {
 			return;
 		}
 
-		const groupData = {
+		const groupData: any = {
 			name: groupName.trim(),
 			maxMembers: members,
 			notice,
 			meetingDays: `${meetingCycle} ${meetingDay}일`,
 			meetingTime,
 			meetingType,
-			region: region as Region,
 			category: category as Category,
 			type: studyTypeDetail.trim(),
 			startDate,
 		};
+
+		if (meetingType === StudyType.오프라인) {
+			groupData.region = region ? (region as Region) : null;
+		}
 
 		try {
 			const response = await createStudyGroup(groupData);
