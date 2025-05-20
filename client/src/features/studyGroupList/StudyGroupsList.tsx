@@ -8,9 +8,21 @@ import 'assets/style/_typography.scss';
 
 interface StudyGroupsListProps {
 	searchResults: SearchGroupResponse | null;
+	myGroupIds: number[];
+	loadingMyGroups: boolean;
 }
 
-const StudyGroupsList: React.FC<StudyGroupsListProps> = ({ searchResults }) => {
+type GroupType = {
+	id: number;
+	currentMembers: number;
+	maxMembers: number;
+};
+
+const StudyGroupsList: React.FC<StudyGroupsListProps> = ({
+	searchResults,
+	myGroupIds,
+	loadingMyGroups,
+}) => {
 	const { groups, loadMore, hasMore, loading, message } = useStudyGroups();
 	const [visibleCount, setVisibleCount] = useState(10);
 	const observer = useRef<IntersectionObserver | null>(null);
@@ -41,7 +53,6 @@ const StudyGroupsList: React.FC<StudyGroupsListProps> = ({ searchResults }) => {
 		[loading, visibleCount, groups, hasMore, loadMore, searchResults],
 	);
 
-	// 보여줄 그룹 리스트 결정
 	const displayGroups = searchResults?.groups ?? groups;
 	const displayMessage = searchResults?.message ?? message;
 
@@ -55,7 +66,22 @@ const StudyGroupsList: React.FC<StudyGroupsListProps> = ({ searchResults }) => {
 
 	if (!displayGroups) return null;
 
-	const visibleGroups = displayGroups.slice(0, visibleCount);
+	if (loadingMyGroups) {
+		return (
+			<div className="flex-center" style={{ padding: '20px' }}>
+				내 그룹 정보 불러오는 중...
+			</div>
+		);
+	}
+
+	const isJoinable = (group: GroupType) => {
+		const notJoined = !myGroupIds.includes(group.id);
+		const hasSpace = group.currentMembers < group.maxMembers;
+		return notJoined && hasSpace;
+	};
+
+	const filteredGroups = displayGroups.filter(isJoinable);
+	const visibleGroups = filteredGroups.slice(0, visibleCount);
 
 	return (
 		<div className="list-container">

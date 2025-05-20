@@ -6,16 +6,22 @@ import StudyGroupsList from 'features/studyGroupList/StudyGroupsList';
 import Header from 'features/header/Header';
 import SearchBar from 'features/searchBar/SearchBar';
 import { SearchGroupResponse } from 'api/searchFilterApi';
+import { useMyGroupIds } from 'hooks/useMyGroupIds';
 
 const MainPage = () => {
 	const [searchResults, setSearchResults] =
 		useState<SearchGroupResponse | null>(null);
+	const { myGroupIds, loading: loadingMyGroups } = useMyGroupIds();
 
 	return (
 		<div>
 			<Header />
 			<SearchBar onSearchResult={setSearchResults} />
-			<StudyGroupsList searchResults={searchResults} />
+			<StudyGroupsList
+				searchResults={searchResults}
+				myGroupIds={myGroupIds}
+				loadingMyGroups={loadingMyGroups}
+			/>
 		</div>
 	);
 };
