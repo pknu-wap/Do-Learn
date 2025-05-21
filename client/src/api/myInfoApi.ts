@@ -7,28 +7,29 @@ export interface MyPageInfo {
 	profileImage: string;
 }
 
+type UpdateMyPageInfoPayload = Partial<
+	Pick<MyPageInfo, 'nickname' | 'profileImage'>
+>;
+
+const getAccessToken = () =>
+	localStorage.getItem('accessToken') ||
+	sessionStorage.getItem('accessToken') ||
+	'';
+
 // 내 정보 조회
 export const getMyPageInfo = () => {
-	const token = localStorage.getItem('accessToken') || '';
-	return api.get<MyPageInfo>('/mypage/info', {
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
+	const token = getAccessToken();
+	return api.get<MyPageInfo>('/api/mypage/info', {
+		headers: { Authorization: `Bearer ${token}` },
 	});
 };
 
-// 닉네임 수정
-export const updateMyNickname = (nickname: string) => {
-	const token = localStorage.getItem('accessToken') || '';
-	return api.patch<{ nickname: string }>(
-		'/mypage/nickname',
-		{ nickname },
-		{
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		},
-	);
+// 내 정보 업데이트 (명세서 반영)
+export const updateMyPageInfo = (payload: UpdateMyPageInfoPayload) => {
+	const token = getAccessToken();
+	return api.patch<{ message: string }>('/api/mypage/updateInfo', payload, {
+		headers: { Authorization: `Bearer ${token}` },
+	});
 };
 
 export interface JoinedGroup {
@@ -46,10 +47,8 @@ export interface JoinedGroup {
 
 // 내가 가입한 그룹 목록 조회
 export const getJoinedGroups = () => {
-	const token = localStorage.getItem('accessToken') || '';
-	return api.get<JoinedGroup[]>('/mypage/groups', {
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
+	const token = getAccessToken();
+	return api.get<{ studygroups: JoinedGroup[] }>('/api/mypage/studygroups', {
+		headers: { Authorization: `Bearer ${token}` },
 	});
 };
