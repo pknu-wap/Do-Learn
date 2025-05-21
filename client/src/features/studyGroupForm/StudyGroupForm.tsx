@@ -60,8 +60,8 @@ const StudyGroupForm = () => {
 			return;
 		}
 		const members = Number(memberCount);
-		if (!members || members < 2 || members > 10) {
-			alert('모집 인원은 2명 이상 10명 이하로 입력해주세요.');
+		if (!members || members < 3 || members > 12) {
+			alert('모집 인원은 3명 이상 12명 이하로 입력해주세요.');
 			return;
 		}
 		if (!category) {
@@ -172,8 +172,6 @@ const StudyGroupForm = () => {
 				</div>
 
 				{/* 모집 인원 */}
-
-				{/* 모집 인원 */}
 				<div>
 					<input
 						type="number"
@@ -182,13 +180,13 @@ const StudyGroupForm = () => {
 						onChange={(e) => setMemberCount(e.target.value)}
 						onBlur={() => {
 							const members = Number(memberCount);
-							if (members < 2) setMemberCount('2');
-							else if (members > 10) setMemberCount('10');
+							if (members < 3) setMemberCount('3');
+							else if (members > 12) setMemberCount('12');
 						}}
 						className="member-count-input button2"
 						onWheel={(e) => e.currentTarget.blur()}
-						min={2}
-						max={10}
+						min={3}
+						max={12}
 						step={1}
 					/>
 					<span className="button2">명</span>
