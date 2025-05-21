@@ -32,26 +32,22 @@ export const searchGroups = async (
 	params: SearchGroupParams,
 ): Promise<SearchGroupResponse> => {
 	try {
-		const { keyword, categories, regions, cursor = 0, size = 10 } = params;
+		const { keyword, categories, regions, cursor, size = 10 } = params;
 
-		const queryParams = new URLSearchParams({
-			keyword,
-			size: String(size),
-		});
-
+		const queryParams = new URLSearchParams({ keyword, size: String(size) });
 		if (categories) queryParams.append('categories', categories);
 		if (regions) queryParams.append('regions', regions);
-		if (cursor !== null) queryParams.append('cursor', String(cursor));
+		if (cursor != null) queryParams.append('cursor', String(cursor));
 
-		const response = await api.get(
+		const response = await api.get<SearchGroupResponse>(
 			`/grouplist/search?${queryParams.toString()}`,
 		);
 
 		return response.data;
 	} catch (error) {
-		const err = error as AxiosError;
-		console.error(err.response?.data || err.message);
-
+		console.error(
+			(error as AxiosError).response?.data || (error as Error).message,
+		);
 		return {
 			groups: null,
 			nextCursor: null,
