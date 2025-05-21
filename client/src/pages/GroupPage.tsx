@@ -30,7 +30,7 @@ const GroupPage = () => {
 
 	return (
 		<div>
-			<Header title={groupName} showLogo={false} />
+			<Header title={groupName} showLogo={false} variant="groupDetail" />
 			<GroupMenu />
 			<GroupMemberList />
 			<GroupChecklist />
