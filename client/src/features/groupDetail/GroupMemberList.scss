@@ -12,21 +12,27 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
 		gap: 16px;
+		justify-items: center;
 	}
 
 	.member-card {
 		margin: 0;
 		padding: 0;
+		width: 60px;
 	}
 
 	.avatar {
-		width: 50px;
-		height: 50px;
+		width: 60px;
+		height: 60px;
 		border-radius: 8px;
 		background-color: #ccc;
+		border: 1px solid #ccc;
+		flex-shrink: 0;
 	}
 
 	.nickname {
 		margin-top: 4px;
+		width: 100%;
+		text-align: center;
 	}
 }

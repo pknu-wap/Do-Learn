@@ -32,7 +32,7 @@ const GroupPage = () => {
 		<div>
 			<Header title={groupName} showLogo={false} variant="groupDetail" />
 			<GroupMenu />
-			<GroupMemberList />
+			<GroupMemberList studyGroupId={Number(studyGroupId)} />
 			<GroupChecklist />
 			<NavBar />
 		</div>
