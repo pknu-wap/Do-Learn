@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { fetchMyGroups } from 'api/myGroupsApi';
+import { isLoggedIn } from 'utils/auth';
 
 export const useMyGroupIds = () => {
 	const [myGroupIds, setMyGroupIds] = useState<number[]>([]);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
+		if (!isLoggedIn()) return;
+
 		const load = async () => {
 			try {
 				const groups = await fetchMyGroups();

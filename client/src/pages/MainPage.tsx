@@ -1,4 +1,3 @@
-// MainPage.tsx
 import { useState } from 'react';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
@@ -11,17 +10,13 @@ import { useMyGroupIds } from 'hooks/useMyGroupIds';
 const MainPage = () => {
 	const [searchResults, setSearchResults] =
 		useState<SearchGroupResponse | null>(null);
-	const { myGroupIds, loading: loadingMyGroups } = useMyGroupIds();
+	const { myGroupIds } = useMyGroupIds();
 
 	return (
 		<div>
 			<Header />
 			<SearchBar onSearchResult={setSearchResults} />
-			<StudyGroupsList
-				searchResults={searchResults}
-				myGroupIds={myGroupIds}
-				loadingMyGroups={loadingMyGroups}
-			/>
+			<StudyGroupsList searchResults={searchResults} myGroupIds={myGroupIds} />
 		</div>
 	);
 };

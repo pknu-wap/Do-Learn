@@ -5,6 +5,7 @@ import './Header.scss';
 interface HeaderProps {
 	title?: string;
 	showLogo?: boolean;
+	variant?: 'default' | 'groupDetail';
 }
 
 const Header = ({ title = '두런두런', showLogo = true }: HeaderProps) => {

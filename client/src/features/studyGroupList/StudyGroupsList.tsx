@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useStudyGroups } from '../../hooks/useStudyGroups';
 import StudyGroupItem from './StudyGroupItem';
 import { SearchGroupResponse } from 'api/searchFilterApi';
+import { isLoggedIn } from 'utils/auth';
 import './StudyGroupsList.scss';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
@@ -9,7 +10,6 @@ import 'assets/style/_typography.scss';
 interface StudyGroupsListProps {
 	searchResults: SearchGroupResponse | null;
 	myGroupIds: number[];
-	loadingMyGroups: boolean;
 }
 
 type GroupType = {
@@ -21,7 +21,6 @@ type GroupType = {
 const StudyGroupsList: React.FC<StudyGroupsListProps> = ({
 	searchResults,
 	myGroupIds,
-	loadingMyGroups,
 }) => {
 	const { groups, loadMore, hasMore, loading, message } = useStudyGroups();
 	const [visibleCount, setVisibleCount] = useState(10);
@@ -66,17 +65,14 @@ const StudyGroupsList: React.FC<StudyGroupsListProps> = ({
 
 	if (!displayGroups) return null;
 
-	if (loadingMyGroups) {
-		return (
-			<div className="flex-center" style={{ padding: '20px' }}>
-				내 그룹 정보 불러오는 중...
-			</div>
-		);
-	}
-
 	const isJoinable = (group: GroupType) => {
-		const notJoined = !myGroupIds.includes(group.id);
 		const hasSpace = group.currentMembers < group.maxMembers;
+
+		if (!isLoggedIn()) {
+			return hasSpace;
+		}
+
+		const notJoined = !myGroupIds.includes(group.id);
 		return notJoined && hasSpace;
 	};
 
