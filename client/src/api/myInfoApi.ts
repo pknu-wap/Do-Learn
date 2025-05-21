@@ -1,4 +1,5 @@
 import api from './instance';
+import { getAuthHeaders } from './auth';
 
 export interface MyPageInfo {
 	id: number;
@@ -20,7 +21,7 @@ const getAccessToken = () =>
 export const getMyPageInfo = () => {
 	const token = getAccessToken();
 	return api.get<MyPageInfo>('/api/mypage/info', {
-		headers: { Authorization: `Bearer ${token}` },
+		headers: getAuthHeaders(),
 	});
 };
 
@@ -28,7 +29,7 @@ export const getMyPageInfo = () => {
 export const updateMyPageInfo = (payload: UpdateMyPageInfoPayload) => {
 	const token = getAccessToken();
 	return api.patch<{ message: string }>('/api/mypage/updateInfo', payload, {
-		headers: { Authorization: `Bearer ${token}` },
+		headers: getAuthHeaders(),
 	});
 };
 
@@ -49,6 +50,6 @@ export interface JoinedGroup {
 export const getJoinedGroups = () => {
 	const token = getAccessToken();
 	return api.get<{ studygroups: JoinedGroup[] }>('/api/mypage/studygroups', {
-		headers: { Authorization: `Bearer ${token}` },
+		headers: getAuthHeaders(),
 	});
 };

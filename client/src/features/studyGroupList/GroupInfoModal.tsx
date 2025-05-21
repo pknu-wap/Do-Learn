@@ -1,6 +1,7 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { getGroupNotice } from 'api/groupNotice';
+import { useNavigate } from 'react-router-dom';
 import './GroupInfoModal.scss';
 import 'assets/style/_typography.scss';
 import 'assets/style/_flex.scss';
@@ -22,10 +23,17 @@ interface Props {
 	group: Group;
 	onClose: () => void;
 	onJoin: () => void;
+	mode?: 'joined' | 'browse';
 }
 
-const GroupInfoModal: React.FC<Props> = ({ group, onClose, onJoin }) => {
+const GroupInfoModal: React.FC<Props> = ({
+	group,
+	onClose,
+	onJoin,
+	mode = 'browse',
+}) => {
 	const [notice, setNotice] = useState('');
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		if (group.id) {
@@ -106,9 +114,18 @@ const GroupInfoModal: React.FC<Props> = ({ group, onClose, onJoin }) => {
 				</div>
 
 				<div className="group-modal-actions">
-					<div className="group-modal-button join button1" onClick={onJoin}>
-						가입하기
-					</div>
+					{mode === 'joined' ? (
+						<div
+							className="group-modal-button join button1"
+							onClick={() => navigate(`/group-detail/${group.id}`)}
+						>
+							입장하기
+						</div>
+					) : (
+						<div className="group-modal-button join button1" onClick={onJoin}>
+							가입하기
+						</div>
+					)}
 				</div>
 			</div>
 		</div>

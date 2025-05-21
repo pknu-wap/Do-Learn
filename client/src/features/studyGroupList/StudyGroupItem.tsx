@@ -21,9 +21,13 @@ interface StudyGroupItemProps {
 		category: string;
 		type: string;
 	};
+	mode?: 'joined' | 'browse';
 }
 
-const StudyGroupItem: React.FC<StudyGroupItemProps> = ({ group }) => {
+const StudyGroupItem: React.FC<StudyGroupItemProps> = ({
+	group,
+	mode = 'browse',
+}) => {
 	const navigate = useNavigate();
 	const [showModal, setShowModal] = useState(false);
 	const [showGroupModal, setShowGroupModal] = useState(false);
@@ -102,6 +106,7 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({ group }) => {
 					group={group}
 					onClose={() => setShowGroupModal(false)}
 					onJoin={handleJoin}
+					mode={mode}
 				/>
 			)}
 		</div>

@@ -2,6 +2,7 @@ import NavBar from 'components/NavBar';
 import Header from 'features/header/Header';
 import LogoutButton from 'features/myPage/LogoutButton';
 import Profile from 'features/myPage/Profile';
+import MyGroupsList from 'features/myGroupsList/MyGroupsList';
 // import JoinGroupList from 'features/myPage/JoinGroupList';
 import '../features/header/Header.scss';
 import StudyGroupsList from 'features/studyGroupList/StudyGroupsList';
@@ -16,7 +17,7 @@ const MyPage = () => {
 				<Header title="마이페이지" showLogo={false} />
 			</div>
 			<Profile />
-			<StudyGroupsList searchResults={null} myGroupIds={myGroupIds} />
+			<MyGroupsList />
 			<LogoutButton />
 			<NavBar />
 		</div>
