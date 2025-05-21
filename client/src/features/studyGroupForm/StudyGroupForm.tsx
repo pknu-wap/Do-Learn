@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './StudyGroupForm.scss';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
@@ -24,6 +24,16 @@ const StudyGroupForm = () => {
 	const [category, setCategory] = useState<Category | ''>('');
 	const [startDate, setStartDate] = useState('');
 
+	useEffect(() => {
+		if (meetingDay) {
+			const dayNum = Number(meetingDay);
+			const maxDay = meetingCycle === '주' ? 7 : 31;
+			if (dayNum > maxDay) {
+				setMeetingDay(String(maxDay));
+			}
+		}
+	}, [meetingCycle]);
+
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
@@ -44,8 +54,9 @@ const StudyGroupForm = () => {
 			return;
 		}
 		const day = Number(meetingDay);
-		if (!day || day < 1 || day > 31) {
-			alert('올바른 날짜(1~31)를 입력해주세요.');
+		const maxDay = meetingCycle === '주' ? 7 : 31;
+		if (!day || day < 1 || day > maxDay) {
+			alert(`올바른 날짜(1~${maxDay})를 입력해주세요.`);
 			return;
 		}
 		const members = Number(memberCount);
@@ -72,18 +83,21 @@ const StudyGroupForm = () => {
 			return;
 		}
 
-		const groupData = {
+		const groupData: any = {
 			name: groupName.trim(),
 			maxMembers: members,
 			notice,
 			meetingDays: `${meetingCycle} ${meetingDay}일`,
 			meetingTime,
 			meetingType,
-			region: region as Region,
 			category: category as Category,
 			type: studyTypeDetail.trim(),
 			startDate,
 		};
+
+		if (meetingType === StudyType.오프라인) {
+			groupData.region = region ? (region as Region) : null;
+		}
 
 		try {
 			const response = await createStudyGroup(groupData);
@@ -109,6 +123,8 @@ const StudyGroupForm = () => {
 			console.error('스터디 그룹 생성 실패:', error);
 		}
 	};
+
+	const maxDay = meetingCycle === '주' ? 7 : 31;
 
 	return (
 		<div className="study-group-form">
@@ -144,11 +160,12 @@ const StudyGroupForm = () => {
 						onBlur={() => {
 							const day = Number(meetingDay);
 							if (day < 1) setMeetingDay('1');
-							else if (day > 31) setMeetingDay('31');
+							else if (day > maxDay) setMeetingDay(String(maxDay));
 						}}
 						className="meeting-period-input button2"
 						onWheel={(e) => e.currentTarget.blur()}
 						min={1}
+						max={maxDay}
 						step={1}
 					/>
 					<span className="button2">일</span>
@@ -180,13 +197,17 @@ const StudyGroupForm = () => {
 			<div className="meeting-method">
 				<button
 					onClick={() => setMeetingType(StudyType.온라인)}
-					className={`meeting-method-button button2 ${meetingType === StudyType.온라인 ? 'bg-green-300' : ''}`}
+					className={`meeting-method-button button2 ${
+						meetingType === StudyType.온라인 ? 'bg-green-300' : ''
+					}`}
 				>
 					온라인
 				</button>
 				<button
 					onClick={() => setMeetingType(StudyType.오프라인)}
-					className={`meeting-method-button button2 ${meetingType === StudyType.오프라인 ? 'bg-green-300' : ''}`}
+					className={`meeting-method-button button2 ${
+						meetingType === StudyType.오프라인 ? 'bg-green-300' : ''
+					}`}
 				>
 					오프라인
 				</button>
@@ -220,7 +241,9 @@ const StudyGroupForm = () => {
 					<button
 						key={time}
 						onClick={() => setMeetingTime(time)}
-						className={`time-option-button button2 ${meetingTime === time ? 'bg-green-300' : ''}`}
+						className={`time-option-button button2 ${
+							meetingTime === time ? 'bg-green-300' : ''
+						}`}
 					>
 						{time}
 					</button>
@@ -282,7 +305,7 @@ const StudyGroupForm = () => {
 				</div>
 			</div>
 
-			<button className="create-button" onClick={handleSubmit}>
+			<button className="create-button button2" onClick={handleSubmit}>
 				생성하기
 			</button>
 		</div>
