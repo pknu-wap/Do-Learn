@@ -1,12 +1,10 @@
 import api from './instance';
+import { getAuthHeaders } from './auth';
 
 export const getGroupNotice = async (groupId: number) => {
-	const accessToken =
-		localStorage.getItem('accessToken') ||
-		sessionStorage.getItem('accessToken');
 	const response = await api.get(`/api/studygroup/${groupId}/notice`, {
 		headers: {
-			Authorization: accessToken ? `Bearer ${accessToken}` : '',
+			...getAuthHeaders(),
 		},
 	});
 	return response.data;

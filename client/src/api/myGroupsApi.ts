@@ -1,14 +1,10 @@
 import api from './instance';
+import { getAuthHeaders } from './auth';
 
 export const fetchMyGroups = async () => {
-	const token =
-		localStorage.getItem('accessToken') ||
-		sessionStorage.getItem('accessToken');
-	if (!token) throw new Error('로그인이 필요합니다.');
-
 	const res = await api.get('/api/mypage/studygroups', {
 		headers: {
-			Authorization: `Bearer ${token}`,
+			...getAuthHeaders(),
 		},
 	});
 	return res.data.studygroups;

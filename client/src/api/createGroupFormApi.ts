@@ -1,4 +1,5 @@
 import api from './instance';
+import { getAuthHeaders } from './auth';
 
 export enum Category {
 	어학 = '어학',
@@ -58,15 +59,9 @@ interface CreateGroupResponse {
 export const createStudyGroup = async (
 	data: CreateGroupParams,
 ): Promise<CreateGroupResponse> => {
-	const token =
-		localStorage.getItem('accessToken') ||
-		sessionStorage.getItem('accessToken');
-
-	if (!token) throw new Error('인증 토큰이 없습니다.');
-
 	const response = await api.post('/api/studygroup/create', data, {
 		headers: {
-			Authorization: `Bearer ${token}`,
+			...getAuthHeaders(),
 			'Content-Type': 'application/json',
 		},
 	});
