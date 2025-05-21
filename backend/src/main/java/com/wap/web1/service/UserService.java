@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Map;
+
 
 @Service
 @RequiredArgsConstructor
@@ -40,12 +42,21 @@ public class UserService {
     public MyGroupsDto getMyGroups(Long userId){
         List<StudyMember> memberships = studyMemberRepository.findByUserId(userId);
 
-        List<MyStudyGroupDto> studyGroups = memberships.stream()
-                .map(member -> {
-                    StudyGroup group = member.getStudyGroup();
-                    int currentMembers = studyMemberRepository.countByStudyGroupIdAndStatus(
-                            group.getId(), StudyMember.Status.ACTIVE);
+        List<StudyGroup> groups = memberships.stream()
+                .map(StudyMember::getStudyGroup)
+                .toList();
 
+        List<Long> groupIds = groups.stream()
+                .map(StudyGroup::getId)
+                .toList();
+
+        Map<Long, Long> memberCountMap = studyMemberRepository
+                .countActiveMembersByGroupIds(groupIds).stream()
+                .collect(Collectors.toMap(GroupMemberCount::getGroupId, GroupMemberCount::getCount));
+
+        List<MyStudyGroupDto> studyGroups = groups.stream()
+                .map(group -> {
+                    int currentMembers = memberCountMap.getOrDefault(group.getId(), 0L).intValue();
                     return MyStudyGroupDto.builder()
                             .id(group.getId())
                             .name(group.getName())
@@ -75,7 +86,13 @@ public class UserService {
         }
 
         if (dto.getName()!=null) group.setName(dto.getName());
-        if (dto.getMaxMembers() != null) group.setMaxMembers(dto.getMaxMembers());
+        if (dto.getMaxMembers() != null) {
+            int maxMembers = dto.getMaxMembers();
+            if (maxMembers < 3 || maxMembers > 12) {
+                throw new IllegalArgumentException("스터디 인원은 3명 이상 12명 이하이어야 합니다.");
+            }
+            group.setMaxMembers(maxMembers);
+        }
         if (dto.getNotice() != null) group.setNotice(dto.getNotice());
         if (dto.getMeetingDays() != null) group.setMeetingDays(dto.getMeetingDays());
         if (dto.getMeetingTime() != null) group.setMeetingTime(dto.getMeetingTime());
@@ -93,16 +110,27 @@ public class UserService {
     public Response updateMyInfo(Long userId, MyInfoUpdateDto dto){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        //닉네임 검증 및 수정
+        if(dto.getNickname() != null){
+            String newNickname = dto.getNickname();
+            if (newNickname.length() > 10){
+                throw new IllegalArgumentException("닉네임은 10자 이내로 입력해야 합니다.");
+            }
 
-        if (dto.getNickname() != null){
-            user.setNickname(dto.getNickname());
+            boolean isDuplicate = userRepository.existsByNickname(newNickname);
+            if (isDuplicate){
+                throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+            }
+
+            user.setNickname(newNickname);
         }
 
+
         if(dto.getProfileImage() != null){
-            List<String> allowedImages = List.of("icon1.png","icon1.png", "icon2.png", "icon3.png", "icon4.png");
+            List<Integer> allowedImages = List.of(1, 2, 3, 4);
             if (!allowedImages.contains(dto.getProfileImage())) {
                 throw new IllegalArgumentException(
-                        "올바르지 않은 프로필 이미지입니다.(현재 임의사진으로 되어있음 사진, 링크 수정후 괄호 삭제하기)");
+                        "올바르지 않은 프로필 이미지입니다.");
             }
             user.setProfileImage(dto.getProfileImage());
         }

@@ -16,7 +16,7 @@ public class GroupMembersDto {
     public static class MemberDto{
         private Long userId;
         private String nickname;
-        private String profileImage;
+        private Integer profileImage;
     }
 
 }

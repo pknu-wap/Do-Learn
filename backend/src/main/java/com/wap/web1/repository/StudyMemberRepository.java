@@ -3,9 +3,11 @@ package com.wap.web1.repository;
 import com.wap.web1.domain.StudyGroup;
 import com.wap.web1.domain.StudyMember;
 import com.wap.web1.domain.User;
+import com.wap.web1.dto.GroupMemberCount;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,4 +32,11 @@ public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> 
     void resetAllweeklyAttendance();
 
     int countByStudyGroupIdAndStatus(Long studyGroupId, StudyMember.Status status);
+
+    //현재 인원 계산
+    @Query("SELECT sm.studyGroup.id AS groupId, COUNT(sm) AS count " +
+            "FROM StudyMember sm " +
+            "WHERE sm.status = 'ACTIVE' AND sm.studyGroup.id IN :groupIds " +
+            "GROUP BY sm.studyGroup.id")
+    List<GroupMemberCount> countActiveMembersByGroupIds(@Param("groupIds") List<Long> groupIds);
 }

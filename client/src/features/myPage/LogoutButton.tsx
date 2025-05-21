@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { logout } from 'api/auth';
 import './LogoutButton.scss';
 import 'assets/style/_flex.scss';
+import 'assets/style/_typography.scss';
 
 const LogoutButton = () => {
 	const [showModal, setShowModal] = useState(false);
@@ -29,8 +30,7 @@ const LogoutButton = () => {
 		<>
 			<div
 				onClick={() => handleLogout()}
-				className="flex-center logout-text"
-				style={{ paddingTop: '100px' }}
+				className="flex-center logout-text button2"
 			>
 				로그아웃
 			</div>

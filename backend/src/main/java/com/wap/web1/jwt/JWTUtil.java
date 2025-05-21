@@ -21,6 +21,7 @@ public class JWTUtil {
 
         return Jwts.parser()
                 .verifyWith(secretKey)
+                .setAllowedClockSkewSeconds(600)//시간오차 10분 허용
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()

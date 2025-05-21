@@ -3,12 +3,36 @@
 .header-wrapper {
 	background-color: $main-color-green;
 	min-height: 140px;
+	padding: 25px 16px;
 }
 
 .header-item {
-	gap: 16px;
+	gap: 8px;
 }
 
 .title-name {
 	color: #f1ffe2;
+	word-break: keep-all;
+}
+
+.header-wrapper.groupDetail {
+	background-color: $main-color-green;
+	min-height: 140px;
+
+	.title-name {
+		font-size: 30px;
+		color: #f1ffe2;
+		max-width: 390px;
+		width: 100%;
+		word-break: break-word;
+		line-height: 1.2;
+		text-align: center;
+	}
+}
+
+.my-page-wrapper {
+	.header-wrapper {
+		font-size: 24px;
+		min-height: 80px;
+	}
 }

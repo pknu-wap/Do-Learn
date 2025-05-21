@@ -34,7 +34,9 @@ const logout = () => {
 };
 
 const reissue = () => {
-	const refreshToken = localStorage.getItem('refreshToken');
+	const refreshToken =
+		localStorage.getItem('refreshToken') ||
+		sessionStorage.getItem('refreshToken');
 	return api.post('/auth/reissue', null, {
 		headers: {
 			Refresh: refreshToken || '',
@@ -42,4 +44,14 @@ const reissue = () => {
 	});
 };
 
-export { login, signup, logout, reissue };
+const getAuthHeaders = () => {
+	const accessToken =
+		localStorage.getItem('accessToken') ||
+		sessionStorage.getItem('accessToken');
+
+	return {
+		Authorization: `Bearer ${accessToken}`,
+	};
+};
+
+export { login, signup, logout, reissue, getAuthHeaders };

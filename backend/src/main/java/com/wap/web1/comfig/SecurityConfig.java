@@ -8,6 +8,7 @@ import com.wap.web1.repository.RefreshRepository;
 import com.wap.web1.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +20,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+
 
 import java.util.Arrays;
 
@@ -59,12 +63,14 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/", "/auth/login", "/auth/reissue", "/auth/join").permitAll()  // /auth/login 경로 허용
                         .requestMatchers("/auth/logout").permitAll()
-                        .requestMatchers("/api/main/{study_group_id}/join","/api/main/grouplist","/grouplist/search/**").permitAll()
+                        .requestMatchers("/api/main/grouplist","/grouplist/search/**").permitAll()
                         .requestMatchers("/api/main/test").permitAll() // 테스트용
                         .anyRequest().authenticated()
                 );
+
 
         // LoginFilter를 /auth/login 경로에 적용
         http
@@ -96,4 +102,16 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        grantedAuthoritiesConverter.setAuthorityPrefix(""); // "ROLE_" 접두어 유지
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("role"); // JWT claim 이름 설정
+
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        return converter;
+    }
+
 }

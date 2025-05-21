@@ -21,9 +21,13 @@ interface StudyGroupItemProps {
 		category: string;
 		type: string;
 	};
+	mode?: 'joined' | 'browse';
 }
 
-const StudyGroupItem: React.FC<StudyGroupItemProps> = ({ group }) => {
+const StudyGroupItem: React.FC<StudyGroupItemProps> = ({
+	group,
+	mode = 'browse',
+}) => {
 	const navigate = useNavigate();
 	const [showModal, setShowModal] = useState(false);
 	const [showGroupModal, setShowGroupModal] = useState(false);
@@ -37,25 +41,31 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({ group }) => {
 	};
 
 	const handleJoin = async () => {
-		navigate(`/group-detail/${group.id}`);
-		// try {
-		// 	const message = await joinGroupApi(group.id);
-		// 	alert(message);
-		// 	setShowGroupModal(false);
-		// } catch (error) {
-		// 	alert('가입 요청 중 오류가 발생했습니다.');
-		// }
+		try {
+			const message = await joinGroupApi(group.id);
+			alert(message);
+			setShowGroupModal(false);
+			navigate(`/group-detail/${group.id}`);
+		} catch (error: any) {
+			const msg =
+				error?.response?.data?.message ||
+				'가입 요청 중 예상치 못한 오류가 발생했습니다.';
+			alert(msg);
+		}
 	};
 
 	return (
-		<div className="list-box" onClick={handleClick}>
+		<div
+			className={`list-box ${group.region === '해당없음' ? 'border-virtual' : ''}`}
+			onClick={handleClick}
+		>
 			<div className="top-row flex-between">
 				<div className="group-name body3">{group.name}</div>
-				<span className="meeting-type button3">
+				<div className="meeting-type button3">
 					{group.region?.trim() && group.region !== '해당없음'
 						? group.region
 						: '비대면'}
-				</span>
+				</div>
 			</div>
 			<div className="flex-left list">
 				<div className="first-col flex-col">
@@ -96,6 +106,7 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({ group }) => {
 					group={group}
 					onClose={() => setShowGroupModal(false)}
 					onJoin={handleJoin}
+					mode={mode}
 				/>
 			)}
 		</div>

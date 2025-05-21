@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,8 +36,8 @@ public class StudyGroupService {
         User leader = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("리더 유저를 찾을 수 없습니다."));
 
-        if (dto.getMaxMembers() < 3) {
-            throw new IllegalArgumentException("스터디 최소 인원은 3명 이상이어야 합니다.");
+        if (dto.getMaxMembers() < 3 || dto.getMaxMembers() > 12) {
+            throw new IllegalArgumentException("스터디 인원은 3명 이상 12명 이하이어야 합니다.");
         }
 
         Region region = dto.getRegion() != null ? dto.getRegion() : Region.해당없음;
@@ -93,11 +94,11 @@ public class StudyGroupService {
                 .filter(member -> member.getStatus() == StudyMember.Status.ACTIVE)
                 .map(member -> {
                     int rank = memberIdToRankMap.getOrDefault(member.getId(), 0);
-                    String profileImage = switch (rank){
-                        case 1 -> "icon1.png";//임시 아이콘임 나중에 디자이너분께 프사받아서 이름 수정필요
-                        case 2 -> "icon2.png";
-                        case 3 -> "icon3.png";
-                        default -> "icon4.png";
+                    Integer profileImage = switch (rank){
+                        case 1 -> 1;
+                        case 2 -> 2;
+                        case 3 -> 3;
+                        default -> 4;
                     };
 
                     return GroupMembersDto.MemberDto.builder()
@@ -132,7 +133,7 @@ public class StudyGroupService {
         StudyMember member = studyMemberRepository.findByStudyGroupAndUser(group, user)
                 .orElseThrow(() -> new IllegalArgumentException("해당 스터디 그룹의 멤버가 아닙니다."));
 
-        LocalDate today= LocalDate.now();
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 
         boolean alreadyChecked = attendanceRepository.existsByStudyGroupAndUserAndDate(group, user, today);
         if(alreadyChecked){

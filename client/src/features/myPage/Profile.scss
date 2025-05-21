@@ -1,0 +1,53 @@
+@import 'assets/style/_colors.scss';
+
+.profile-page {
+	background-color: $main-color-green;
+}
+
+.profile-header {
+	border-radius: 50px 50px 0 0;
+	padding: 10% 0;
+	// border: 2px solid #333;
+	width: 100%;
+	background-color: white;
+
+	.content {
+		padding: 0;
+		gap: 20px;
+	}
+	.avatar {
+		width: 65px;
+		height: 65px;
+		border-radius: 50%;
+		cursor: pointer;
+		// border: 2px solid rgb(208, 208, 208);
+		background-color: $main-color-light-green;
+	}
+
+	.name-wrapper {
+		.nickname-input {
+			font-size: 23px;
+			font-weight: 600;
+			border: none;
+			outline: none;
+			text-align: center;
+			padding: 3px;
+			border-bottom: 1px solid $main-color-dark-green;
+			color: $sub-color-deep-green;
+			&.editable {
+				border-bottom: 1px solid #000000;
+			}
+		}
+
+		.edit-button {
+			background: none;
+			border: none;
+			cursor: pointer;
+			color: $sub-color-deep-green;
+
+			&:hover {
+				color: $sub-color-dark-green;
+			}
+		}
+	}
+}

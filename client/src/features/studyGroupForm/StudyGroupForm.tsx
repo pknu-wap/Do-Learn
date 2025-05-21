@@ -172,6 +172,8 @@ const StudyGroupForm = () => {
 				</div>
 
 				{/* 모집 인원 */}
+
+				{/* 모집 인원 */}
 				<div>
 					<input
 						type="number"

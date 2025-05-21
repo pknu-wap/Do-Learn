@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search } from 'lucide-react';
 import { searchGroups, SearchGroupResponse } from 'api/searchFilterApi';
 import './SearchBar.scss';
@@ -11,19 +11,48 @@ interface SearchBarProps {
 
 const SearchBar: React.FC<SearchBarProps> = ({ onSearchResult }) => {
 	const [keyword, setKeyword] = useState('');
+	const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
-	const handleSearch = async () => {
-		if (!keyword.trim()) {
-			onSearchResult(null);
-			return;
+	useEffect(() => {
+		if (debounceTimer.current) {
+			clearTimeout(debounceTimer.current);
 		}
 
-		try {
-			const response = await searchGroups({ keyword });
-			onSearchResult(response); // 부모(MainPage)로 결과 전달
-		} catch (error) {
-			console.error('검색 중 오류 발생:', error);
-			onSearchResult(null);
+		debounceTimer.current = setTimeout(() => {
+			if (!keyword.trim()) {
+				onSearchResult(null);
+				return;
+			}
+
+			searchGroups({ keyword })
+				.then((response) => onSearchResult(response))
+				.catch((error) => {
+					console.error('검색 중 오류 발생:', error);
+					onSearchResult(null);
+				});
+		}, 10);
+
+		return () => {
+			if (debounceTimer.current) {
+				clearTimeout(debounceTimer.current);
+			}
+		};
+	}, [keyword]);
+
+	// ⌨️ 엔터 키 검색
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			if (!keyword.trim()) {
+				onSearchResult(null);
+				return;
+			}
+
+			searchGroups({ keyword })
+				.then((response) => onSearchResult(response))
+				.catch((error) => {
+					console.error('검색 중 오류 발생:', error);
+					onSearchResult(null);
+				});
 		}
 	};
 
@@ -38,7 +67,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearchResult }) => {
 						className="searchbar-input flex-row-center body3"
 						value={keyword}
 						onChange={(e) => setKeyword(e.target.value)}
-						onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+						onKeyDown={handleKeyDown}
 					/>
 				</div>
 			</div>
