@@ -109,19 +109,26 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({ onClose }) => {
 			onClose(); // 폼 닫기
 			navigate('/mypage'); // 마이페이지로 이동
 		} catch (error: any) {
-			const serverMessage = error?.response?.data;
-			if (
-				error.response?.status === 401 &&
-				serverMessage === 'access token expired'
-			) {
+			const status = error.response?.status;
+			const serverData = error.response?.data;
+			const serverMessage =
+				typeof serverData === 'string'
+					? serverData
+					: (serverData?.message ?? '');
+
+			// 중복 그룹명
+			if (status === 400 && serverMessage.includes('존재')) {
+				alert('이미 존재하는 그룹명입니다.');
+				return;
+			}
+			// 토큰 만료
+			if (status === 401 && serverMessage === 'access token expired') {
 				alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
 				window.location.href = '/login';
 				return;
 			}
-			if (typeof serverMessage === 'string' && serverMessage.includes('존재')) {
-				alert('이미 존재하는 그룹명입니다.');
-				return;
-			}
+
+			// 그 외의 에러
 			alert('스터디 그룹 생성에 실패했습니다.');
 			console.error('스터디 그룹 생성 실패:', error);
 		}
