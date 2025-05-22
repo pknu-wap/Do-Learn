@@ -20,15 +20,16 @@ public class StudyScheduler {
     private  final StudyMemberRepository studyMemberRepository;
     private  final StudyGroupRepository studyGroupRepository;
 
-    // 출석 리셋
-    @Scheduled(cron = "0 0 0 * * MON")//매주 월요일 00:00
+    // 리셋: 매주 월요일 00:00 (한국 시간 기준)
+    @Scheduled(cron = "0 0 0 * * MON", zone = "Asia/Seoul")
     @Transactional
     public void resetWeeklyAttendance(){
+
         studyMemberRepository.resetAllweeklyAttendance();
     }
 
-    // 모집 상태 자동 마감
-    @Scheduled(cron = "0 0 0 * * *") // 매일 자정
+    // 모집 상태 자동 마감: 매일 자정 (한국 시간 기준)
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
     @Transactional
     public void autoCloseRecruitingStudyGroups() {
         LocalDate today = LocalDate.now();

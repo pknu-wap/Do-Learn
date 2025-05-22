@@ -26,8 +26,8 @@ public class User {
     @Column(length = 20)
     private String nickname;
 
-    @Column(nullable = false, length = 255)
-    private String profileImage;
+    @Column(length = 255)
+    private Integer profileImage;
 
     @Column(length = 255)
     private String provider;

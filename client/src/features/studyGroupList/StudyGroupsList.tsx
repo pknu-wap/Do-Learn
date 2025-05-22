@@ -2,15 +2,26 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useStudyGroups } from '../../hooks/useStudyGroups';
 import StudyGroupItem from './StudyGroupItem';
 import { SearchGroupResponse } from 'api/searchFilterApi';
+import { isLoggedIn } from 'utils/auth';
 import './StudyGroupsList.scss';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 
 interface StudyGroupsListProps {
 	searchResults: SearchGroupResponse | null;
+	myGroupIds: number[];
 }
 
-const StudyGroupsList: React.FC<StudyGroupsListProps> = ({ searchResults }) => {
+type GroupType = {
+	id: number;
+	currentMembers: number;
+	maxMembers: number;
+};
+
+const StudyGroupsList: React.FC<StudyGroupsListProps> = ({
+	searchResults,
+	myGroupIds,
+}) => {
 	const { groups, loadMore, hasMore, loading, message } = useStudyGroups();
 	const [visibleCount, setVisibleCount] = useState(10);
 	const observer = useRef<IntersectionObserver | null>(null);
@@ -41,7 +52,6 @@ const StudyGroupsList: React.FC<StudyGroupsListProps> = ({ searchResults }) => {
 		[loading, visibleCount, groups, hasMore, loadMore, searchResults],
 	);
 
-	// 보여줄 그룹 리스트 결정
 	const displayGroups = searchResults?.groups ?? groups;
 	const displayMessage = searchResults?.message ?? message;
 
@@ -55,7 +65,19 @@ const StudyGroupsList: React.FC<StudyGroupsListProps> = ({ searchResults }) => {
 
 	if (!displayGroups) return null;
 
-	const visibleGroups = displayGroups.slice(0, visibleCount);
+	const isJoinable = (group: GroupType) => {
+		const hasSpace = group.currentMembers < group.maxMembers;
+
+		if (!isLoggedIn()) {
+			return hasSpace;
+		}
+
+		const notJoined = !myGroupIds.includes(group.id);
+		return notJoined && hasSpace;
+	};
+
+	const filteredGroups = displayGroups.filter(isJoinable);
+	const visibleGroups = filteredGroups.slice(0, visibleCount);
 
 	return (
 		<div className="list-container">

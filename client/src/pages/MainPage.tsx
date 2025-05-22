@@ -6,17 +6,19 @@ import Header from 'features/header/Header';
 import SearchBar from 'features/searchBar/SearchBar';
 import Filter from 'features/filter/filter';
 import { SearchGroupResponse } from 'api/searchFilterApi';
+import { useMyGroupIds } from 'hooks/useMyGroupIds';
 
 const MainPage = () => {
 	const [searchResults, setSearchResults] =
 		useState<SearchGroupResponse | null>(null);
+	const { myGroupIds } = useMyGroupIds();
 
 	return (
 		<div>
 			<Header />
 			<SearchBar onSearchResult={setSearchResults} />
 			<Filter />
-			<StudyGroupsList searchResults={searchResults} />
+			<StudyGroupsList searchResults={searchResults} myGroupIds={myGroupIds} />
 		</div>
 	);
 };

@@ -58,7 +58,7 @@ function App() {
 						<Route path="/login" element={<LoginPage />} />
 						<Route path="/signup" element={<SignupPage />} />
 						<Route path="/mypage" element={<MyPage />} />
-						<Route path="/group-detail/:id" element={<GroupPage />} />
+						<Route path="/group-detail/:studyGroupId" element={<GroupPage />} />
 					</Routes>
 				</Layout>
 			</BrowserRouter>

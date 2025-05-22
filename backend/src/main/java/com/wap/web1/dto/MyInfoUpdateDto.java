@@ -11,5 +11,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class MyInfoUpdateDto {
     private String nickname;
-    private String profileImage;
+    private Integer profileImage;
 }

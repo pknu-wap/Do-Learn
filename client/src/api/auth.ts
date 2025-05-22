@@ -44,4 +44,14 @@ const reissue = () => {
 	});
 };
 
-export { login, signup, logout, reissue };
+const getAuthHeaders = () => {
+	const accessToken =
+		localStorage.getItem('accessToken') ||
+		sessionStorage.getItem('accessToken');
+
+	return {
+		Authorization: `Bearer ${accessToken}`,
+	};
+};
+
+export { login, signup, logout, reissue, getAuthHeaders };

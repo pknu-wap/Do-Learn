@@ -1,18 +1,11 @@
 import api from './instance';
+import { getAuthHeaders } from './auth';
 
 const joinGroupApi = async (studyGroupId: number) => {
-	const token =
-		localStorage.getItem('accessToken') ||
-		sessionStorage.getItem('accessToken');
-
-	if (!token) {
-		throw new Error('로그인이 필요합니다.');
-	}
-
 	try {
 		const response = await api.post(`/api/main/${studyGroupId}/join`, null, {
 			headers: {
-				Authorization: `Bearer ${token}`,
+				...getAuthHeaders(),
 			},
 		});
 		return response.data.message;
