@@ -120,7 +120,7 @@ const NavBar = () => {
 						>
 							✕
 						</button>
-						<StudyGroupForm />
+						<StudyGroupForm onClose={closeStudyGroupForm} />
 					</div>
 				</div>
 			)}
