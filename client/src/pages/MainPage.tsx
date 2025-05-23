@@ -1,4 +1,3 @@
-// src/pages/MainPage.tsx
 import React, { useState, useEffect } from 'react';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
@@ -12,11 +11,11 @@ import { Region, Category } from 'api/createGroupFormApi';
 import { SearchGroupResponse, Group as APIGroup } from 'api/searchFilterApi';
 
 export default function MainPage() {
-	// 1) 기본 무한스크롤로 불러오는 전체 목록
+	// 1) 기본 무한스크롤 목록
 	const { groups, loadMore, hasMore, loading, message } = useStudyGroups();
 	const { myGroupIds } = useMyGroupIds();
 
-	// 2) 검색바로 들어온 “서버 검색” 결과 (null이면 사용 안 함)
+	// 2) 검색바 서버 검색 결과 (null이면 사용 안 함)
 	const [searchResults, setSearchResults] = useState<APIGroup[] | null>(null);
 
 	// 3) 드롭다운 필터 상태
@@ -24,17 +23,29 @@ export default function MainPage() {
 	const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
 	const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
 
-	// 4) 실제 화면에 뿌릴 최종 목록
+	// 4) **만남횟수** 필터 상태
+	const [selectedMeetingCycle, setSelectedMeetingCycle] = useState<
+		'월' | '주' | null
+	>(null);
+	const [selectedMeetingCount, setSelectedMeetingCount] = useState<
+		number | null
+	>(null);
+	const [meetingComparison, setMeetingComparison] = useState<'above' | 'below'>(
+		'above',
+	);
+
+	// 5) 화면에 실제 뿌릴 최종 목록
 	const [displayedGroups, setDisplayedGroups] = useState<APIGroup[]>([]);
 
-	// A) 무한스크롤(or 검색 전) & 필터 비활성 시 → 기본 groups
+	// A) 필터·검색 모두 비활성 → 기본 groups 사용
 	useEffect(() => {
 		if (
 			searchResults === null &&
 			selectedRegions.length +
 				selectedCategories.length +
 				selectedTimes.length ===
-				0
+				0 &&
+			selectedMeetingCycle === null
 		) {
 			setDisplayedGroups(groups);
 		}
@@ -44,47 +55,66 @@ export default function MainPage() {
 		selectedRegions,
 		selectedCategories,
 		selectedTimes,
+		selectedMeetingCycle,
 	]);
 
-	// B) **클라이언트 필터** 모드: 검색바 모드가 아닐 때만 실행
+	// B) **클라이언트 필터** 모드
 	useEffect(() => {
-		if (searchResults !== null) return;
+		if (searchResults !== null) return; // 검색 모드가 우선
 
-		// 하나라도 선택됐으면 필터 적용
+		// 하나라도 활성화됐으면 필터 적용
 		if (
 			selectedRegions.length ||
 			selectedCategories.length ||
-			selectedTimes.length
+			selectedTimes.length ||
+			selectedMeetingCycle !== null
 		) {
 			let filtered = groups;
 
+			// 지역
 			if (selectedRegions.length) {
 				filtered = filtered.filter((g) =>
 					selectedRegions.includes(g.region as Region),
 				);
 			}
+			// 분야
 			if (selectedCategories.length) {
 				filtered = filtered.filter((g) =>
 					selectedCategories.includes(g.category as Category),
 				);
 			}
+			// 시간대
 			if (selectedTimes.length) {
 				filtered = filtered.filter((g) =>
 					selectedTimes.includes(g.meetingTime),
 				);
+			}
+			// 만남횟수
+			if (selectedMeetingCycle && selectedMeetingCount != null) {
+				filtered = filtered.filter((g) => {
+					const [cycle, countStr] = g.meetingDays.split(' ');
+					const cnt = Number(countStr.replace(/\D/g, ''));
+					if (cycle !== selectedMeetingCycle) return false;
+					return meetingComparison === 'above'
+						? cnt >= selectedMeetingCount
+						: cnt <= selectedMeetingCount;
+				});
 			}
 
 			setDisplayedGroups(filtered);
 		}
 	}, [
 		groups,
+		searchResults,
 		selectedRegions,
 		selectedCategories,
 		selectedTimes,
-		searchResults,
+		selectedMeetingCycle,
+		selectedMeetingCount,
+		meetingComparison,
 	]);
 
-	// C) 검색바 결과 들어오면 서버검색 모드로 전환
+	// C) 검색바 서버 검색 결과 처리
 	const handleSearchResult = (res: SearchGroupResponse | null) => {
 		if (res?.groups) {
 			setSearchResults(res.groups);
@@ -94,19 +124,18 @@ export default function MainPage() {
 		}
 	};
 
-	// D) StudyGroupsList에 넘길 최종 props 계산
+	// D) StudyGroupsList에 넘길 최종 props
 	const finalSearchResults =
-		// 검색바 모드 or 클라이언트 필터 모드일 땐 여기로 강제 렌더링
 		searchResults !== null ||
 		selectedRegions.length + selectedCategories.length + selectedTimes.length >
-			0
+			0 ||
+		selectedMeetingCycle !== null
 			? { groups: displayedGroups, nextCursor: null, message: null }
 			: null;
 
 	return (
 		<div>
 			<Header />
-
 			<SearchBar onSearchResult={handleSearchResult} />
 
 			<Filter
@@ -116,6 +145,12 @@ export default function MainPage() {
 				setSelectedCategories={setSelectedCategories}
 				selectedTimes={selectedTimes}
 				setSelectedTimes={setSelectedTimes}
+				selectedMeetingCycle={selectedMeetingCycle}
+				setSelectedMeetingCycle={setSelectedMeetingCycle}
+				selectedMeetingCount={selectedMeetingCount}
+				setSelectedMeetingCount={setSelectedMeetingCount}
+				meetingComparison={meetingComparison}
+				setMeetingComparison={setMeetingComparison}
 			/>
 
 			<StudyGroupsList
