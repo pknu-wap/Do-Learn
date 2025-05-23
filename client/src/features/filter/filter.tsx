@@ -135,7 +135,7 @@ const Filter: React.FC<FilterProps> = ({
 										key={c}
 										type="button"
 										className={`button2 ${selectedMeetingCycle === c ? 'selected' : ''}`}
-										onClick={() => setSelectedMeetingCycle(c)} // 이제 `c`가 '월'|'주' 타입입니다
+										onClick={() => setSelectedMeetingCycle(c)}
 									>
 										{c}
 									</button>

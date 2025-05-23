@@ -11,19 +11,15 @@ import { Region, Category } from 'api/createGroupFormApi';
 import { SearchGroupResponse, Group as APIGroup } from 'api/searchFilterApi';
 
 export default function MainPage() {
-	// 1) 기본 무한스크롤 목록
 	const { groups, loadMore, hasMore, loading, message } = useStudyGroups();
 	const { myGroupIds } = useMyGroupIds();
 
-	// 2) 검색바 서버 검색 결과 (null이면 사용 안 함)
 	const [searchResults, setSearchResults] = useState<APIGroup[] | null>(null);
 
-	// 3) 드롭다운 필터 상태
 	const [selectedRegions, setSelectedRegions] = useState<Region[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
 	const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
 
-	// 4) **만남횟수** 필터 상태
 	const [selectedMeetingCycle, setSelectedMeetingCycle] = useState<
 		'월' | '주' | null
 	>(null);
@@ -34,10 +30,8 @@ export default function MainPage() {
 		'above',
 	);
 
-	// 5) 화면에 실제 뿌릴 최종 목록
 	const [displayedGroups, setDisplayedGroups] = useState<APIGroup[]>([]);
 
-	// A) 필터·검색 모두 비활성 → 기본 groups 사용
 	useEffect(() => {
 		if (
 			searchResults === null &&
@@ -58,9 +52,8 @@ export default function MainPage() {
 		selectedMeetingCycle,
 	]);
 
-	// B) **클라이언트 필터** 모드
 	useEffect(() => {
-		if (searchResults !== null) return; // 검색 모드가 우선
+		if (searchResults !== null) return;
 
 		// 하나라도 활성화됐으면 필터 적용
 		if (
@@ -114,7 +107,6 @@ export default function MainPage() {
 		meetingComparison,
 	]);
 
-	// C) 검색바 서버 검색 결과 처리
 	const handleSearchResult = (res: SearchGroupResponse | null) => {
 		if (res?.groups) {
 			setSearchResults(res.groups);
