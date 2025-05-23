@@ -1,5 +1,6 @@
 // src/features/filter/filter.tsx
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 import { Region, Category } from 'api/createGroupFormApi';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
@@ -7,7 +8,7 @@ import './filter.scss';
 
 type DropdownType = 'regions' | 'categories' | 'times' | 'days' | null;
 const MEETING_TIMES = ['오전', '오후', '저녁', '새벽'] as const;
-const CYCLE_OPTIONS = ['월', '주'] as const; // ← as const 로 리터럴 타입 보존
+const CYCLE_OPTIONS = ['월', '주'] as const;
 
 interface FilterProps {
 	selectedRegions: Region[];
@@ -34,7 +35,6 @@ const Filter: React.FC<FilterProps> = ({
 	setSelectedCategories,
 	selectedTimes,
 	setSelectedTimes,
-
 	selectedMeetingCycle,
 	setSelectedMeetingCycle,
 	selectedMeetingCount,
@@ -43,25 +43,64 @@ const Filter: React.FC<FilterProps> = ({
 	setMeetingComparison,
 }) => {
 	const [openDropdown, setOpenDropdown] = useState<DropdownType>(null);
+	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+	const [menuPos, setMenuPos] = useState<{
+		top: number;
+		left: number;
+		width: number;
+	} | null>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
+	const menuRef = useRef<HTMLDivElement>(null);
 
-	// 외부 클릭 시 드롭다운 닫기
+	// 외부 클릭 시: container 나 portal 메뉴 안이 아니면 닫기
 	useEffect(() => {
-		const onOutsideClick = (e: MouseEvent) => {
-			if (
-				containerRef.current &&
-				!containerRef.current.contains(e.target as Node)
-			) {
-				setOpenDropdown(null);
-			}
+		const onClick = (e: MouseEvent) => {
+			const t = e.target as Node;
+			if (containerRef.current?.contains(t)) return;
+			if (menuRef.current?.contains(t)) return;
+			setOpenDropdown(null);
+			setAnchorEl(null);
 		};
-		document.addEventListener('mousedown', onOutsideClick);
-		return () => document.removeEventListener('mousedown', onOutsideClick);
+		document.addEventListener('mousedown', onClick);
+		return () => document.removeEventListener('mousedown', onClick);
 	}, []);
 
-	const toggleItem = <T,>(arr: T[], item: T, setter: (v: T[]) => void) => {
-		setter(arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item]);
-	};
+	// 메뉴 위치 계산
+	const updateMenuPos = useCallback(() => {
+		if (!anchorEl) {
+			setMenuPos(null);
+			return;
+		}
+		const rect = anchorEl.getBoundingClientRect();
+		setMenuPos({
+			top: rect.bottom + window.scrollY,
+			left: rect.left + window.scrollX,
+			width: rect.width,
+		});
+	}, [anchorEl]);
+
+	// anchorEl 변화 / 스크롤 / 리사이즈 시 위치 갱신
+	useEffect(() => {
+		updateMenuPos();
+	}, [anchorEl, updateMenuPos]);
+	useEffect(() => {
+		if (!anchorEl) return;
+		window.addEventListener('scroll', updateMenuPos, true);
+		window.addEventListener('resize', updateMenuPos);
+		return () => {
+			window.removeEventListener('scroll', updateMenuPos, true);
+			window.removeEventListener('resize', updateMenuPos);
+		};
+	}, [anchorEl, updateMenuPos]);
+
+	const toggleItem = useCallback(
+		<T,>(arr: T[], item: T, setter: (v: T[]) => void) => {
+			setter(
+				arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item],
+			);
+		},
+		[],
+	);
 
 	const handleReset = () => {
 		setSelectedRegions([]);
@@ -70,79 +109,76 @@ const Filter: React.FC<FilterProps> = ({
 		setSelectedMeetingCycle(null);
 		setSelectedMeetingCount(null);
 		setMeetingComparison('above');
+		setOpenDropdown(null);
+		setAnchorEl(null);
 	};
 
-	return (
-		<div className="filter-container flex-center" ref={containerRef}>
-			<div className="filter flex-left">
-				{/* 초기화 */}
-				<button
-					type="button"
-					className="filter-button button2"
-					onClick={handleReset}
-				>
-					초기화
-				</button>
+	const handleButtonClick =
+		(type: DropdownType) => (e: React.MouseEvent<HTMLButtonElement>) => {
+			if (openDropdown === type) {
+				setOpenDropdown(null);
+				setAnchorEl(null);
+			} else {
+				setOpenDropdown(type);
+				setAnchorEl(e.currentTarget);
+			}
+		};
 
-				{/* 만남장소 */}
-				<div className="dropdown-wrapper">
+	const renderMenu = useCallback(() => {
+		if (!openDropdown || !menuPos) return null;
+		let items: React.ReactNode = null;
+
+		switch (openDropdown) {
+			case 'regions':
+				items = Object.values(Region).map((r) => (
 					<button
-						type="button"
-						className="filter-button dropdown button2"
+						key={r}
+						className={`dropdown-item button2 ${selectedRegions.includes(r) ? 'selected' : ''}`}
+						onClick={() => toggleItem(selectedRegions, r, setSelectedRegions)}
+					>
+						{r}
+					</button>
+				));
+				break;
+			case 'categories':
+				items = Object.values(Category).map((c) => (
+					<button
+						key={c}
+						className={`dropdown-item button2 ${selectedCategories.includes(c) ? 'selected' : ''}`}
 						onClick={() =>
-							setOpenDropdown(openDropdown === 'regions' ? null : 'regions')
+							toggleItem(selectedCategories, c, setSelectedCategories)
 						}
 					>
-						만남장소
+						{c}
 					</button>
-					{openDropdown === 'regions' && (
-						<div className="dropdown-menu">
-							{Object.values(Region).map((region) => (
+				));
+				break;
+			case 'times':
+				items = MEETING_TIMES.map((t) => (
+					<button
+						key={t}
+						className={`dropdown-item button2 ${selectedTimes.includes(t) ? 'selected' : ''}`}
+						onClick={() => toggleItem(selectedTimes, t, setSelectedTimes)}
+					>
+						{t}
+					</button>
+				));
+				break;
+			case 'days':
+				items = (
+					<>
+						<div className="cycle-selector flex-center">
+							{CYCLE_OPTIONS.map((cycle) => (
 								<button
-									key={region}
-									type="button"
-									className={`dropdown-item button2 ${
-										selectedRegions.includes(region) ? 'selected' : ''
-									}`}
-									onClick={() =>
-										toggleItem(selectedRegions, region, setSelectedRegions)
-									}
+									key={cycle}
+									className={`dropdown-item button2 ${selectedMeetingCycle === cycle ? 'selected' : ''}`}
+									onClick={() => setSelectedMeetingCycle(cycle)}
 								>
-									{region}
+									{cycle}
 								</button>
 							))}
 						</div>
-					)}
-				</div>
-
-				{/* 만남횟수 */}
-				<div className="dropdown-wrapper">
-					<button
-						type="button"
-						className="filter-button dropdown button2"
-						onClick={() =>
-							setOpenDropdown(openDropdown === 'days' ? null : 'days')
-						}
-					>
-						만남횟수
-					</button>
-					{openDropdown === 'days' && (
-						<div className="dropdown-menu days-menu">
-							{/* 주/월 선택 */}
-							<div className="cycle-selector">
-								{CYCLE_OPTIONS.map((c) => (
-									<button
-										key={c}
-										type="button"
-										className={`button2 ${selectedMeetingCycle === c ? 'selected' : ''}`}
-										onClick={() => setSelectedMeetingCycle(c)}
-									>
-										{c}
-									</button>
-								))}
-							</div>
-
-							{/* 숫자 입력 */}
+						<div className="count-container">
 							<div className="count-input-wrapper">
 								<input
 									type="number"
@@ -150,105 +186,110 @@ const Filter: React.FC<FilterProps> = ({
 									value={selectedMeetingCount ?? ''}
 									onChange={(e) =>
 										setSelectedMeetingCount(
-											e.target.value ? Number(e.target.value) : null,
+											e.target.value ? +e.target.value : null,
 										)
 									}
 									className="button2 count-input"
 								/>
 								<span className="button2">회</span>
 							</div>
-
-							{/* 이상/이하 선택 */}
-							<div className="comparison-selector" style={{ marginTop: 8 }}>
+							<div className="comparison-selector">
 								<button
-									type="button"
-									className={`button2 ${meetingComparison === 'above' ? 'selected' : ''}`}
+									className={`dropdown-item button2 ${meetingComparison === 'above' ? 'selected' : ''}`}
 									onClick={() => setMeetingComparison('above')}
 								>
 									이상
 								</button>
 								<button
-									type="button"
-									className={`button2 ${meetingComparison === 'below' ? 'selected' : ''}`}
+									className={`dropdown-item button2 ${meetingComparison === 'below' ? 'selected' : ''}`}
 									onClick={() => setMeetingComparison('below')}
-									style={{ marginLeft: 4 }}
 								>
 									이하
 								</button>
 							</div>
 						</div>
-					)}
-				</div>
+					</>
+				);
+				break;
+		}
 
-				{/* 시간대 */}
-				<div className="dropdown-wrapper">
-					<button
-						type="button"
-						className="filter-button dropdown button2"
-						onClick={() =>
-							setOpenDropdown(openDropdown === 'times' ? null : 'times')
-						}
-					>
-						시간대
-					</button>
-					{openDropdown === 'times' && (
-						<div className="dropdown-menu">
-							{MEETING_TIMES.map((time) => (
-								<button
-									key={time}
-									type="button"
-									className={`dropdown-item button2 ${
-										selectedTimes.includes(time) ? 'selected' : ''
-									}`}
-									onClick={() =>
-										toggleItem(selectedTimes, time, setSelectedTimes)
-									}
-								>
-									{time}
-								</button>
-							))}
-						</div>
-					)}
-				</div>
+		return ReactDOM.createPortal(
+			<div
+				ref={menuRef}
+				className={`dropdown-menu ${openDropdown === 'days' ? 'days-menu' : ''}`}
+				style={{
+					position: 'absolute',
+					top: menuPos.top,
+					left: menuPos.left,
+					width: menuPos.width,
+					zIndex: 10000,
+				}}
+			>
+				{items}
+			</div>,
+			document.body,
+		);
+	}, [
+		openDropdown,
+		menuPos,
+		selectedRegions,
+		selectedCategories,
+		selectedTimes,
+		selectedMeetingCycle,
+		selectedMeetingCount,
+		meetingComparison,
+		toggleItem,
+		setSelectedRegions,
+		setSelectedCategories,
+		setSelectedTimes,
+		setSelectedMeetingCycle,
+		setSelectedMeetingCount,
+		setMeetingComparison,
+	]);
 
-				{/* 분야 */}
-				<div className="dropdown-wrapper">
-					<button
-						type="button"
-						className="filter-button dropdown button2"
-						onClick={() =>
-							setOpenDropdown(
-								openDropdown === 'categories' ? null : 'categories',
-							)
-						}
-					>
-						분야
+	return (
+		<>
+			<div className="filter-container flex-center" ref={containerRef}>
+				<div className="filter flex-left">
+					<button className="filter-button button2" onClick={handleReset}>
+						초기화
 					</button>
-					{openDropdown === 'categories' && (
-						<div className="dropdown-menu">
-							{Object.values(Category).map((category) => (
-								<button
-									key={category}
-									type="button"
-									className={`dropdown-item button2 ${
-										selectedCategories.includes(category) ? 'selected' : ''
-									}`}
-									onClick={() =>
-										toggleItem(
-											selectedCategories,
-											category,
-											setSelectedCategories,
-										)
-									}
-								>
-									{category}
-								</button>
-							))}
-						</div>
-					)}
+					<div className="dropdown-wrapper">
+						<button
+							className="filter-button dropdown button2"
+							onClick={handleButtonClick('regions')}
+						>
+							만남장소
+						</button>
+					</div>
+					<div className="dropdown-wrapper">
+						<button
+							className="filter-button dropdown button2"
+							onClick={handleButtonClick('days')}
+						>
+							만남횟수
+						</button>
+					</div>
+					<div className="flex-center dropdown-wrapper">
+						<button
+							className="filter-button dropdown button2"
+							onClick={handleButtonClick('times')}
+						>
+							시간대
+						</button>
+					</div>
+					<div className="dropdown-wrapper">
+						<button
+							className="filter-button dropdown button2"
+							onClick={handleButtonClick('categories')}
+						>
+							분야
+						</button>
+					</div>
 				</div>
 			</div>
-		</div>
+			{renderMenu()}
+		</>
 	);
 };
 
