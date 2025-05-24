@@ -15,9 +15,11 @@ export default function MainPage() {
 	const { myGroupIds } = useMyGroupIds();
 
 	const [searchResults, setSearchResults] = useState<APIGroup[] | null>(null);
+
 	const [selectedRegions, setSelectedRegions] = useState<Region[]>([]);
 	const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
 	const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
+
 	const [selectedMeetingCycle, setSelectedMeetingCycle] = useState<
 		'월' | '주' | null
 	>(null);
@@ -30,22 +32,21 @@ export default function MainPage() {
 
 	const [displayedGroups, setDisplayedGroups] = useState<APIGroup[]>([]);
 
-	// infinite scroll on window
-	useEffect(() => {
-		const handleScroll = () => {
-			if (
-				window.innerHeight + window.scrollY >=
-					document.body.offsetHeight - 200 &&
-				hasMore &&
-				!loading
-			) {
-				loadMore();
-			}
-		};
-		window.addEventListener('scroll', handleScroll);
-		return () => window.removeEventListener('scroll', handleScroll);
-	}, [hasMore, loading, loadMore]);
+	// 필터 활성화 플래그
+	const filterActive =
+		selectedRegions.length > 0 ||
+		selectedCategories.length > 0 ||
+		selectedTimes.length > 0 ||
+		selectedMeetingCycle !== null;
 
+	// 필터 사용 시 모든 페이지 불러오기
+	useEffect(() => {
+		if (filterActive && hasMore && !loading) {
+			loadMore();
+		}
+	}, [filterActive, hasMore, loading, loadMore]);
+
+	// 초기 로드 또는 필터·검색 비활성 시 전체 그룹 표시
 	useEffect(() => {
 		if (
 			searchResults === null &&
@@ -66,8 +67,10 @@ export default function MainPage() {
 		selectedMeetingCycle,
 	]);
 
+	// 필터 적용 로직
 	useEffect(() => {
 		if (searchResults !== null) return;
+
 		if (
 			selectedRegions.length ||
 			selectedCategories.length ||
@@ -75,18 +78,26 @@ export default function MainPage() {
 			selectedMeetingCycle !== null
 		) {
 			let filtered = groups;
-			if (selectedRegions.length)
+
+			// 지역 필터
+			if (selectedRegions.length) {
 				filtered = filtered.filter((g) =>
 					selectedRegions.includes(g.region as Region),
 				);
-			if (selectedCategories.length)
+			}
+			// 분야 필터
+			if (selectedCategories.length) {
 				filtered = filtered.filter((g) =>
 					selectedCategories.includes(g.category as Category),
 				);
-			if (selectedTimes.length)
+			}
+			// 시간대 필터
+			if (selectedTimes.length) {
 				filtered = filtered.filter((g) =>
 					selectedTimes.includes(g.meetingTime),
 				);
+			}
+			// 만남 횟수 필터
 			if (selectedMeetingCycle && selectedMeetingCount != null) {
 				filtered = filtered.filter((g) => {
 					const [cycle, countStr] = g.meetingDays.split(' ');
@@ -97,6 +108,7 @@ export default function MainPage() {
 						: cnt <= selectedMeetingCount;
 				});
 			}
+
 			setDisplayedGroups(filtered);
 		}
 	}, [
@@ -110,6 +122,7 @@ export default function MainPage() {
 		meetingComparison,
 	]);
 
+	// 검색 결과 핸들러
 	const handleSearchResult = (res: SearchGroupResponse | null) => {
 		if (res?.groups) {
 			setSearchResults(res.groups);
@@ -119,12 +132,9 @@ export default function MainPage() {
 		}
 	};
 
+	// 최종 props
 	const finalSearchResults =
-		searchResults !== null ||
-		selectedRegions.length > 0 ||
-		selectedCategories.length > 0 ||
-		selectedTimes.length > 0 ||
-		selectedMeetingCycle !== null
+		searchResults !== null || filterActive
 			? { groups: displayedGroups, nextCursor: null, message: null }
 			: null;
 
@@ -132,6 +142,7 @@ export default function MainPage() {
 		<div>
 			<Header />
 			<SearchBar onSearchResult={handleSearchResult} />
+
 			<Filter
 				selectedRegions={selectedRegions}
 				setSelectedRegions={setSelectedRegions}
@@ -146,6 +157,7 @@ export default function MainPage() {
 				meetingComparison={meetingComparison}
 				setMeetingComparison={setMeetingComparison}
 			/>
+
 			<StudyGroupsList
 				searchResults={finalSearchResults}
 				myGroupIds={myGroupIds}
