@@ -1,4 +1,3 @@
-// src/features/filter/filter.tsx
 import React, {
 	useRef,
 	useEffect,
@@ -58,12 +57,10 @@ const Filter: React.FC<FilterProps> = ({
 	const containerRef = useRef<HTMLDivElement>(null);
 	const menuRef = useRef<HTMLDivElement>(null);
 
-	// scroll & fade state
 	const scrollRef = useRef<HTMLDivElement>(null);
-	const [showFadeLeft, setShowFadeLeft] = useState(false);
-	const [showFadeRight, setShowFadeRight] = useState(false);
+	// const [showFadeLeft, setShowFadeLeft] = useState(false);
+	// const [showFadeRight, setShowFadeRight] = useState(false);
 
-	// close dropdown on outside click
 	useEffect(() => {
 		const onClick = (e: MouseEvent) => {
 			const t = e.target as Node;
@@ -103,13 +100,12 @@ const Filter: React.FC<FilterProps> = ({
 		};
 	}, [anchorEl, updateMenuPos]);
 
-	// update fade based on scroll
 	const updateFade = useCallback(() => {
 		const el = scrollRef.current;
 		if (!el) return;
 		const { scrollLeft, scrollWidth, clientWidth } = el;
-		setShowFadeLeft(scrollLeft > 0);
-		setShowFadeRight(scrollLeft + clientWidth < scrollWidth);
+		// setShowFadeLeft(scrollLeft > 0);
+		// setShowFadeRight(scrollLeft + clientWidth < scrollWidth);
 	}, []);
 
 	useEffect(() => {
@@ -117,7 +113,6 @@ const Filter: React.FC<FilterProps> = ({
 	}, [updateFade]);
 	const onScroll = () => updateFade();
 
-	// toggle selection
 	const toggleItem = useCallback(
 		<T,>(arr: T[], item: T, setter: (v: T[]) => void) => {
 			setter(
@@ -127,7 +122,6 @@ const Filter: React.FC<FilterProps> = ({
 		[],
 	);
 
-	// reset filters
 	const handleReset = () => {
 		setSelectedRegions([]);
 		setSelectedCategories([]);
@@ -139,7 +133,6 @@ const Filter: React.FC<FilterProps> = ({
 		setAnchorEl(null);
 	};
 
-	// dropdown toggle
 	const handleButtonClick =
 		(type: DropdownType) => (e: React.MouseEvent<HTMLButtonElement>) => {
 			if (openDropdown === type) {
@@ -151,14 +144,12 @@ const Filter: React.FC<FilterProps> = ({
 			}
 		};
 
-	// render dropdown menu
 	const renderMenu = useCallback(() => {
 		if (!openDropdown || !menuPos) return null;
 		let items: ReactNode = null;
 
 		switch (openDropdown) {
 			case 'regions': {
-				// ‘해당없음’ 은 최상단에, 라벨은 ‘비대면’ 표시
 				const noneKey = Region.해당없음;
 				const regionsOrdered = [
 					noneKey,
@@ -291,7 +282,7 @@ const Filter: React.FC<FilterProps> = ({
 	return (
 		<>
 			<div className="filter-container flex-center" ref={containerRef}>
-				{showFadeLeft && <div className="fade fade-left" />}
+				{/* {showFadeLeft && <div className="fade fade-left" />} */}
 				<div className="filter flex-left" ref={scrollRef} onScroll={onScroll}>
 					<button className="filter-button button2" onClick={handleReset}>
 						초기화
@@ -329,7 +320,7 @@ const Filter: React.FC<FilterProps> = ({
 						</button>
 					</div>
 				</div>
-				{showFadeRight && <div className="fade fade-right" />}
+				{/* {showFadeRight && <div className="fade fade-right" />} */}
 			</div>
 			{renderMenu()}
 		</>
