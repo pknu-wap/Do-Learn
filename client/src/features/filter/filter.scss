@@ -1,4 +1,3 @@
-// src/features/filter/filter.scss
 @import 'assets/style/_colors.scss';
 
 .filter-container {
@@ -22,25 +21,25 @@
 		-webkit-mask-image: linear-gradient(
 			to right,
 			transparent 0%,
-			black 10%,
-			black 90%,
+			black 20%,
+			black 95%,
 			transparent 100%
 		);
 		mask-image: linear-gradient(
 			to right,
 			transparent 0%,
-			black 10%,
+			black 5%,
 			black 90%,
 			transparent 100%
 		);
 	}
 	&.mask-left {
-		-webkit-mask-image: linear-gradient(to right, transparent 0%, black 100%);
-		mask-image: linear-gradient(to right, transparent 0%, black 100%);
+		-webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%);
+		mask-image: linear-gradient(to right, transparent 0%, black 10%);
 	}
 	&.mask-right {
-		-webkit-mask-image: linear-gradient(to left, transparent 0%, black 100%);
-		mask-image: linear-gradient(to left, transparent 0%, black 100%);
+		-webkit-mask-image: linear-gradient(to left, transparent 0%, black 10%);
+		mask-image: linear-gradient(to left, transparent 0%, black 10%);
 	}
 }
 
