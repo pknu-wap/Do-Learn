@@ -32,6 +32,21 @@ export default function MainPage() {
 
 	const [displayedGroups, setDisplayedGroups] = useState<APIGroup[]>([]);
 
+	// 필터 활성화 플래그
+	const filterActive =
+		selectedRegions.length > 0 ||
+		selectedCategories.length > 0 ||
+		selectedTimes.length > 0 ||
+		selectedMeetingCycle !== null;
+
+	// 필터 사용 시 모든 페이지 불러오기
+	useEffect(() => {
+		if (filterActive && hasMore && !loading) {
+			loadMore();
+		}
+	}, [filterActive, hasMore, loading, loadMore]);
+
+	// 초기 로드 또는 필터·검색 비활성 시 전체 그룹 표시
 	useEffect(() => {
 		if (
 			searchResults === null &&
@@ -52,10 +67,10 @@ export default function MainPage() {
 		selectedMeetingCycle,
 	]);
 
+	// 필터 적용 로직
 	useEffect(() => {
 		if (searchResults !== null) return;
 
-		// 하나라도 활성화됐으면 필터 적용
 		if (
 			selectedRegions.length ||
 			selectedCategories.length ||
@@ -64,25 +79,25 @@ export default function MainPage() {
 		) {
 			let filtered = groups;
 
-			// 지역
+			// 지역 필터
 			if (selectedRegions.length) {
 				filtered = filtered.filter((g) =>
 					selectedRegions.includes(g.region as Region),
 				);
 			}
-			// 분야
+			// 분야 필터
 			if (selectedCategories.length) {
 				filtered = filtered.filter((g) =>
 					selectedCategories.includes(g.category as Category),
 				);
 			}
-			// 시간대
+			// 시간대 필터
 			if (selectedTimes.length) {
 				filtered = filtered.filter((g) =>
 					selectedTimes.includes(g.meetingTime),
 				);
 			}
-			// 만남횟수
+			// 만남 횟수 필터
 			if (selectedMeetingCycle && selectedMeetingCount != null) {
 				filtered = filtered.filter((g) => {
 					const [cycle, countStr] = g.meetingDays.split(' ');
@@ -107,6 +122,7 @@ export default function MainPage() {
 		meetingComparison,
 	]);
 
+	// 검색 결과 핸들러
 	const handleSearchResult = (res: SearchGroupResponse | null) => {
 		if (res?.groups) {
 			setSearchResults(res.groups);
@@ -116,12 +132,9 @@ export default function MainPage() {
 		}
 	};
 
-	// D) StudyGroupsList에 넘길 최종 props
+	// 최종 props
 	const finalSearchResults =
-		searchResults !== null ||
-		selectedRegions.length + selectedCategories.length + selectedTimes.length >
-			0 ||
-		selectedMeetingCycle !== null
+		searchResults !== null || filterActive
 			? { groups: displayedGroups, nextCursor: null, message: null }
 			: null;
 
