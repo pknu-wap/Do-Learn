@@ -1,4 +1,3 @@
-// src/pages/MainPage.tsx
 import React, { useState, useEffect } from 'react';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
@@ -47,7 +46,6 @@ export default function MainPage() {
 		return () => window.removeEventListener('scroll', handleScroll);
 	}, [hasMore, loading, loadMore]);
 
-	// initial or reset
 	useEffect(() => {
 		if (
 			searchResults === null &&
@@ -68,7 +66,6 @@ export default function MainPage() {
 		selectedMeetingCycle,
 	]);
 
-	// filter logic
 	useEffect(() => {
 		if (searchResults !== null) return;
 		if (
@@ -113,7 +110,6 @@ export default function MainPage() {
 		meetingComparison,
 	]);
 
-	// search handler
 	const handleSearchResult = (res: SearchGroupResponse | null) => {
 		if (res?.groups) {
 			setSearchResults(res.groups);
