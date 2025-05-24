@@ -5,7 +5,7 @@ export interface MyPageInfo {
 	id: number;
 	email: string;
 	nickname: string;
-	profileImage: string;
+	profileImage: number;
 }
 
 type UpdateMyPageInfoPayload = Partial<
