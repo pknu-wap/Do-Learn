@@ -38,7 +38,7 @@ const GroupMemberList = ({ studyGroupId }: { studyGroupId: number }) => {
 			<div className="group-member-title body1">그룹 멤버</div>
 			<div className="group-member-grid">
 				{members.map((member) => (
-					<div key={member.userId} className="member-card flex-col-center">
+					<div key={member.userId} className="member-card flex-col">
 						<img
 							className="avatar"
 							src={profileImageMap[member.profileImage] || profileImageMap[4]}
