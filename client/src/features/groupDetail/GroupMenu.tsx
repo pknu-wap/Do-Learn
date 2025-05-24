@@ -8,7 +8,7 @@ import './GroupMenu.scss';
 type TabKey = 'attendance' | 'info' | 'goal' | 'ranking';
 
 interface Props {
-	selected: TabKey;
+	selected: TabKey | null;
 	onSelectMenu: (key: TabKey) => void;
 }
 

@@ -31,3 +31,12 @@
 .menu-title {
 	margin-top: 10px;
 }
+
+.menu-item-group.active {
+	.menu-item {
+		color: white;
+	}
+	.menu-item {
+		background-color: rgb(182, 193, 169);
+	}
+}
