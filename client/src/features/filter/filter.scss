@@ -1,6 +1,8 @@
+// src/features/filter/filter.scss
 @import 'assets/style/_colors.scss';
 
 .filter-container {
+	position: relative;
 	width: 100%;
 	padding: 16px 0 30px;
 	background-color: #fff;
@@ -11,11 +13,38 @@
 	width: 78%;
 	overflow-x: auto;
 	overflow-y: visible;
+
 	&::-webkit-scrollbar {
 		display: none;
 	}
+
+	&.mask-both {
+		-webkit-mask-image: linear-gradient(
+			to right,
+			transparent 0%,
+			black 10%,
+			black 90%,
+			transparent 100%
+		);
+		mask-image: linear-gradient(
+			to right,
+			transparent 0%,
+			black 10%,
+			black 90%,
+			transparent 100%
+		);
+	}
+	&.mask-left {
+		-webkit-mask-image: linear-gradient(to right, transparent 0%, black 100%);
+		mask-image: linear-gradient(to right, transparent 0%, black 100%);
+	}
+	&.mask-right {
+		-webkit-mask-image: linear-gradient(to left, transparent 0%, black 100%);
+		mask-image: linear-gradient(to left, transparent 0%, black 100%);
+	}
 }
 
+/* 기존 스타일 유지 */
 .filter-button {
 	margin-right: 12px;
 	padding: 6px 12px;
@@ -75,23 +104,28 @@
 		flex: 1;
 	}
 
-	.cycle-selector {
-		display: flex;
-		margin-bottom: 8px;
+	// .cycle-selector {
+	// 	button {
+	// 		flex: 1;
+	// 	}
+	// }
 
-		button {
+	.count-input-wrapper {
+		gap: 4px;
+		margin: 3px;
+		.count-input {
 			flex: 1;
+			height: 27px;
+			min-width: 10px;
+			text-align: center;
+			border: 1px solid $sub-color-dark-green;
+			border-radius: 10px;
 		}
 	}
 
-	.count-input-wrapper {
-		display: flex;
-		align-items: center;
-		gap: 4px;
-	}
-
-	.count-input {
-		width: 48px;
-		text-align: center;
+	.comparison-selector {
+		button {
+			flex: 1;
+		}
 	}
 }
