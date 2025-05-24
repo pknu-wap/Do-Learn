@@ -1,4 +1,3 @@
-// src/features/groupDetail/GroupMenu.tsx
 import React from 'react';
 import { CalendarDays, Info, Target, Trophy } from 'lucide-react';
 import 'assets/style/_flex.scss';
