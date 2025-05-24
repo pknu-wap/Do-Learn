@@ -46,7 +46,6 @@ const Filter: React.FC<FilterProps> = ({
 	meetingComparison,
 	setMeetingComparison,
 }) => {
-	// dropdown state
 	const [openDropdown, setOpenDropdown] = useState<DropdownType>(null);
 	const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 	const [menuPos, setMenuPos] = useState<{
@@ -58,14 +57,18 @@ const Filter: React.FC<FilterProps> = ({
 	const menuRef = useRef<HTMLDivElement>(null);
 
 	const scrollRef = useRef<HTMLDivElement>(null);
-	// const [showFadeLeft, setShowFadeLeft] = useState(false);
-	// const [showFadeRight, setShowFadeRight] = useState(false);
+	const [showFadeLeft, setShowFadeLeft] = useState(false);
+	const [showFadeRight, setShowFadeRight] = useState(false);
+
+	const isRegionActive = selectedRegions.length > 0;
+	const isCategoryActive = selectedCategories.length > 0;
+	const isTimeActive = selectedTimes.length > 0;
 
 	useEffect(() => {
 		const onClick = (e: MouseEvent) => {
 			const t = e.target as Node;
-			if (containerRef.current?.contains(t)) return;
-			if (menuRef.current?.contains(t)) return;
+			if (containerRef.current?.contains(t) || menuRef.current?.contains(t))
+				return;
 			setOpenDropdown(null);
 			setAnchorEl(null);
 		};
@@ -73,7 +76,6 @@ const Filter: React.FC<FilterProps> = ({
 		return () => document.removeEventListener('mousedown', onClick);
 	}, []);
 
-	// compute menu position
 	const updateMenuPos = useCallback(() => {
 		if (!anchorEl) {
 			setMenuPos(null);
@@ -86,10 +88,7 @@ const Filter: React.FC<FilterProps> = ({
 			width: rect.width,
 		});
 	}, [anchorEl]);
-
-	useEffect(() => {
-		updateMenuPos();
-	}, [anchorEl, updateMenuPos]);
+	useEffect(() => updateMenuPos(), [anchorEl, updateMenuPos]);
 	useEffect(() => {
 		if (!anchorEl) return;
 		window.addEventListener('scroll', updateMenuPos, true);
@@ -100,19 +99,24 @@ const Filter: React.FC<FilterProps> = ({
 		};
 	}, [anchorEl, updateMenuPos]);
 
+	// fade update
 	const updateFade = useCallback(() => {
 		const el = scrollRef.current;
 		if (!el) return;
 		const { scrollLeft, scrollWidth, clientWidth } = el;
-		// setShowFadeLeft(scrollLeft > 0);
-		// setShowFadeRight(scrollLeft + clientWidth < scrollWidth);
+		setShowFadeLeft(scrollLeft > 0);
+		const epsilon = 1;
+		setShowFadeRight(scrollLeft + clientWidth < scrollWidth - epsilon);
 	}, []);
-
 	useEffect(() => {
 		updateFade();
+		scrollRef.current?.addEventListener('scroll', updateFade);
+		return () => {
+			scrollRef.current?.removeEventListener('scroll', updateFade);
+		};
 	}, [updateFade]);
-	const onScroll = () => updateFade();
 
+	// toggle item
 	const toggleItem = useCallback(
 		<T,>(arr: T[], item: T, setter: (v: T[]) => void) => {
 			setter(
@@ -135,19 +139,13 @@ const Filter: React.FC<FilterProps> = ({
 
 	const handleButtonClick =
 		(type: DropdownType) => (e: React.MouseEvent<HTMLButtonElement>) => {
-			if (openDropdown === type) {
-				setOpenDropdown(null);
-				setAnchorEl(null);
-			} else {
-				setOpenDropdown(type);
-				setAnchorEl(e.currentTarget);
-			}
+			setOpenDropdown(openDropdown === type ? null : type);
+			setAnchorEl(openDropdown === type ? null : e.currentTarget);
 		};
 
 	const renderMenu = useCallback(() => {
 		if (!openDropdown || !menuPos) return null;
 		let items: ReactNode = null;
-
 		switch (openDropdown) {
 			case 'regions': {
 				const noneKey = Region.해당없음;
@@ -197,9 +195,7 @@ const Filter: React.FC<FilterProps> = ({
 							{CYCLE_OPTIONS.map((cycle) => (
 								<button
 									key={cycle}
-									className={`dropdown-item button2 ${
-										selectedMeetingCycle === cycle ? 'selected' : ''
-									}`}
+									className="dropdown-item button2"
 									onClick={() => setSelectedMeetingCycle(cycle)}
 								>
 									{cycle}
@@ -209,6 +205,7 @@ const Filter: React.FC<FilterProps> = ({
 						<div className="count-container">
 							<div className="count-input-wrapper flex-center">
 								<input
+									placeholder="숫자 입력"
 									type="number"
 									min={1}
 									value={selectedMeetingCount ?? ''}
@@ -223,17 +220,13 @@ const Filter: React.FC<FilterProps> = ({
 							</div>
 							<div className="comparison-selector flex-center">
 								<button
-									className={`dropdown-item button2 ${
-										meetingComparison === 'above' ? 'selected' : ''
-									}`}
+									className={`dropdown-item button2 ${meetingComparison === 'above' ? 'selected' : ''}`}
 									onClick={() => setMeetingComparison('above')}
 								>
 									이상
 								</button>
 								<button
-									className={`dropdown-item button2 ${
-										meetingComparison === 'below' ? 'selected' : ''
-									}`}
+									className={`dropdown-item button2 ${meetingComparison === 'below' ? 'selected' : ''}`}
 									onClick={() => setMeetingComparison('below')}
 								>
 									이하
@@ -244,7 +237,6 @@ const Filter: React.FC<FilterProps> = ({
 				);
 				break;
 		}
-
 		return ReactDOM.createPortal(
 			<div
 				ref={menuRef}
@@ -271,25 +263,27 @@ const Filter: React.FC<FilterProps> = ({
 		selectedMeetingCount,
 		meetingComparison,
 		toggleItem,
-		setSelectedRegions,
-		setSelectedCategories,
-		setSelectedTimes,
-		setSelectedMeetingCycle,
-		setSelectedMeetingCount,
-		setMeetingComparison,
 	]);
+
+	const maskClass =
+		showFadeLeft && showFadeRight
+			? 'mask-both'
+			: showFadeLeft
+				? 'mask-left'
+				: showFadeRight
+					? 'mask-right'
+					: '';
 
 	return (
 		<>
 			<div className="filter-container flex-center" ref={containerRef}>
-				{/* {showFadeLeft && <div className="fade fade-left" />} */}
-				<div className="filter flex-left" ref={scrollRef} onScroll={onScroll}>
+				<div className={`filter flex-left ${maskClass}`} ref={scrollRef}>
 					<button className="filter-button button2" onClick={handleReset}>
 						초기화
 					</button>
 					<div className="dropdown-wrapper">
 						<button
-							className="filter-button dropdown button2"
+							className={`filter-button dropdown button2 ${isRegionActive ? 'active' : ''}`}
 							onClick={handleButtonClick('regions')}
 						>
 							만남장소
@@ -303,24 +297,23 @@ const Filter: React.FC<FilterProps> = ({
 							만남횟수
 						</button>
 					</div>
-					<div className="flex-center dropdown-wrapper">
-						<button
-							className="filter-button dropdown button2"
-							onClick={handleButtonClick('times')}
-						>
-							시간대
-						</button>
-					</div>
 					<div className="dropdown-wrapper">
 						<button
-							className="filter-button dropdown button2"
+							className={`filter-button dropdown button2 ${isCategoryActive ? 'active' : ''}`}
 							onClick={handleButtonClick('categories')}
 						>
 							분야
 						</button>
 					</div>
+					<div className="flex-center dropdown-wrapper">
+						<button
+							className={`filter-button dropdown button2 ${isTimeActive ? 'active' : ''}`}
+							onClick={handleButtonClick('times')}
+						>
+							시간대
+						</button>
+					</div>
 				</div>
-				{/* {showFadeRight && <div className="fade fade-right" />} */}
 			</div>
 			{renderMenu()}
 		</>

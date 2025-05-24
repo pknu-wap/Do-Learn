@@ -135,7 +135,14 @@ export default function MainPage() {
 	// 최종 props
 	const finalSearchResults =
 		searchResults !== null || filterActive
-			? { groups: displayedGroups, nextCursor: null, message: null }
+			? {
+					groups: displayedGroups,
+					nextCursor: null,
+					message:
+						filterActive && !loading && displayedGroups.length === 0
+							? '조건에 맞는 스터디그룹이 없습니다.'
+							: message,
+				}
 			: null;
 
 	return (
