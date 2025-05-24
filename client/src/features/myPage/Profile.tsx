@@ -1,4 +1,3 @@
-// src/features/myPage/Profile.tsx
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { getMyPageInfo, updateMyPageInfo } from 'api/myInfoApi';
 import { Pencil } from 'lucide-react';
@@ -11,7 +10,6 @@ interface UserState {
 	nickname: string;
 }
 
-// 프로필 이미지 맵 (ID → URL)
 const profileImageMap: Record<number, string> = {
 	1: '/assets/profile_images/profile-1st.png',
 	2: '/assets/profile_images/profile-2nd.png',
@@ -27,7 +25,6 @@ const Profile: React.FC = () => {
 	const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	// 1) 사용자 정보 로드 (profileImageId: number 으로 받음)
 	useEffect(() => {
 		(async () => {
 			try {
@@ -51,7 +48,6 @@ const Profile: React.FC = () => {
 		})();
 	}, []);
 
-	// 2) 닉네임 입력란 자동 크기 조정
 	useLayoutEffect(() => {
 		if (inputRef.current) {
 			const text = isEditing ? draft : user?.nickname || '';
@@ -67,14 +63,17 @@ const Profile: React.FC = () => {
 		}
 	}, [draft, isEditing, user?.nickname]);
 
-	// 닉네임 편집 토글
 	const handleEditClick = () => {
-		isEditing ? handleFinishEdit() : setIsEditing(true);
+		if (isEditing) {
+			handleFinishEdit();
+		} else {
+			setIsEditing(true);
+		}
 	};
 
-	// 닉네임 변경
 	const handleFinishEdit = async () => {
 		if (!user) return;
+
 		const trimmed = draft.trim();
 		if (trimmed.length < 2 || trimmed.length > 10) {
 			alert('닉네임은 2~10자 사이로 입력해주세요.');
@@ -84,13 +83,18 @@ const Profile: React.FC = () => {
 			setIsEditing(false);
 			return;
 		}
-		// TODO: 중복 확인 로직
+
 		try {
 			await updateMyPageInfo({ nickname: trimmed });
 			setUser({ ...user, nickname: trimmed });
 			setIsEditing(false);
 		} catch (error: any) {
-			if (error.response?.status === 401) {
+			const status = error.response?.status;
+			const serverMsg = error.response?.data?.message || '';
+
+			if (status === 400) {
+				alert('이미 사용 중인 닉네임입니다.');
+			} else if (status === 401) {
 				alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
 				window.location.href = '/login';
 			} else {
@@ -99,14 +103,11 @@ const Profile: React.FC = () => {
 		}
 	};
 
-	// 아바타 클릭 → 모달 열기
 	const handleAvatarClick = () => setIsImageModalOpen(true);
-
-	// 이미지 선택 → ID 보내고 상태 업데이트
 	const handleImageSelect = async (id: number) => {
 		if (!user) return;
 		try {
-			await updateMyPageInfo({ profileImage: id }); // 백엔드에 ID 전송
+			await updateMyPageInfo({ profileImage: id });
 			setUser({ ...user, profileImageId: id });
 			setIsImageModalOpen(false);
 		} catch (error: any) {
@@ -128,7 +129,6 @@ const Profile: React.FC = () => {
 
 	return (
 		<>
-			{/* 이미지 선택 모달 */}
 			{isImageModalOpen && (
 				<div className="image-modal-overlay flex-center">
 					<div className="image-modal body2">
@@ -164,7 +164,6 @@ const Profile: React.FC = () => {
 				</div>
 			)}
 
-			{/* 프로필 페이지 */}
 			<div className="profile-page flex-center">
 				<div className="profile-header flex-center">
 					<div className="content flex-center">
