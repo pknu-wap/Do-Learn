@@ -18,114 +18,113 @@
 		display: none;
 	}
 
-	// 	&.mask-both {
-	// 		-webkit-mask-image: linear-gradient(
-	// 			to right,
-	// 			transparent 0%,
-	// 			black 10%,
-	// 			black 90%,
-	// 			transparent 100%
-	// 		);
-	// 		mask-image: linear-gradient(
-	// 			to right,
-	// 			transparent 0%,
-	// 			black 10%,
-	// 			black 90%,
-	// 			transparent 100%
-	// 		);
-	// 	}
-	// 	&.mask-left {
-	// 		-webkit-mask-image: linear-gradient(to right, transparent 0%, black 100%);
-	// 		mask-image: linear-gradient(to right, transparent 0%, black 100%);
-	// 	}
-	// 	&.mask-right {
-	// 		-webkit-mask-image: linear-gradient(to left, transparent 0%, black 100%);
-	// 		mask-image: linear-gradient(to left, transparent 0%, black 100%);
+	&.mask-both {
+		-webkit-mask-image: linear-gradient(
+			to right,
+			transparent 0%,
+			black 10%,
+			black 90%,
+			transparent 100%
+		);
+		mask-image: linear-gradient(
+			to right,
+			transparent 0%,
+			black 10%,
+			black 90%,
+			transparent 100%
+		);
+	}
+	&.mask-left {
+		-webkit-mask-image: linear-gradient(to right, transparent 0%, black 100%);
+		mask-image: linear-gradient(to right, transparent 0%, black 100%);
+	}
+	&.mask-right {
+		-webkit-mask-image: linear-gradient(to left, transparent 0%, black 100%);
+		mask-image: linear-gradient(to left, transparent 0%, black 100%);
+	}
+}
+
+.filter-button {
+	margin-right: 12px;
+	padding: 6px 12px;
+	border: 1.5px solid $main-color-deep-green;
+	border-radius: 50px;
+	background: #fff;
+	color: #333;
+	white-space: nowrap;
+	cursor: pointer;
+	&:hover {
+		background-color: #f6ffed;
+	}
+	&.dropdown::after {
+		content: '▼';
+		font-size: 10px;
+		margin-left: 4px;
+	}
+}
+
+.count-container {
+	gap: 10px;
+}
+
+.dropdown-menu {
+	max-width: 50% !important;
+	min-width: 120px !important;
+	margin-top: 5px;
+	background: #fff;
+	border: 1.5px solid $main-color-deep-green;
+	border-radius: 8px;
+	padding: 8px;
+	max-height: 300px;
+	overflow-y: auto;
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+.dropdown-item {
+	margin: 3px;
+	padding: 5px 8px;
+	border: 1px solid $sub-color-dark-green;
+	border-radius: 10px;
+	background-color: white;
+	&:hover {
+		background-color: #f6ffed;
+	}
+	&.selected {
+		background-color: $sub-color-green;
+		border: 1px solid $sub-color-green;
+		color: #fff;
+	}
+}
+
+.days-menu {
+	button {
+		flex: 1;
+	}
+
+	// .cycle-selector {
+	// 	button {
+	// 		flex: 1;
 	// 	}
 	// }
 
-	.filter-button {
-		margin-right: 12px;
-		padding: 6px 12px;
-		border: 1.5px solid $main-color-deep-green;
-		border-radius: 50px;
-		background: #fff;
-		color: #333;
-		white-space: nowrap;
-		cursor: pointer;
-		&:hover {
-			background-color: #f6ffed;
-		}
-		&.dropdown::after {
-			content: '▼';
-			font-size: 10px;
-			margin-left: 4px;
-		}
-	}
-
-	.count-container {
-		gap: 10px;
-	}
-
-	.dropdown-menu {
-		max-width: 50% !important;
-		min-width: 120px !important;
-		margin-top: 5px;
-		background: #fff;
-		border: 1.5px solid $main-color-deep-green;
-		border-radius: 8px;
-		padding: 8px;
-		max-height: 300px;
-		overflow-y: auto;
-		&::-webkit-scrollbar {
-			display: none;
-		}
-	}
-
-	.dropdown-item {
+	.count-input-wrapper {
+		gap: 4px;
 		margin: 3px;
-		padding: 5px 8px;
-		border: 1px solid $sub-color-dark-green;
-		border-radius: 10px;
-		background-color: white;
-		&:hover {
-			background-color: #f6ffed;
-		}
-		&.selected {
-			background-color: $sub-color-green;
-			border: 1px solid $sub-color-green;
-			color: #fff;
+		.count-input {
+			flex: 1;
+			height: 27px;
+			min-width: 10px;
+			text-align: center;
+			border: 1px solid $sub-color-dark-green;
+			border-radius: 10px;
 		}
 	}
 
-	.days-menu {
+	.comparison-selector {
 		button {
 			flex: 1;
-		}
-
-		// .cycle-selector {
-		// 	button {
-		// 		flex: 1;
-		// 	}
-		// }
-
-		.count-input-wrapper {
-			gap: 4px;
-			margin: 3px;
-			.count-input {
-				flex: 1;
-				height: 27px;
-				min-width: 10px;
-				text-align: center;
-				border: 1px solid $sub-color-dark-green;
-				border-radius: 10px;
-			}
-		}
-
-		.comparison-selector {
-			button {
-				flex: 1;
-			}
 		}
 	}
 }

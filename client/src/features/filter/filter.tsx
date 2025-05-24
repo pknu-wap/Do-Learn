@@ -58,8 +58,8 @@ const Filter: React.FC<FilterProps> = ({
 	const menuRef = useRef<HTMLDivElement>(null);
 
 	const scrollRef = useRef<HTMLDivElement>(null);
-	// const [showFadeLeft, setShowFadeLeft] = useState(false);
-	// const [showFadeRight, setShowFadeRight] = useState(false);
+	const [showFadeLeft, setShowFadeLeft] = useState(false);
+	const [showFadeRight, setShowFadeRight] = useState(false);
 
 	useEffect(() => {
 		const onClick = (e: MouseEvent) => {
@@ -282,7 +282,7 @@ const Filter: React.FC<FilterProps> = ({
 	return (
 		<>
 			<div className="filter-container flex-center" ref={containerRef}>
-				{/* {showFadeLeft && <div className="fade fade-left" />} */}
+				{showFadeLeft && <div className="fade fade-left" />}
 				<div className="filter flex-left" ref={scrollRef} onScroll={onScroll}>
 					<button className="filter-button button2" onClick={handleReset}>
 						초기화
@@ -320,7 +320,7 @@ const Filter: React.FC<FilterProps> = ({
 						</button>
 					</div>
 				</div>
-				{/* {showFadeRight && <div className="fade fade-right" />} */}
+				{showFadeRight && <div className="fade fade-right" />}
 			</div>
 			{renderMenu()}
 		</>
