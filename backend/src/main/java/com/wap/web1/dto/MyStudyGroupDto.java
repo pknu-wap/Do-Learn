@@ -1,5 +1,6 @@
 package com.wap.web1.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.wap.web1.domain.Category;
 import com.wap.web1.domain.RecruitStatus;
 import com.wap.web1.domain.Region;
@@ -25,4 +26,6 @@ public class MyStudyGroupDto {
     private String type;
     private LocalDate startDate;
     private RecruitStatus recruitStatus;
+    @JsonProperty("isLeader")
+    private boolean isLeader;
 }

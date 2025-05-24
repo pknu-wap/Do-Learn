@@ -54,9 +54,12 @@ public class UserService {
                 .countActiveMembersByGroupIds(groupIds).stream()
                 .collect(Collectors.toMap(GroupMemberCount::getGroupId, GroupMemberCount::getCount));
 
+
         List<MyStudyGroupDto> studyGroups = groups.stream()
                 .map(group -> {
                     int currentMembers = memberCountMap.getOrDefault(group.getId(), 0L).intValue();
+                    boolean isLeader = group.getLeader().getId().equals(userId); // 리더인지 확인
+
                     return MyStudyGroupDto.builder()
                             .id(group.getId())
                             .name(group.getName())
@@ -70,6 +73,7 @@ public class UserService {
                             .type(group.getType())
                             .startDate(group.getStartDate())
                             .recruitStatus(group.getRecruitStatus())
+                            .isLeader(isLeader)
                             .build();
                 })
                 .collect(Collectors.toList());
