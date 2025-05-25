@@ -40,7 +40,9 @@ public class UserService {
     }
 
     public MyGroupsDto getMyGroups(Long userId){
-        List<StudyMember> memberships = studyMemberRepository.findByUserId(userId);
+        List<StudyMember> memberships = studyMemberRepository.findByUserId(userId).stream()
+                .filter(member -> member.getStatus() == StudyMember.Status.ACTIVE)
+                .toList();
 
         List<StudyGroup> groups = memberships.stream()
                 .map(StudyMember::getStudyGroup)
@@ -117,8 +119,11 @@ public class UserService {
         //닉네임 검증 및 수정
         if(dto.getNickname() != null){
             String newNickname = dto.getNickname();
-            if (newNickname.length() > 10){
-                throw new IllegalArgumentException("닉네임은 10자 이내로 입력해야 합니다.");
+            if (newNickname.length() > 10 || newNickname.length()<2){
+                throw new IllegalArgumentException("닉네임은 2~10자 이내로 입력해야 합니다.");
+            }
+            if (newNickname.trim().isEmpty()) {
+                throw new IllegalArgumentException("닉네임은 공백만으로 구성될 수 없습니다.");
             }
 
             boolean isDuplicate = userRepository.existsByNickname(newNickname);
@@ -141,4 +146,61 @@ public class UserService {
         return new Response("내 정보가 성공적으로 수정되었습니다.");
     }
 
+    @Transactional
+    public Response kickUserFromGroup(Long studyGroupId, Long userId, Long targetUserId){
+        StudyGroup group = studyGroupRepository.findById(studyGroupId)
+                .orElseThrow(()-> new IllegalArgumentException("스터디그룹을 찾을 수 없습니다."));
+
+        if (!group.getLeader().getId().equals(userId)){
+            throw new IllegalArgumentException("방장만 멤버를 강퇴할 수 있습니다.");
+        }
+
+        if (group.getLeader().getId().equals(targetUserId)){
+            throw new IllegalArgumentException("방장은 자신을 강퇴할 수 없습니다.");
+        }
+
+        StudyMember member = studyMemberRepository.findByStudyGroupIdAndUserId(studyGroupId, targetUserId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자는 스터디 멤버가 아닙니다."));
+
+        // 이미 비활성화된 사용자 확인
+        if (member.getStatus() != StudyMember.Status.ACTIVE) {
+            throw new IllegalArgumentException("이미 강퇴되었거나 탈퇴한 사용자입니다.");
+        }
+        // 상태를 BANNED로 설정
+        member.setStatus(StudyMember.Status.BANNED);
+
+        return new Response("사용자가 성공적으로 강퇴었습니다.");
+    }
+
+    @Transactional
+    public Response updateLeader(Long studyGroupId, Long userId, Long targetUserId){
+        StudyGroup group = studyGroupRepository.findById(studyGroupId)
+                .orElseThrow(()-> new IllegalArgumentException("스터디그룹을 찾을 수 없습니다."));
+
+        if (!group.getLeader().getId().equals(userId)){
+            throw new IllegalArgumentException("방장만 리더 권한을 위임할 수 있습니다.");
+        }
+
+        if (group.getLeader().getId().equals(targetUserId)){
+            throw new IllegalArgumentException("자기 자신에게 방장 권한을 넘길 수 없습니다.");
+        }
+
+        StudyMember currentLeader = studyMemberRepository.findByStudyGroupIdAndUserId(studyGroupId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("현재 방장이 스터디 멤버가 아닙니다."));
+
+        StudyMember newLeader = studyMemberRepository.findByStudyGroupIdAndUserId(studyGroupId, targetUserId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자는 스터디 멤버가 아닙니다."));
+
+        if (newLeader.getStatus() != StudyMember.Status.ACTIVE) {
+            throw new IllegalArgumentException("ACTIVE 상태의 멤버만 방장이 될 수 있습니다.");
+        }
+        // 역할 변경
+        currentLeader.setRole(StudyMember.Role.MEMBER);
+        newLeader.setRole(StudyMember.Role.LEADER);
+
+        //스터디 그룹의 leader필드 변경
+        group.setLeader(newLeader.getUser());
+
+        return new Response("방장이 성공적으로 변경되었습니다.");
+    }
 }

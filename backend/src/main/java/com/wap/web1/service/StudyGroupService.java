@@ -172,4 +172,22 @@ public class StudyGroupService {
                 .orElseThrow(()-> new IllegalArgumentException("스터디 그룹을 찾을 수 없습니다."))
                 .getName();
     }
+
+    @Transactional
+    public Response leaveStudyGroup(Long studyGroupId, Long userId){
+        StudyGroup group = studyGroupRepository.findById(studyGroupId)
+                .orElseThrow(() -> new IllegalArgumentException("스터디그룹을 찾을 수 없습니다"));
+        StudyMember member = studyMemberRepository.findByStudyGroupAndUser(group,
+                        userRepository.findById(userId)
+                                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다.")))
+                .orElseThrow(() -> new IllegalArgumentException("해당 스터디 그룹의 멤버가 아닙니다."));
+        if(group.getLeader().getId().equals(userId)){
+            throw new IllegalArgumentException("방장은 탈퇴할 수 없습니다.");
+        }
+        if(member.getStatus() != StudyMember.Status.ACTIVE){
+            throw new IllegalArgumentException("이미 탈퇴했거나 강퇴된 상태입니다.");
+        }
+        member.setStatus(StudyMember.Status.LEFT);
+        return new Response("스터디에서 성공적으로 탈퇴했습니다.");
+    }
 }
