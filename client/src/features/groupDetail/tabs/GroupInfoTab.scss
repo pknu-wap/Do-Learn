@@ -45,10 +45,11 @@
 .notice-header {
 	align-items: center;
 	gap: 6px;
+	margin-bottom: 10px;
 }
 
 .notice-icon {
-	margin-right: 7px;
+	margin-right: 2px;
 	color: $main-color-deep-green;
 }
 
@@ -59,4 +60,5 @@
 .notice-content {
 	white-space: pre-wrap;
 	word-break: break-word;
+	width: 94%;
 }

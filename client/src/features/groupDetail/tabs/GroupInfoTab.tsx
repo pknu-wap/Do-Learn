@@ -1,54 +1,53 @@
 import React, { useEffect, useState } from 'react';
 import { Megaphone } from 'lucide-react';
 import { getGroupNotice } from 'api/groupNotice';
-import { fetchStudyGroups, StudyGroup } from 'api/studyGroupApi';
 import './GroupInfoTab.scss';
 import 'assets/style/_typography.scss';
 import 'assets/style/_flex.scss';
 
-interface GroupInfoTabProps {
-	studyGroupId: number;
+export interface StudyGroup {
+	id: number;
+	name: string;
+	meetingDays: string;
+	meetingTime: string;
+	meetingType: string;
+	currentMembers: number;
+	maxMembers: number;
+	region: string;
+	category: string;
+	type: string;
 }
 
-const GroupInfoTab: React.FC<GroupInfoTabProps> = ({ studyGroupId }) => {
-	const [group, setGroup] = useState<StudyGroup | null>(null);
+interface GroupInfoTabProps {
+	group: StudyGroup;
+}
+
+const GroupInfoTab: React.FC<GroupInfoTabProps> = ({ group }) => {
 	const [notice, setNotice] = useState<string>('');
 	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		const loadData = async () => {
+		const loadNotice = async () => {
 			try {
-				const response = await fetchStudyGroups(0, 100);
-				const found =
-					response.groups?.find((g) => g.id === studyGroupId) || null;
-				setGroup(found);
-			} catch (err) {
-				console.error('그룹 정보 불러오기 실패', err);
-			}
-			try {
-				const data = await getGroupNotice(studyGroupId);
+				const data = await getGroupNotice(group.id);
 				setNotice(data.notice || '등록된 공지사항이 없습니다.');
-			} catch (err) {
-				console.error('공지사항 불러오기 실패', err);
-				setNotice('공지사항 불러오기 실패');
+			} catch (err: any) {
+				console.error('공지사항 로드 실패:', err);
+				setError(`공지사항 로드 중 오류: ${err.message}`);
 			}
 			setLoading(false);
 		};
-		loadData();
-	}, [studyGroupId]);
+		loadNotice();
+	}, [group.id]);
 
-	if (loading) {
+	if (loading)
 		return <div className="group-info-container flex-center">로딩 중...</div>;
-	}
-
-	if (!group) {
-		return (
-			<div className="group-info-container">그룹 정보를 찾을 수 없습니다.</div>
-		);
-	}
+	if (error)
+		return <div className="group-info-container body3 error-text">{error}</div>;
 
 	return (
-		<div className="group-info-container flex-center">
+		<div className="group-info-container flex-col-center">
 			<div className="group-meta-row-1 flex-row-center body3">
 				<div className="meta-item flex-row">
 					<div className="notice-info-label">주기</div>
@@ -77,15 +76,15 @@ const GroupInfoTab: React.FC<GroupInfoTabProps> = ({ studyGroupId }) => {
 					{group.type}
 				</div>
 			</div>
-			<div className="group-notice flex-row-center">
+
+			<div className="group-notice flex-col-center">
 				<div className="notice-header flex-row-center">
 					<Megaphone size={24} className="notice-icon" />
-					{/* <span className="notice-label body3">공지사항</span> */}
+					<span className="notice-label body2">공지사항</span>
 				</div>
-				<div className="notice-content body3">{notice}</div>
+				<div className="notice-content flex-center body3">{notice}</div>
 			</div>
 		</div>
 	);
 };
-
 export default GroupInfoTab;
