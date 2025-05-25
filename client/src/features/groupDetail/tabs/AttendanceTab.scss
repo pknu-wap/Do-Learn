@@ -4,7 +4,7 @@
 .attendance-container {
 	width: 100%;
 	background-color: white;
-	padding: 16px;
+	padding: 3px 16px 16px;
 
 	.calendar-nav {
 		width: 91%;
@@ -15,11 +15,10 @@
 			background: none;
 			border: none;
 			cursor: pointer;
-		}
-
-		.calender-prev,
-		.calender-next {
-			color: #888;
+			&.calendar-prev,
+			&.calendar-next {
+				color: gray;
+			}
 		}
 	}
 
