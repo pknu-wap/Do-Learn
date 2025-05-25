@@ -27,9 +27,9 @@
 		display: grid;
 		grid-template-columns: repeat(7, 1fr);
 		gap: 7px;
-		margin-bottom: 16px;
 		width: 95%;
 		max-width: 400px;
+		margin-bottom: 17px;
 
 		.calendar-header {
 			text-align: center;
@@ -48,7 +48,8 @@
 			}
 
 			&.present {
-				color: $sub-color-dark-green;
+				color: $sub-color-green;
+				font-weight: 700;
 			}
 
 			&.today {
@@ -59,7 +60,7 @@
 					right: 2px;
 					bottom: 2px;
 					left: 2px;
-					border: 1px solid $sub-color-dark-green;
+					border: 1px solid $sub-color-green;
 					border-radius: 7px;
 				}
 			}
@@ -86,7 +87,7 @@
 		transition: background-color 0.2s ease;
 
 		&:hover:not(:disabled) {
-			background-color: darken($main-color-deep-green, 10%);
+			background-color: $main-color-deep-green;
 		}
 
 		&:disabled {
