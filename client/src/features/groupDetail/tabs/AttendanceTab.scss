@@ -1,6 +1,98 @@
+// features/groupDetail/tabs/AttendanceTab.scss
 @import 'assets/style/_colors.scss';
 
 .attendance-container {
 	width: 100%;
 	background-color: white;
+	padding: 3px 16px 16px;
+
+	.calendar-nav {
+		width: 91%;
+		max-width: 400px;
+		margin-bottom: 20px;
+
+		button {
+			background: none;
+			border: none;
+			cursor: pointer;
+			&.calendar-prev,
+			&.calendar-next {
+				color: gray;
+			}
+		}
+	}
+
+	.calendar {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		gap: 7px;
+		width: 95%;
+		max-width: 400px;
+		margin-bottom: 17px;
+
+		.calendar-header {
+			text-align: center;
+			font-size: 0.875rem;
+			font-weight: 600;
+			color: #333;
+		}
+
+		.calendar-cell {
+			width: 100%;
+			padding-top: 100%;
+			position: relative;
+
+			&.blank {
+				visibility: hidden;
+			}
+
+			&.present {
+				color: $sub-color-green;
+				font-weight: 700;
+			}
+
+			&.today {
+				&::after {
+					content: '';
+					position: absolute;
+					top: 2px;
+					right: 2px;
+					bottom: 2px;
+					left: 2px;
+					border: 1px solid $sub-color-green;
+					border-radius: 7px;
+				}
+			}
+
+			span {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+			}
+		}
+	}
+
+	.attendance-button {
+		width: 95%;
+		max-width: 400px;
+		padding: 12px 0;
+		font-weight: 600;
+		color: #fff;
+		background-color: $main-color-dark-green;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+
+		&:hover:not(:disabled) {
+			background-color: $main-color-deep-green;
+		}
+
+		&:disabled {
+			background-color: #e0e0e0;
+			color: #888;
+			cursor: not-allowed;
+		}
+	}
 }

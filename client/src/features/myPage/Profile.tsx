@@ -93,7 +93,11 @@ const Profile: React.FC = () => {
 			const serverMsg = error.response?.data?.message || '';
 
 			if (status === 400) {
-				alert('이미 사용 중인 닉네임입니다.');
+				if (serverMsg.includes('이미')) {
+					alert('이미 사용 중인 닉네임입니다.');
+				} else {
+					alert('잘못된 닉네임 입니다. 오류가 발생했습니다.');
+				}
 			} else if (status === 401) {
 				alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
 				window.location.href = '/login';

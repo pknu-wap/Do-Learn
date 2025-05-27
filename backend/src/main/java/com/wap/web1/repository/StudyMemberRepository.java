@@ -33,6 +33,9 @@ public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> 
 
     int countByStudyGroupIdAndStatus(Long studyGroupId, StudyMember.Status status);
 
+
+    Optional<StudyMember> findByStudyGroupIdAndUserId(Long studyGroupId, Long userId);
+
     //현재 인원 계산
     @Query("SELECT sm.studyGroup.id AS groupId, COUNT(sm) AS count " +
             "FROM StudyMember sm " +

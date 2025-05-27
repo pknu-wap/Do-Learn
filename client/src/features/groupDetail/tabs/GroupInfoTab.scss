@@ -3,4 +3,62 @@
 .group-info-container {
 	width: 100%;
 	background-color: white;
+	padding: 3px 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.group-meta-row-1,
+.group-meta-row-2 {
+	gap: 4px;
+	margin-bottom: 8px;
+}
+
+.meta-item {
+	padding: 2px 6px;
+	white-space: nowrap;
+	gap: 5px;
+}
+
+.notice-info-label {
+	color: rgb(98, 98, 98);
+	font-weight: 500;
+}
+
+.dot-divider {
+	margin: 0 4px;
+}
+
+.category-type-item {
+	padding: 2px 6px;
+	gap: 5px;
+	word-break: break-word;
+	white-space: normal;
+	text-align: center;
+}
+
+.group-notice {
+	width: 95%;
+}
+
+.notice-header {
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 10px;
+}
+
+.notice-icon {
+	margin-right: 2px;
+	color: $main-color-deep-green;
+}
+
+// .notice-label {
+// 	font-weight: 600;
+// }
+
+.notice-content {
+	white-space: pre-wrap;
+	word-break: break-word;
+	width: 94%;
 }
