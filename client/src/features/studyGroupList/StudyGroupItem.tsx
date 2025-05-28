@@ -3,7 +3,7 @@ import { isLoggedIn } from 'utils/auth';
 import { useNavigate } from 'react-router-dom';
 import LoginModal from 'components/LoginModal';
 import GroupInfoModal from './GroupInfoModal';
-import joinGroupApi from 'api/joinGroupApi';
+import { joinGroupApi } from 'api/joinLeaveGroupApi';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 import './StudyGroupsList.scss';
