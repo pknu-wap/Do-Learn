@@ -4,6 +4,7 @@ import com.wap.web1.domain.Attendance;
 import com.wap.web1.domain.StudyGroup;
 import com.wap.web1.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -27,4 +28,9 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             @Param("year") int year,
             @Param("month") int month
     );
+
+    @Modifying
+    @Query("DELETE FROM Attendance a WHERE a.studyGroup.id = :studyGroupId")
+    void deleteAllByStudyGroupId(@Param("studyGroupId") Long studyGroupId);
+
 }

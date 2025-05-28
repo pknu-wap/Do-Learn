@@ -70,6 +70,16 @@ public class UserController {
         Response response = userService.updateLeader(studyGroupId, userId, targetUserId);
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/studygroups/{studyGroupId}/delete")
+    public ResponseEntity<Response> deleteStudyGroup(
+            @PathVariable Long studyGroupId,
+            @CurrentUser CustomUserDetails currentUser
+    ){
+        Long userId = currentUser.getUser().getId();
+        Response response = userService.deleteStudyGroup(studyGroupId, userId);
+        return ResponseEntity.ok(response);
+    }
 }
 
 
