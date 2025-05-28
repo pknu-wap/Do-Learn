@@ -27,7 +27,7 @@ public class JoinService {
         String email = joinDto.getEmail();
         String password = joinDto.getPassword();
         String nickname = joinDto.getNickname();
-        int profileImage = 4;
+        Integer profileImage = 4;
 
         if (userRepository.existsByEmail(email)){
             return new ResponseEntity<>("Email is already registered", HttpStatus.BAD_REQUEST);

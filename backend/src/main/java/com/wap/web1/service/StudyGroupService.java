@@ -89,17 +89,28 @@ public class StudyGroupService {
                 ));
 
         List<StudyMember> members = studyMemberRepository.findByStudyGroupId(studyGroupId);
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 
         List<GroupMembersDto.MemberDto> memberDtos = members.stream()
                 .filter(member -> member.getStatus() == StudyMember.Status.ACTIVE)
                 .map(member -> {
-                    int rank = memberIdToRankMap.getOrDefault(member.getId(), 0);
-                    Integer profileImage = switch (rank){
-                        case 1 -> 1;
-                        case 2 -> 2;
-                        case 3 -> 3;
-                        default -> 4;
-                    };
+                    User user = member.getUser();
+
+                    boolean attendedToday = attendanceRepository.existsByStudyGroupAndUserAndDate(group, user, today);
+
+                    // 출석 안 했으면 무조건 5번 이미지
+                    int profileImage;
+                    if (!attendedToday) {
+                        profileImage = 5;
+                    } else {
+                        int rank = memberIdToRankMap.getOrDefault(member.getId(), 0);
+                        profileImage = switch (rank) {
+                            case 1 -> 1;
+                            case 2 -> 2;
+                            case 3 -> 3;
+                            default -> 4;
+                        };
+                    }
 
                     return GroupMembersDto.MemberDto.builder()
                             .userId(member.getUser().getId())
@@ -171,5 +182,23 @@ public class StudyGroupService {
         return studyGroupRepository.findById(studyGroupId)
                 .orElseThrow(()-> new IllegalArgumentException("스터디 그룹을 찾을 수 없습니다."))
                 .getName();
+    }
+
+    @Transactional
+    public Response leaveStudyGroup(Long studyGroupId, Long userId){
+        StudyGroup group = studyGroupRepository.findById(studyGroupId)
+                .orElseThrow(() -> new IllegalArgumentException("스터디그룹을 찾을 수 없습니다"));
+        StudyMember member = studyMemberRepository.findByStudyGroupAndUser(group,
+                        userRepository.findById(userId)
+                                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다.")))
+                .orElseThrow(() -> new IllegalArgumentException("해당 스터디 그룹의 멤버가 아닙니다."));
+        if(group.getLeader().getId().equals(userId)){
+            throw new IllegalArgumentException("방장은 탈퇴할 수 없습니다.");
+        }
+        if(member.getStatus() != StudyMember.Status.ACTIVE){
+            throw new IllegalArgumentException("이미 탈퇴했거나 강퇴된 상태입니다.");
+        }
+        member.setStatus(StudyMember.Status.LEFT);
+        return new Response("스터디에서 성공적으로 탈퇴했습니다.");
     }
 }

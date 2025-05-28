@@ -10,7 +10,7 @@
 	border-radius: 50px 50px 0 0;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 	.group-menu-item {
-		width: 70%;
+		width: 76%;
 	}
 }
 
@@ -30,4 +30,13 @@
 
 .menu-title {
 	margin-top: 10px;
+}
+
+.menu-item-group.active {
+	.menu-item {
+		color: white;
+	}
+	.menu-item {
+		background-color: rgb(182, 193, 169);
+	}
 }

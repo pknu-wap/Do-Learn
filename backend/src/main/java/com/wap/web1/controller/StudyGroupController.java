@@ -68,6 +68,16 @@ public class StudyGroupController {
         String name = studyGroupService.getGroupName(studyGroupId);
         return ResponseEntity.ok(name);
     }
+
+    @DeleteMapping("{studyGroupId}/leave")
+    public ResponseEntity<Response> leaveStudyGroup(
+            @PathVariable Long studyGroupId,
+            @CurrentUser CustomUserDetails currentUser
+    ){
+        Long userId = currentUser.getUser().getId();
+        Response response = studyGroupService.leaveStudyGroup(studyGroupId, userId);
+        return ResponseEntity.ok(response);
+    }
 }
 
 

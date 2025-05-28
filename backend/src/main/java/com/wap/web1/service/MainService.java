@@ -25,6 +25,13 @@ public class MainService {
         StudyGroup studyGroup = studyGroupRepository.findById(studyGroupId)
                 .orElseThrow(() -> new IllegalArgumentException("스터디 그룹을 찾을 수 없습니다."));
 
+        //강퇴여부 확인
+        boolean isBanned = studyMemberRepository.existsByStudyGroupAndUserAndStatus(
+                studyGroup, user, StudyMember.Status.BANNED);
+        if(isBanned) {
+            throw new IllegalArgumentException("강퇴된 사용자 입니다.");
+        }
+
         //중복가입 확인
         boolean alreadyJoined = studyMemberRepository.existsByStudyGroupAndUserAndStatus(
                 studyGroup, user, StudyMember.Status.ACTIVE);
@@ -38,6 +45,7 @@ public class MainService {
         if(studyGroup.getMaxMembers() != null&& currentMembers >= studyGroup.getMaxMembers()) {
             throw new IllegalArgumentException("스터디 정원이 초과되었습니다.");
         }
+
         //StudyMember 저장
         StudyMember member = StudyMember.builder()
                 .studyGroup(studyGroup)

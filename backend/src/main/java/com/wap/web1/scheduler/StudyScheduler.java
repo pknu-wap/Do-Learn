@@ -40,7 +40,6 @@ public class StudyScheduler {
                 group.setRecruitStatus(RecruitStatus.CLOSED);
             }
         }
-
         studyGroupRepository.saveAll(recruitingGroups);
     }
 }
