@@ -11,6 +11,9 @@ export interface StudyGroup {
 	region: string;
 	category: string;
 	type: string;
+	// startDate: string;
+	recruitStatus: 'RECRUITING' | 'CLOSED';
+	isLeader: boolean;
 }
 
 export interface StudyGroupsResponse {

@@ -28,13 +28,14 @@
 	}
 }
 .list-box {
-	height: 100px;
+	min-height: 100px;
 	margin: auto;
 	width: 78%;
 	border: 1.5px solid $main-color-dark-green;
 	border-radius: 20px;
-	padding: 5%;
+	padding: 5% 5% 3% 5%;
 	margin-bottom: 8%;
+	background-color: #ffffff;
 
 	&:hover {
 		background-color: #f6ffed;
@@ -64,8 +65,58 @@
 	.info-label {
 		margin-right: 5px;
 	}
+
+	.left-group {
+		gap: 8px;
+	}
+
+	.group-name {
+		max-width: 150px;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
 }
 
 .border-virtual {
 	border-color: #6f9e61;
+}
+
+.edit-wrapper {
+	border-top: 1px solid #ddd;
+	padding-top: 2px;
+	margin-top: 5%;
+	text-align: center;
+}
+
+.edit-button {
+	background: none;
+	border: none;
+	color: #999;
+	cursor: pointer;
+	transition: color 0.2s;
+
+	&:hover {
+		color: #555;
+	}
+}
+
+.badge {
+	display: inline-block;
+	padding: 4px 5px;
+	border-radius: 3px;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1;
+	white-space: nowrap;
+
+	&.recruiting {
+		background-color: #cce7c3;
+		color: #1e4620;
+	}
+
+	&.closed {
+		background-color: #e0e0e0;
+		color: #333;
+	}
 }

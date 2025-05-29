@@ -20,19 +20,29 @@ interface StudyGroupItemProps {
 		region: string;
 		category: string;
 		type: string;
+		// startDate: string;
+		recruitStatus?: 'RECRUITING' | 'CLOSED';
+		isLeader?: boolean;
 	};
 	mode?: 'joined' | 'browse';
+	showEdit?: boolean;
 }
 
 const StudyGroupItem: React.FC<StudyGroupItemProps> = ({
 	group,
 	mode = 'browse',
+	showEdit,
 }) => {
 	const navigate = useNavigate();
 	const [showModal, setShowModal] = useState(false);
 	const [showGroupModal, setShowGroupModal] = useState(false);
 
 	const handleClick = () => {
+		if (mode === 'joined') {
+			navigate(`/group-detail/${group.id}`);
+			return;
+		}
+
 		if (!isLoggedIn()) {
 			setShowModal(true);
 		} else {
@@ -60,13 +70,25 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({
 			onClick={handleClick}
 		>
 			<div className="top-row flex-between">
-				<div className="group-name body3">{group.name}</div>
+				<div className="left-group flex-left">
+					{mode === 'joined' && group.recruitStatus === 'RECRUITING' && (
+						<div className="badge recruiting button2">모집중</div>
+					)}
+					{mode === 'joined' && group.recruitStatus === 'CLOSED' && (
+						<div className="badge closed button2">모집 마감</div>
+					)}
+					<div className="group-name body3" title={group.name}>
+						{group.name}
+					</div>
+				</div>
+
 				<div className="meeting-type button3">
 					{group.region?.trim() && group.region !== '해당없음'
 						? group.region
 						: '비대면'}
 				</div>
 			</div>
+
 			<div className="flex-left list">
 				<div className="first-col flex-col">
 					<div className="flex-left first-col-meetingdays">
@@ -108,6 +130,20 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({
 					onJoin={handleJoin}
 					mode={mode}
 				/>
+			)}
+
+			{showEdit && (
+				<div className="edit-wrapper">
+					<button
+						className="edit-button button2"
+						onClick={(e) => {
+							e.stopPropagation();
+							navigate(`/group-edit/${group.id}`);
+						}}
+					>
+						편집하기
+					</button>
+				</div>
 			)}
 		</div>
 	);
