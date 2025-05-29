@@ -73,7 +73,6 @@ const Profile: React.FC = () => {
 
 	const handleFinishEdit = async () => {
 		if (!user) return;
-
 		const trimmed = draft.trim();
 		if (trimmed.length < 2 || trimmed.length > 10) {
 			alert('닉네임은 2~10자 사이로 입력해주세요.');
@@ -83,7 +82,6 @@ const Profile: React.FC = () => {
 			setIsEditing(false);
 			return;
 		}
-
 		try {
 			await updateMyPageInfo({ nickname: trimmed });
 			setUser({ ...user, nickname: trimmed });
@@ -91,7 +89,6 @@ const Profile: React.FC = () => {
 		} catch (error: any) {
 			const status = error.response?.status;
 			const serverMsg = error.response?.data?.message || '';
-
 			if (status === 400) {
 				if (serverMsg.includes('이미')) {
 					alert('이미 사용 중인 닉네임입니다.');
@@ -177,7 +174,7 @@ const Profile: React.FC = () => {
 							className="avatar flex-center"
 							onClick={handleAvatarClick}
 						/>
-						<div className="name-wrapper flex-center">
+						<div className="name-wrapper">
 							<input
 								type="text"
 								ref={inputRef}
@@ -188,14 +185,16 @@ const Profile: React.FC = () => {
 								onBlur={handleFinishEdit}
 								onKeyDown={(e) => e.key === 'Enter' && handleFinishEdit()}
 							/>
-							<button
-								type="button"
-								className="edit-button"
-								onClick={handleEditClick}
-								aria-label="닉네임 수정"
-							>
-								<Pencil size={12} />
-							</button>
+							<div className="edit-box">
+								<button
+									type="button"
+									className="edit-button"
+									onClick={handleEditClick}
+									aria-label="닉네임 수정"
+								>
+									<Pencil size={12} />
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>
