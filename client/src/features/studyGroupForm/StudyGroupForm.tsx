@@ -9,6 +9,7 @@ import {
 	Region,
 	StudyType,
 } from 'api/createGroupFormApi';
+import { isLoggedIn } from 'utils/auth';
 
 interface StudyGroupFormProps {
 	onClose: () => void;
@@ -169,8 +170,15 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 			}
 			// 토큰 만료
 			if (status === 401 && serverMessage === 'access token expired') {
-				alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
-				window.location.href = '/login';
+				const hasToken = isLoggedIn();
+
+				if (hasToken) {
+					alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+				} else {
+					alert('로그인 후 이용해주세요.');
+				}
+
+				window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
 				return;
 			}
 
