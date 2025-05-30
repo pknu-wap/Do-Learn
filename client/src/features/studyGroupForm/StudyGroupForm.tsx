@@ -12,23 +12,48 @@ import {
 
 interface StudyGroupFormProps {
 	onClose: () => void;
+	onSubmit?: (formData: any) => Promise<void>;
+	initialData?: any;
+	isEdit?: boolean;
+
+	recruitStatus?: 'RECRUITING' | 'CLOSED';
+	setRecruitStatus?: (status: 'RECRUITING' | 'CLOSED') => void;
 }
 
 const MAX_NOTICE_LENGTH = 1000;
 
-const StudyGroupForm: React.FC<StudyGroupFormProps> = ({ onClose }) => {
+const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
+	onClose,
+	onSubmit,
+	initialData,
+	isEdit,
+	recruitStatus,
+	setRecruitStatus,
+}) => {
 	const navigate = useNavigate();
-	const [groupName, setGroupName] = useState('');
-	const [meetingType, setMeetingType] = useState<StudyType | ''>('');
-	const [meetingTime, setMeetingTime] = useState('');
-	const [meetingCycle, setMeetingCycle] = useState<'월' | '주'>('월');
-	const [meetingDay, setMeetingDay] = useState('');
-	const [memberCount, setMemberCount] = useState('');
-	const [studyTypeDetail, setStudyTypeDetail] = useState('');
-	const [notice, setNotice] = useState('');
-	const [region, setRegion] = useState<Region | ''>('');
-	const [category, setCategory] = useState<Category | ''>('');
-	const [startDate, setStartDate] = useState('');
+	const [groupName, setGroupName] = useState(initialData?.name ?? '');
+	const [meetingType, setMeetingType] = useState<StudyType | ''>(
+		initialData?.meetingType ?? '',
+	);
+	const [meetingTime, setMeetingTime] = useState(
+		initialData?.meetingTime ?? '',
+	);
+	const [meetingCycle, setMeetingCycle] = useState<'월' | '주'>(
+		initialData?.meetingDays?.startsWith('주') ? '주' : '월',
+	);
+	const [meetingDay, setMeetingDay] = useState(
+		initialData?.meetingDays?.replace(/[^0-9]/g, '') ?? '',
+	);
+	const [memberCount, setMemberCount] = useState(
+		initialData?.maxMembers?.toString() ?? '',
+	);
+	const [studyTypeDetail, setStudyTypeDetail] = useState(
+		initialData?.type ?? '',
+	);
+	const [notice, setNotice] = useState(initialData?.notice ?? '');
+	const [region, setRegion] = useState(initialData?.region ?? '');
+	const [category, setCategory] = useState(initialData?.category ?? '');
+	const [startDate, setStartDate] = useState(initialData?.startDate ?? '');
 
 	useEffect(() => {
 		if (meetingDay) {
@@ -103,11 +128,22 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({ onClose }) => {
 			region: meetingType === StudyType.오프라인 ? (region as Region) : null,
 		};
 
+		if (isEdit && onSubmit) {
+			await onSubmit(groupData); // EditGroupModal 등에서 처리
+			return;
+		}
+
+		// 수정, 생성 분기
 		try {
-			const response = await createStudyGroup(groupData);
-			alert(response.message);
-			onClose(); // 폼 닫기
-			navigate('/mypage'); // 마이페이지로 이동
+			if (onSubmit) {
+				await onSubmit(groupData); // 수정
+				onClose();
+			} else {
+				const response = await createStudyGroup(groupData); // 생성
+				alert(response.message);
+				onClose();
+				navigate('/mypage');
+			}
 		} catch (error: any) {
 			const status = error.response?.status;
 			const serverData = error.response?.data;
@@ -139,7 +175,10 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({ onClose }) => {
 	return (
 		<form onSubmit={handleSubmit}>
 			<div className="study-group-form">
-				<div className="title heading2 flex-center">스터디 그룹 생성</div>
+				<div className="title heading2 flex-center">
+					{' '}
+					{isEdit ? '스터디 그룹 수정' : '스터디 그룹 생성'}
+				</div>
 
 				{/* 그룹 명 */}
 				<div className="group-name">
@@ -202,6 +241,26 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({ onClose }) => {
 					</div>
 				</div>
 
+				{/* 모집 상태 */}
+				{isEdit && (
+					<div className="recruit-status-buttons">
+						<button
+							type="button"
+							className={`recruit-status-button ${recruitStatus === 'RECRUITING' ? 'active' : ''}`}
+							onClick={() => setRecruitStatus?.('RECRUITING')}
+						>
+							모집중
+						</button>
+						<button
+							type="button"
+							className={`recruit-status-button ${recruitStatus === 'CLOSED' ? 'active' : ''}`}
+							onClick={() => setRecruitStatus?.('CLOSED')}
+						>
+							모집 마감
+						</button>
+					</div>
+				)}
+
 				{/* 만남 방식 */}
 				<div className="meeting-method">
 					<button
@@ -253,9 +312,7 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({ onClose }) => {
 							key={time}
 							type="button"
 							onClick={() => setMeetingTime(time)}
-							className={`time-option-button button2 ${
-								meetingTime === time ? 'bg-green-300' : ''
-							}`}
+							className={`time-option-button button2 ${meetingTime === time ? 'bg-green-300' : ''}`}
 						>
 							{time}
 						</button>
@@ -315,7 +372,7 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({ onClose }) => {
 				</div>
 
 				<button type="submit" className="create-button button2">
-					생성하기
+					{isEdit ? '수정하기' : '생성하기'}
 				</button>
 			</div>
 		</form>

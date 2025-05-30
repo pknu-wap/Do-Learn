@@ -2,7 +2,7 @@ import React from 'react';
 import StudyGroupItem from 'features/studyGroupList/StudyGroupItem';
 import { useMyStudyGroups } from 'hooks/useMyStudyGroups';
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import EditGroupModal from 'features/editGroups/EditGroupModal';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 import './MyGroupsList.scss';
@@ -13,6 +13,8 @@ const MyGroupsList: React.FC = () => {
 	const filteredGroups = groups.filter((group) =>
 		activeTab === 'leader' ? group.isLeader : !group.isLeader,
 	);
+	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+	const [selectedGroup, setSelectedGroup] = useState<any>(null);
 
 	if (loading) {
 		return (
@@ -63,6 +65,10 @@ const MyGroupsList: React.FC = () => {
 							group={group}
 							mode="joined"
 							showEdit={group.isLeader}
+							onEditClick={(group) => {
+								setSelectedGroup(group);
+								setIsEditModalOpen(true);
+							}}
 						/>
 					))
 				) : (
@@ -73,6 +79,14 @@ const MyGroupsList: React.FC = () => {
 					</div>
 				)}
 			</div>
+
+			{isEditModalOpen && selectedGroup && (
+				<EditGroupModal
+					studyGroupId={selectedGroup.id}
+					initialData={selectedGroup}
+					onClose={() => setIsEditModalOpen(false)}
+				/>
+			)}
 		</div>
 	);
 };

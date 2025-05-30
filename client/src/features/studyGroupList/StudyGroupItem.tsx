@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import LoginModal from 'components/LoginModal';
 import GroupInfoModal from './GroupInfoModal';
 import joinGroupApi from 'api/joinGroupApi';
+import { StudyGroup } from 'utils/StudyGroup';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 import './StudyGroupsList.scss';
@@ -26,12 +27,14 @@ interface StudyGroupItemProps {
 	};
 	mode?: 'joined' | 'browse';
 	showEdit?: boolean;
+	onEditClick?: (group: StudyGroup) => void;
 }
 
 const StudyGroupItem: React.FC<StudyGroupItemProps> = ({
 	group,
 	mode = 'browse',
 	showEdit,
+	onEditClick,
 }) => {
 	const navigate = useNavigate();
 	const [showModal, setShowModal] = useState(false);
@@ -138,7 +141,7 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({
 						className="edit-button button2"
 						onClick={(e) => {
 							e.stopPropagation();
-							navigate(`/group-edit/${group.id}`);
+							onEditClick?.(group);
 						}}
 					>
 						편집하기

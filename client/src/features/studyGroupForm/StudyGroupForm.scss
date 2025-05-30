@@ -159,4 +159,26 @@
 			width: 47%;
 		}
 	}
+
+	.recruit-status-buttons {
+		display: flex;
+		gap: 0.5rem;
+
+		.recruit-status-button {
+			flex: 1;
+			padding: 0.4rem;
+			border: 1px solid $main-color-green;
+			border-radius: 8px;
+			background-color: white;
+			color: #333;
+			cursor: pointer;
+			text-align: center;
+
+			&.active {
+				background-color: $main-color-dark-green;
+				border: 1px solid $main-color-dark-green;
+				color: white;
+			}
+		}
+	}
 }
