@@ -50,10 +50,16 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 	const [studyTypeDetail, setStudyTypeDetail] = useState(
 		initialData?.type ?? '',
 	);
-	const [notice, setNotice] = useState(initialData?.notice ?? '');
+	const [notice, setNotice] = useState('');
 	const [region, setRegion] = useState(initialData?.region ?? '');
 	const [category, setCategory] = useState(initialData?.category ?? '');
 	const [startDate, setStartDate] = useState(initialData?.startDate ?? '');
+
+	useEffect(() => {
+		if (initialData?.notice) {
+			setNotice(initialData.notice);
+		}
+	}, [initialData?.notice]);
 
 	useEffect(() => {
 		if (meetingDay) {
@@ -69,6 +75,10 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 		e.preventDefault();
 
 		// 유효성 검사 (제출 시 한 번만 실행됨)
+		if (isEdit && !recruitStatus) {
+			alert('모집 상태를 선택해주세요.');
+			return;
+		}
 		if (groupName.trim().length < 2) {
 			alert('스터디명을 2자 이상 입력해주세요.');
 			return;
@@ -109,7 +119,7 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 			return;
 		}
 		const today = new Date().toISOString().slice(0, 10);
-		if (startDate < today) {
+		if (!isEdit && startDate < today) {
 			alert('스터디 시작일은 오늘 이후 날짜여야 합니다.');
 			return;
 		}
@@ -246,14 +256,14 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 					<div className="recruit-status-buttons">
 						<button
 							type="button"
-							className={`recruit-status-button ${recruitStatus === 'RECRUITING' ? 'active' : ''}`}
+							className={`recruit-status-button ${recruitStatus === 'RECRUITING' ? 'active' : ''} button2`}
 							onClick={() => setRecruitStatus?.('RECRUITING')}
 						>
 							모집중
 						</button>
 						<button
 							type="button"
-							className={`recruit-status-button ${recruitStatus === 'CLOSED' ? 'active' : ''}`}
+							className={`recruit-status-button ${recruitStatus === 'CLOSED' ? 'active' : ''} button2`}
 							onClick={() => setRecruitStatus?.('CLOSED')}
 						>
 							모집 마감

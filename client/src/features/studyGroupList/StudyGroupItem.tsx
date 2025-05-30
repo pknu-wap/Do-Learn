@@ -136,16 +136,14 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({
 			)}
 
 			{showEdit && (
-				<div className="edit-wrapper">
-					<button
-						className="edit-button button2"
-						onClick={(e) => {
-							e.stopPropagation();
-							onEditClick?.(group);
-						}}
-					>
-						편집하기
-					</button>
+				<div
+					className="edit-wrapper"
+					onClick={(e) => {
+						e.stopPropagation(); // 상위로 버블 방지
+						onEditClick?.(group);
+					}}
+				>
+					<button className="edit-button button2">편집하기</button>
 				</div>
 			)}
 		</div>

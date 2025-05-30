@@ -72,7 +72,7 @@ const MyGroupsList: React.FC = () => {
 						/>
 					))
 				) : (
-					<div className="empty-message">
+					<div className="empty-message button2">
 						{activeTab === 'leader'
 							? '생성한 그룹이 없습니다.'
 							: '가입한 그룹이 없습니다.'}
