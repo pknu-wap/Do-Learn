@@ -1,4 +1,4 @@
-package com.wap.web1.util;
+package com.wap.web1.mapper;
 
 import com.wap.web1.domain.StudyGroup;
 import com.wap.web1.domain.StudyMember;
@@ -9,7 +9,7 @@ import com.wap.web1.repository.StudyMemberRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class StudyGroupUtils {
+public class StudyGroupMapper {
 
     public static StudyGroupResponse convertToResponse(List<StudyGroup> groups, int size, StudyMemberRepository studyMemberRepository) {
         List<StudyGroupDto> dtos = groups.stream()

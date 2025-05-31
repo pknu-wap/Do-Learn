@@ -53,4 +53,7 @@ public class StudyGroup {
     @Enumerated(EnumType.STRING)
     private RecruitStatus recruitStatus;//모집중/모집마감
 
+    public StudyGroup(Long id) {
+        this.id = id;
+    }
 }

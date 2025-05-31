@@ -25,6 +25,9 @@
 	}
 
 	.name-wrapper {
+		display: flex;
+		align-items: flex-end;
+
 		.nickname-input {
 			font-size: 23px;
 			font-weight: 600;
@@ -34,10 +37,15 @@
 			padding: 3px;
 			border-bottom: 1px solid $main-color-dark-green;
 			color: $sub-color-deep-green;
+		}
 
-			&.editable {
-				border-bottom: 1px solid #000;
-			}
+		.editable {
+			border-bottom: 1px solid #000;
+		}
+
+		.edit-box {
+			align-self: flex-end;
+			margin-bottom: -3px;
 		}
 
 		.edit-button {
@@ -63,15 +71,6 @@
 	z-index: 1000;
 }
 
-.image-title {
-	margin: 10px 0;
-}
-
-.image-sub-title {
-	margin-bottom: 15px;
-	color: #767676;
-}
-
 .image-modal {
 	background: #fff;
 	padding: 16px;
@@ -91,7 +90,18 @@
 		cursor: pointer;
 	}
 
+	.image-title {
+		margin: 10px 0;
+	}
+
+	.image-sub-title {
+		margin-bottom: 15px;
+		color: #767676;
+	}
+
 	.image-options {
+		display: flex;
+		justify-content: center;
 		gap: 12px;
 
 		.image-option {

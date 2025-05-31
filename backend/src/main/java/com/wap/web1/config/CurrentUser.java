@@ -1,4 +1,4 @@
-package com.wap.web1.comfig;
+package com.wap.web1.config;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 

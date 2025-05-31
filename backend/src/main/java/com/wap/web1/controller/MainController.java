@@ -1,6 +1,6 @@
 package com.wap.web1.controller;
 
-import com.wap.web1.comfig.CurrentUser;
+import com.wap.web1.config.CurrentUser;
 import com.wap.web1.domain.Category;
 import com.wap.web1.domain.Region;
 import com.wap.web1.dto.CustomUserDetails;

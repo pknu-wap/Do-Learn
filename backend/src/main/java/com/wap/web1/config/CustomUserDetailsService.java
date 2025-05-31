@@ -1,4 +1,4 @@
-package com.wap.web1.comfig;
+package com.wap.web1.config;
 
 import com.wap.web1.dto.CustomUserDetails;
 import com.wap.web1.repository.UserRepository;

@@ -1,6 +1,6 @@
 package com.wap.web1.controller;
 
-import com.wap.web1.comfig.CurrentUser;
+import com.wap.web1.config.CurrentUser;
 import com.wap.web1.dto.*;
 import com.wap.web1.response.Response;
 import com.wap.web1.service.UserService;
@@ -68,6 +68,16 @@ public class UserController {
     ){
         Long userId = currentUser.getUser().getId();
         Response response = userService.updateLeader(studyGroupId, userId, targetUserId);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/studygroups/{studyGroupId}/delete")
+    public ResponseEntity<Response> deleteStudyGroup(
+            @PathVariable Long studyGroupId,
+            @CurrentUser CustomUserDetails currentUser
+    ){
+        Long userId = currentUser.getUser().getId();
+        Response response = userService.deleteStudyGroup(studyGroupId, userId);
         return ResponseEntity.ok(response);
     }
 }

@@ -6,7 +6,7 @@ import com.wap.web1.domain.StudyGroup;
 import com.wap.web1.dto.StudyGroupResponse;
 import com.wap.web1.repository.StudyGroupRepository;
 import com.wap.web1.repository.StudyMemberRepository;
-import com.wap.web1.util.StudyGroupUtils;
+import com.wap.web1.mapper.StudyGroupMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -36,6 +36,6 @@ public class StudyGroupListService {
             return StudyGroupResponse.of("해당 목록이 없습니다.");
         }
 
-        return StudyGroupUtils.convertToResponse(studyGroups,size,studyMemberRepository);
+        return StudyGroupMapper.convertToResponse(studyGroups,size,studyMemberRepository);
     }
 }

@@ -53,10 +53,16 @@ const Filter: React.FC<FilterProps> = ({
 		left: number;
 		width: number;
 	} | null>(null);
+
 	const containerRef = useRef<HTMLDivElement>(null);
 	const menuRef = useRef<HTMLDivElement>(null);
-
 	const scrollRef = useRef<HTMLDivElement>(null);
+
+	// 드래그 스크롤 refs
+	const isDragging = useRef(false);
+	const dragStartX = useRef(0);
+	const scrollStartX = useRef(0);
+
 	const [showFadeLeft, setShowFadeLeft] = useState(false);
 	const [showFadeRight, setShowFadeRight] = useState(false);
 
@@ -64,18 +70,28 @@ const Filter: React.FC<FilterProps> = ({
 	const isCategoryActive = selectedCategories.length > 0;
 	const isTimeActive = selectedTimes.length > 0;
 
+	// (1) 클릭 아웃사이드로 드롭다운 닫기
 	useEffect(() => {
-		const onClick = (e: MouseEvent) => {
-			const t = e.target as Node;
-			if (containerRef.current?.contains(t) || menuRef.current?.contains(t))
+		const onClickOutside = (e: MouseEvent) => {
+			const target = e.target as Node;
+			if (
+				containerRef.current?.contains(target) ||
+				menuRef.current?.contains(target)
+			) {
+				// 필터 영역 또는 드롭다운 영역 클릭 시엔 닫지 않음
 				return;
+			}
 			setOpenDropdown(null);
 			setAnchorEl(null);
 		};
-		document.addEventListener('mousedown', onClick);
-		return () => document.removeEventListener('mousedown', onClick);
+
+		document.addEventListener('mousedown', onClickOutside);
+		return () => {
+			document.removeEventListener('mousedown', onClickOutside);
+		};
 	}, []);
 
+	// (2) 드롭다운 위치 업데이트
 	const updateMenuPos = useCallback(() => {
 		if (!anchorEl) {
 			setMenuPos(null);
@@ -88,6 +104,7 @@ const Filter: React.FC<FilterProps> = ({
 			width: rect.width,
 		});
 	}, [anchorEl]);
+
 	useEffect(() => updateMenuPos(), [anchorEl, updateMenuPos]);
 	useEffect(() => {
 		if (!anchorEl) return;
@@ -99,15 +116,15 @@ const Filter: React.FC<FilterProps> = ({
 		};
 	}, [anchorEl, updateMenuPos]);
 
-	// fade update
+	// (3) fade 표시 업데이트
 	const updateFade = useCallback(() => {
 		const el = scrollRef.current;
 		if (!el) return;
 		const { scrollLeft, scrollWidth, clientWidth } = el;
 		setShowFadeLeft(scrollLeft > 0);
-		const epsilon = 1;
-		setShowFadeRight(scrollLeft + clientWidth < scrollWidth - epsilon);
+		setShowFadeRight(scrollLeft + clientWidth < scrollWidth - 1);
 	}, []);
+
 	useEffect(() => {
 		updateFade();
 		scrollRef.current?.addEventListener('scroll', updateFade);
@@ -116,7 +133,43 @@ const Filter: React.FC<FilterProps> = ({
 		};
 	}, [updateFade]);
 
-	// toggle item
+	// (4) 마우스 드래그로 스크롤
+	useEffect(() => {
+		const slider = scrollRef.current;
+		if (!slider) return;
+
+		const onMouseDown = (e: MouseEvent) => {
+			isDragging.current = true;
+			slider.classList.add('dragging');
+			dragStartX.current = e.pageX - slider.offsetLeft;
+			scrollStartX.current = slider.scrollLeft;
+		};
+		const onMouseMove = (e: MouseEvent) => {
+			if (!isDragging.current) return;
+			e.preventDefault();
+			const x = e.pageX - slider.offsetLeft;
+			const walk = x - dragStartX.current;
+			slider.scrollLeft = scrollStartX.current - walk;
+		};
+		const endDrag = () => {
+			isDragging.current = false;
+			slider.classList.remove('dragging');
+		};
+
+		slider.addEventListener('mousedown', onMouseDown);
+		slider.addEventListener('mousemove', onMouseMove);
+		slider.addEventListener('mouseup', endDrag);
+		slider.addEventListener('mouseleave', endDrag);
+
+		return () => {
+			slider.removeEventListener('mousedown', onMouseDown);
+			slider.removeEventListener('mousemove', onMouseMove);
+			slider.removeEventListener('mouseup', endDrag);
+			slider.removeEventListener('mouseleave', endDrag);
+		};
+	}, []);
+
+	// (5) 배열 토글 헬퍼
 	const toggleItem = useCallback(
 		<T,>(arr: T[], item: T, setter: (v: T[]) => void) => {
 			setter(
@@ -146,6 +199,7 @@ const Filter: React.FC<FilterProps> = ({
 	const renderMenu = useCallback(() => {
 		if (!openDropdown || !menuPos) return null;
 		let items: ReactNode = null;
+
 		switch (openDropdown) {
 			case 'regions': {
 				const noneKey = Region.해당없음;
@@ -156,7 +210,9 @@ const Filter: React.FC<FilterProps> = ({
 				items = regionsOrdered.map((r) => (
 					<button
 						key={r}
-						className={`dropdown-item button2 ${selectedRegions.includes(r) ? 'selected' : ''}`}
+						className={`dropdown-item button2 ${
+							selectedRegions.includes(r) ? 'selected' : ''
+						}`}
 						onClick={() => toggleItem(selectedRegions, r, setSelectedRegions)}
 					>
 						{r === noneKey ? '비대면' : r}
@@ -168,7 +224,9 @@ const Filter: React.FC<FilterProps> = ({
 				items = Object.values(Category).map((c) => (
 					<button
 						key={c}
-						className={`dropdown-item button2 ${selectedCategories.includes(c) ? 'selected' : ''}`}
+						className={`dropdown-item button2 ${
+							selectedCategories.includes(c) ? 'selected' : ''
+						}`}
 						onClick={() =>
 							toggleItem(selectedCategories, c, setSelectedCategories)
 						}
@@ -181,7 +239,9 @@ const Filter: React.FC<FilterProps> = ({
 				items = MEETING_TIMES.map((t) => (
 					<button
 						key={t}
-						className={`dropdown-item button2 ${selectedTimes.includes(t) ? 'selected' : ''}`}
+						className={`dropdown-item button2 ${
+							selectedTimes.includes(t) ? 'selected' : ''
+						}`}
 						onClick={() => toggleItem(selectedTimes, t, setSelectedTimes)}
 					>
 						{t}
@@ -220,13 +280,17 @@ const Filter: React.FC<FilterProps> = ({
 							</div>
 							<div className="comparison-selector flex-center">
 								<button
-									className={`dropdown-item button2 ${meetingComparison === 'above' ? 'selected' : ''}`}
+									className={`dropdown-item button2 ${
+										meetingComparison === 'above' ? 'selected' : ''
+									}`}
 									onClick={() => setMeetingComparison('above')}
 								>
 									이상
 								</button>
 								<button
-									className={`dropdown-item button2 ${meetingComparison === 'below' ? 'selected' : ''}`}
+									className={`dropdown-item button2 ${
+										meetingComparison === 'below' ? 'selected' : ''
+									}`}
 									onClick={() => setMeetingComparison('below')}
 								>
 									이하
@@ -237,6 +301,7 @@ const Filter: React.FC<FilterProps> = ({
 				);
 				break;
 		}
+
 		return ReactDOM.createPortal(
 			<div
 				ref={menuRef}
@@ -283,7 +348,9 @@ const Filter: React.FC<FilterProps> = ({
 					</button>
 					<div className="dropdown-wrapper">
 						<button
-							className={`filter-button dropdown button2 ${isRegionActive ? 'active' : ''}`}
+							className={`filter-button dropdown button2 ${
+								isRegionActive ? 'active' : ''
+							}`}
 							onClick={handleButtonClick('regions')}
 						>
 							만남장소
@@ -299,7 +366,9 @@ const Filter: React.FC<FilterProps> = ({
 					</div>
 					<div className="dropdown-wrapper">
 						<button
-							className={`filter-button dropdown button2 ${isCategoryActive ? 'active' : ''}`}
+							className={`filter-button dropdown button2 ${
+								isCategoryActive ? 'active' : ''
+							}`}
 							onClick={handleButtonClick('categories')}
 						>
 							분야
@@ -307,7 +376,9 @@ const Filter: React.FC<FilterProps> = ({
 					</div>
 					<div className="flex-center dropdown-wrapper">
 						<button
-							className={`filter-button dropdown button2 ${isTimeActive ? 'active' : ''}`}
+							className={`filter-button dropdown button2 ${
+								isTimeActive ? 'active' : ''
+							}`}
 							onClick={handleButtonClick('times')}
 						>
 							시간대
