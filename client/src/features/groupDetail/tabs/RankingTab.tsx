@@ -5,7 +5,7 @@ import './RankingTab.scss';
 
 import { viewRanking, updateRanking, Ranking } from 'api/rankingApi';
 import { fetchGroupMembers, GroupMember } from 'api/memberListApi';
-import { getProfileImageUrl } from 'utils/profileImageMap'; // ← 새로 추가
+import { getProfileImageUrl } from 'utils/profileImageMap';
 
 interface MemberRanking {
 	rank: number;
@@ -32,12 +32,15 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 				const res = await viewRanking(studyGroupId, dateString);
 				const data: Ranking[] = res.data;
 
-				if (data.length > 0) {
-					const mapped: MemberRanking[] = data.map((r) => ({
-						rank: r.ranking,
-						nickname: r.nickname,
-						avatarUrl: getProfileImageUrl(4), // 랭킹 API에는 profileImage 정보가 없으므로 기본 이미지 사용
-					}));
+				if (Array.isArray(data) && data.length > 0) {
+					const mapped: MemberRanking[] = data.map((r) => {
+						const imageId = r.ranking <= 3 ? r.ranking : 4;
+						return {
+							rank: r.ranking,
+							nickname: r.nickname,
+							avatarUrl: getProfileImageUrl(imageId),
+						};
+					});
 					setRankings(mapped);
 				} else {
 					throw new Error('no-ranking-data');
@@ -49,12 +52,15 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 					const updRes = await updateRanking(studyGroupId, dateString);
 					const updatedData: Ranking[] = updRes.data;
 
-					if (updatedData.length > 0) {
-						const mappedAfterUpdate: MemberRanking[] = updatedData.map((r) => ({
-							rank: r.ranking,
-							nickname: r.nickname,
-							avatarUrl: getProfileImageUrl(4),
-						}));
+					if (Array.isArray(updatedData) && updatedData.length > 0) {
+						const mappedAfterUpdate: MemberRanking[] = updatedData.map((r) => {
+							const imageId = r.ranking <= 3 ? r.ranking : 4;
+							return {
+								rank: r.ranking,
+								nickname: r.nickname,
+								avatarUrl: getProfileImageUrl(imageId),
+							};
+						});
 						setRankings(mappedAfterUpdate);
 					} else {
 						throw new Error('no-ranking-after-update');
@@ -66,11 +72,10 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 						const members: GroupMember[] =
 							await fetchGroupMembers(studyGroupId);
 
-						if (members.length > 0) {
+						if (Array.isArray(members) && members.length > 0) {
 							const mappedMembers: MemberRanking[] = members.map((m, idx) => ({
 								rank: idx + 4,
 								nickname: m.nickname,
-								// 이제 getProfileImageUrl로 바로 매핑
 								avatarUrl: getProfileImageUrl(m.profileImage),
 							}));
 							setRankings(mappedMembers);
@@ -107,9 +112,9 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 									<div className="avatar">
 										<img src={member.avatarUrl} alt={member.nickname} />
 									</div>
-									<div className="rank-number typo-h4">{rankNum}</div>
+									<div className="rank-number body2">{rankNum}</div>
 								</div>
-								<div className="nickname typo-body">{member.nickname}</div>
+								<div className="nickname body2">{member.nickname}</div>
 							</div>
 						);
 					})}
@@ -118,11 +123,11 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 				<div className="rest-list">
 					{others.map((member) => (
 						<div key={member.rank} className="rest-item flex-center">
-							<div className="rank-num typo-body">{member.rank}.</div>
+							<div className="rank-num body3">{member.rank}.</div>
 							<div className="avatar-small">
 								<img src={member.avatarUrl} alt={member.nickname} />
 							</div>
-							<div className="nickname typo-body">{member.nickname}</div>
+							<div className="nickname body3">{member.nickname}</div>
 						</div>
 					))}
 				</div>
