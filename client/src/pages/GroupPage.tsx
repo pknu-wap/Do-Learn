@@ -9,7 +9,7 @@ import AttendanceTab from 'features/groupDetail/tabs/AttendanceTab';
 import GroupInfoTab, {
 	StudyGroup,
 } from 'features/groupDetail/tabs/GroupInfoTab';
-import GoalTab from 'features/groupDetail/tabs/GoalTab';
+import GoalTab from 'features/groupDetail/tabs/goalTab/GoalTab';
 import RankingTab from 'features/groupDetail/tabs/RankingTab';
 import GroupMemberList from 'features/groupDetail/GroupMemberList';
 import LeaveGroupButton from 'features/groupDetail/LeaveGroupButton';

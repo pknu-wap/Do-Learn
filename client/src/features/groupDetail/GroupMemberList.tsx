@@ -35,7 +35,6 @@ const GroupMemberList = ({ studyGroupId }: { studyGroupId: number }) => {
 
 	return (
 		<div className="group-member body2">
-			<div className="group-member-title body1">그룹 멤버</div>
 			<div className="group-member-grid">
 				{members.map((member) => (
 					<div key={member.userId} className="member-card flex-col">

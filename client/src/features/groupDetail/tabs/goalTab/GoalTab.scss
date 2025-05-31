@@ -1,0 +1,27 @@
+@import 'assets/style/_colors.scss';
+
+.goal-tab-header {
+	display: flex;
+	border-bottom: 1px solid #eee;
+	margin-bottom: 8%;
+	background-color: white;
+	padding-top: 5px;
+	// border-top: 0.5px solid rgba(217, 217, 217, 0.555);
+
+	.tab {
+		flex: 1;
+		text-align: center;
+		padding: 10px 0;
+		font-weight: 500;
+		color: #999;
+		background-color: white;
+		border: none;
+		cursor: pointer;
+
+		&.active {
+			color: #222;
+			border-bottom: 1.6px solid #5d7055;
+			font-weight: bold;
+		}
+	}
+}
