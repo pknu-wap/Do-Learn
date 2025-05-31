@@ -9,6 +9,7 @@ import { getProfileImageUrl } from 'utils/profileImageMap';
 
 interface MemberRanking {
 	rank: number;
+	displayRank: number;
 	nickname: string;
 	avatarUrl: string;
 }
@@ -37,6 +38,7 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 						const imageId = r.ranking <= 3 ? r.ranking : 4;
 						return {
 							rank: r.ranking,
+							displayRank: r.ranking,
 							nickname: r.nickname,
 							avatarUrl: getProfileImageUrl(imageId),
 						};
@@ -57,6 +59,7 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 							const imageId = r.ranking <= 3 ? r.ranking : 4;
 							return {
 								rank: r.ranking,
+								displayRank: r.ranking,
 								nickname: r.nickname,
 								avatarUrl: getProfileImageUrl(imageId),
 							};
@@ -66,7 +69,7 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 						throw new Error('no-ranking-after-update');
 					}
 				} catch (updateErr) {
-					console.warn('updateRanking 실패 또는 데이터 없음:', updateErr);
+					console.warn('updateRanking 실패 또는 빈 배열:', updateErr);
 
 					try {
 						const members: GroupMember[] =
@@ -75,6 +78,7 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 						if (Array.isArray(members) && members.length > 0) {
 							const mappedMembers: MemberRanking[] = members.map((m, idx) => ({
 								rank: idx + 4,
+								displayRank: idx + 1,
 								nickname: m.nickname,
 								avatarUrl: getProfileImageUrl(m.profileImage),
 							}));
@@ -112,9 +116,9 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 									<div className="avatar">
 										<img src={member.avatarUrl} alt={member.nickname} />
 									</div>
-									<div className="rank-number body2">{rankNum}</div>
+									<div className="rank-number body3">{member.displayRank}</div>
 								</div>
-								<div className="nickname body2">{member.nickname}</div>
+								<div className="nickname body3">{member.nickname}</div>
 							</div>
 						);
 					})}
@@ -123,7 +127,7 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 				<div className="rest-list">
 					{others.map((member) => (
 						<div key={member.rank} className="rest-item flex-center">
-							<div className="rank-num body3">{member.rank}.</div>
+							<div className="rank-num body3">{member.displayRank}.</div>
 							<div className="avatar-small">
 								<img src={member.avatarUrl} alt={member.nickname} />
 							</div>

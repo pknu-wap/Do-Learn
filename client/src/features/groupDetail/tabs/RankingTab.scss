@@ -3,7 +3,6 @@
 .container {
 	width: 100%;
 	background: #fff;
-	border-radius: 8px;
 }
 
 .ranking-container {
@@ -15,7 +14,7 @@
 	display: flex;
 	align-items: flex-end;
 	gap: 15px;
-	margin-bottom: 24px;
+	padding-bottom: 24px;
 
 	.rank-card {
 		position: relative;
