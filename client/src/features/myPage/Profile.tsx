@@ -11,17 +11,13 @@ import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 import './Profile.scss';
 
+// 아래 두 가지를 utils/profileImageMap에서 import
+import { profileImageMap, getProfileImageUrl } from 'utils/profileImageMap';
+
 interface UserState {
 	profileImageId: number;
 	nickname: string;
 }
-
-const profileImageMap: Record<number, string> = {
-	1: '/assets/profile_images/profile-1st.png',
-	2: '/assets/profile_images/profile-2nd.png',
-	3: '/assets/profile_images/profile-3rd.png',
-	4: '/assets/profile_images/profile-default.png',
-};
 
 const Profile: React.FC = () => {
 	const [loading, setLoading] = useState(true);
@@ -192,20 +188,22 @@ const Profile: React.FC = () => {
 							✕
 						</button>
 						<div className="image-options flex-row-center">
-							{Object.entries(profileImageMap).map(([key, src]) => {
-								const id = Number(key);
-								return (
-									<img
-										key={id}
-										src={src}
-										alt={`profile-${id}`}
-										className={`image-option ${
-											id === user.profileImageId ? 'selected' : ''
-										}`}
-										onClick={() => handleImageSelect(id)}
-									/>
-								);
-							})}
+							{(Object.entries(profileImageMap) as Array<[string, string]>).map(
+								([key, src]) => {
+									const id = Number(key);
+									return (
+										<img
+											key={id}
+											src={src}
+											alt={`profile-${id}`}
+											className={`image-option ${
+												id === user.profileImageId ? 'selected' : ''
+											}`}
+											onClick={() => handleImageSelect(id)}
+										/>
+									);
+								},
+							)}
 						</div>
 					</div>
 				</div>
@@ -216,7 +214,7 @@ const Profile: React.FC = () => {
 				<div className="profile-header flex-center">
 					<div className="content flex-center">
 						<img
-							src={profileImageMap[user.profileImageId] || profileImageMap[4]}
+							src={getProfileImageUrl(user.profileImageId)}
 							alt="프로필 이미지"
 							className="avatar flex-center"
 							onClick={handleAvatarClick}
