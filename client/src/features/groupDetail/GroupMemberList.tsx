@@ -3,19 +3,13 @@ import { fetchGroupMembers } from 'api/memberListApi';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 import './GroupMemberList.scss';
+import { getProfileImageUrl } from 'utils/profileImageMap';
 
 interface Member {
 	userId: number;
 	nickname: string;
 	profileImage: number;
 }
-
-const profileImageMap: Record<number, string> = {
-	1: '/assets/profile_images/profile-1st.png',
-	2: '/assets/profile_images/profile-2nd.png',
-	3: '/assets/profile_images/profile-3rd.png',
-	4: '/assets/profile_images/profile-default.png',
-};
 
 const GroupMemberList = ({ studyGroupId }: { studyGroupId: number }) => {
 	const [members, setMembers] = useState<Member[]>([]);
@@ -41,7 +35,7 @@ const GroupMemberList = ({ studyGroupId }: { studyGroupId: number }) => {
 					<div key={member.userId} className="member-card flex-col">
 						<img
 							className="avatar"
-							src={profileImageMap[member.profileImage] || profileImageMap[4]}
+							src={getProfileImageUrl(member.profileImage)}
 							alt="profile"
 						/>
 						<div className="nickname button2">{member.nickname}</div>
