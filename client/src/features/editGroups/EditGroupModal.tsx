@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import StudyGroupForm from 'features/studyGroupForm/StudyGroupForm';
 import { editMyGroupApi } from 'api/editMyGroupApi';
 import { getGroupNotice } from 'api/groupNotice';
-import { useNavigate } from 'react-router-dom';
+import { deleteStudyGroup } from 'api/studyGroupApi'; // ← 삭제 API import
 import './EditGroupModal.scss';
 
 interface EditGroupModalProps {
@@ -29,7 +30,7 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
 				setFullInitialData({ ...initialData, notice: res.notice });
 			} catch (e) {
 				console.error('공지사항 불러오기 실패:', e);
-				setFullInitialData({ ...initialData, notice: '' }); // 실패해도 폼은 열 수 있게
+				setFullInitialData({ ...initialData, notice: '' });
 			}
 		};
 		fetchNotice();
@@ -55,9 +56,41 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
 			return;
 		}
 
-		await editMyGroupApi(studyGroupId, payload);
-		navigate(0);
-		onClose();
+		try {
+			await editMyGroupApi(studyGroupId, payload);
+			navigate(0); // 페이지 새로고침
+			onClose();
+		} catch (error) {
+			console.error('그룹 수정 중 오류:', error);
+			alert('그룹 수정에 실패했습니다.');
+		}
+	};
+
+	// “그룹 삭제하기” 클릭 핸들러
+	const handleDelete = async () => {
+		// 한 번 더 확인
+		if (
+			!window.confirm(
+				'정말 이 스터디 그룹을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+			)
+		) {
+			return;
+		}
+
+		try {
+			const { message } = await deleteStudyGroup(studyGroupId);
+			alert(message); // "스터디 그룹이 성공적으로 삭제되었습니다."
+			navigate(0); // 새로고침하거나, 원하는 다른 경로로 이동할 수 있습니다.
+			onClose();
+		} catch (error: any) {
+			console.error('스터디 그룹 삭제 중 오류:', error);
+			if (error.response?.status === 401) {
+				alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+				window.location.href = '/login';
+			} else {
+				alert('그룹 삭제에 실패했습니다.');
+			}
+		}
 	};
 
 	return (
@@ -84,7 +117,9 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
 					) : (
 						<div>공지사항 불러오는 중...</div>
 					)}
-					<div className="scroll-padding-bottom" />
+					<div className="delete-group-button button2" onClick={handleDelete}>
+						그룹 삭제하기
+					</div>
 				</div>
 			</div>
 		</div>
