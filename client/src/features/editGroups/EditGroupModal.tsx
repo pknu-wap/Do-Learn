@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import StudyGroupForm from 'features/studyGroupForm/StudyGroupForm';
 import { editMyGroupApi } from 'api/editMyGroupApi';
 import { getGroupNotice } from 'api/groupNotice';
-import { deleteStudyGroup } from 'api/studyGroupApi'; // ← 삭제 API import
+import { deleteStudyGroup } from 'api/studyGroupApi';
 import './EditGroupModal.scss';
 
 interface EditGroupModalProps {
@@ -39,14 +39,12 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
 	const handleSubmit = async (formData: any) => {
 		const payload: any = {};
 
-		// 초기값과 비교해서 변경된 항목만 추가
 		for (const key in formData) {
 			if (formData[key] !== fullInitialData[key]) {
 				payload[key] = formData[key];
 			}
 		}
 
-		// 모집상태도 따로 반영
 		if (recruitStatus !== fullInitialData.recruitStatus) {
 			payload.recruitStatus = recruitStatus;
 		}
@@ -58,7 +56,7 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
 
 		try {
 			await editMyGroupApi(studyGroupId, payload);
-			navigate(0); // 페이지 새로고침
+			navigate(0);
 			onClose();
 		} catch (error) {
 			console.error('그룹 수정 중 오류:', error);
@@ -66,9 +64,7 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
 		}
 	};
 
-	// “그룹 삭제하기” 클릭 핸들러
 	const handleDelete = async () => {
-		// 한 번 더 확인
 		if (
 			!window.confirm(
 				'정말 이 스터디 그룹을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
@@ -79,8 +75,8 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
 
 		try {
 			const { message } = await deleteStudyGroup(studyGroupId);
-			alert(message); // "스터디 그룹이 성공적으로 삭제되었습니다."
-			navigate(0); // 새로고침하거나, 원하는 다른 경로로 이동할 수 있습니다.
+			alert(message);
+			navigate(0);
 			onClose();
 		} catch (error: any) {
 			console.error('스터디 그룹 삭제 중 오류:', error);
