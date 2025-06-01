@@ -1,4 +1,5 @@
 import api from './instance';
+import { getAuthHeaders } from './auth';
 
 export interface StudyGroup {
 	id: number;
@@ -32,6 +33,20 @@ export const fetchStudyGroups = async (
 	if (categories) params.categories = categories;
 	if (regions) params.regions = regions;
 
-	const response = await api.get('/api/main/grouplist', { params });
+	const response = await api.get<StudyGroupsResponse>('/api/main/grouplist', {
+		params,
+	});
+	return response.data;
+};
+
+export const deleteStudyGroup = async (
+	studyGroupId: number,
+): Promise<{ message: string }> => {
+	const response = await api.delete<{ message: string }>(
+		`/api/mypage/studygroups/${studyGroupId}/delete`,
+		{
+			headers: getAuthHeaders(),
+		},
+	);
 	return response.data;
 };
