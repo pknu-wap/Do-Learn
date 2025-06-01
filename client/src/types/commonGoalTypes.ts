@@ -18,8 +18,8 @@ export interface CommonGoal {
 
 export interface CreateCommonGoalRequest {
 	studyGroupId: number;
-	startDate: string;
-	startDayOfWeek: string;
+	startDate?: string;
+	startDayOfWeek?: string;
 	mainCategory: string;
 	subGoals: SubGoal[];
 }

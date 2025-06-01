@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CommonGoals from './CommonGoals';
 import PersonalGoals from './PersonalGoals';
+import { fetchMyGroups } from 'api/myGroupsApi';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 import './GoalTab.scss';
@@ -11,6 +12,16 @@ interface GoalTabProps {
 
 const GoalTab: React.FC<GoalTabProps> = ({ studyGroupId }) => {
 	const [activeTab, setActiveTab] = useState<'common' | 'personal'>('common');
+	const [isLeader, setIsLeader] = useState(false);
+
+	useEffect(() => {
+		const checkLeader = async () => {
+			const groups = await fetchMyGroups();
+			const match = groups.find((g) => g.id === studyGroupId);
+			setIsLeader(!!match?.isLeader);
+		};
+		checkLeader();
+	}, [studyGroupId]);
 
 	return (
 		<div className="goal-tab">
@@ -32,7 +43,7 @@ const GoalTab: React.FC<GoalTabProps> = ({ studyGroupId }) => {
 
 			{/* 각 탭 콘텐츠 */}
 			{activeTab === 'common' ? (
-				<CommonGoals studyGroupId={studyGroupId} />
+				<CommonGoals studyGroupId={studyGroupId} isLeader={isLeader} />
 			) : (
 				<PersonalGoals studyGroupId={studyGroupId} />
 			)}
