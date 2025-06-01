@@ -3,6 +3,7 @@ export const profileImageMap: Record<number, string> = {
 	2: '/assets/profile_images/profile-2nd.png',
 	3: '/assets/profile_images/profile-3rd.png',
 	4: '/assets/profile_images/profile-default.png',
+	5: '/assets/profile_images/profile-non-attendance.png',
 };
 
 export const getProfileImageUrl = (imageId: number): string => {
