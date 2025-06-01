@@ -110,7 +110,7 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 						if (!member) return null;
 
 						return (
-							<div key={rankNum} className="flex-col-center">
+							<div key={rankNum} className="flex-col-center top-container">
 								<div className={`rank-card flex-col-between rank-${rankNum}`}>
 									{rankNum === 1 && <div className="crown-icon" />}
 									<div className="avatar">

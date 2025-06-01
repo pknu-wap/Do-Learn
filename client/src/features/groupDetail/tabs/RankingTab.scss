@@ -31,7 +31,7 @@
 
 			.crown-icon {
 				position: absolute;
-				top: -16px;
+				top: -20px;
 				left: 50%;
 				transform: translateX(-50%);
 				width: 30px;
@@ -66,6 +66,13 @@
 				object-fit: cover;
 			}
 		}
+	}
+}
+
+.top-container {
+	.nickname {
+		max-width: 65px;
+		text-align: center;
 	}
 }
 
