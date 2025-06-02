@@ -5,7 +5,7 @@ import './RankingTab.scss';
 
 import { viewRanking, updateRanking, Ranking } from 'api/rankingApi';
 import { fetchGroupMembers, GroupMember } from 'api/memberListApi';
-import { getProfileImageUrl } from 'utils/profileImageMap';
+import { getGroupMemberProfileImageUrl } from 'utils/profileImageMap';
 
 interface MemberRanking {
 	rank: number;
@@ -40,7 +40,7 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 							rank: r.ranking,
 							displayRank: r.ranking,
 							nickname: r.nickname,
-							avatarUrl: getProfileImageUrl(imageId),
+							avatarUrl: getGroupMemberProfileImageUrl(imageId),
 						};
 					});
 					setRankings(mapped);
@@ -61,7 +61,7 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 								rank: r.ranking,
 								displayRank: r.ranking,
 								nickname: r.nickname,
-								avatarUrl: getProfileImageUrl(imageId),
+								avatarUrl: getGroupMemberProfileImageUrl(imageId),
 							};
 						});
 						setRankings(mappedAfterUpdate);
@@ -80,7 +80,7 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 								rank: idx + 4,
 								displayRank: idx + 1,
 								nickname: m.nickname,
-								avatarUrl: getProfileImageUrl(m.profileImage),
+								avatarUrl: getGroupMemberProfileImageUrl(m.profileImage),
 							}));
 							setRankings(mappedMembers);
 						} else {

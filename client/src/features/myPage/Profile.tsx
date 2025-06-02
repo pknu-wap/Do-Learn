@@ -11,8 +11,10 @@ import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 import './Profile.scss';
 
-// 아래 두 가지를 utils/profileImageMap에서 import
-import { profileImageMap, getProfileImageUrl } from 'utils/profileImageMap';
+import {
+	userProfileImageMap,
+	getUserProfileImageUrl,
+} from 'utils/profileImageMap';
 
 interface UserState {
 	profileImageId: number;
@@ -104,7 +106,6 @@ const Profile: React.FC = () => {
 			const serverMsg = error.response?.data?.message || '';
 
 			if (status === 400 && serverMsg.includes('이미')) {
-				// 중복 에러: draft 유지, 편집 모드 그대로
 				alert('이미 사용 중인 닉네임입니다.');
 				setIsEditing(true);
 				setTimeout(() => inputRef.current?.focus(), 0);
@@ -188,22 +189,22 @@ const Profile: React.FC = () => {
 							✕
 						</button>
 						<div className="image-options flex-row-center">
-							{(Object.entries(profileImageMap) as Array<[string, string]>).map(
-								([key, src]) => {
-									const id = Number(key);
-									return (
-										<img
-											key={id}
-											src={src}
-											alt={`profile-${id}`}
-											className={`image-option ${
-												id === user.profileImageId ? 'selected' : ''
-											}`}
-											onClick={() => handleImageSelect(id)}
-										/>
-									);
-								},
-							)}
+							{(
+								Object.entries(userProfileImageMap) as Array<[string, string]>
+							).map(([key, src]) => {
+								const id = Number(key);
+								return (
+									<img
+										key={id}
+										src={src}
+										alt={`profile-${id}`}
+										className={`image-option ${
+											id === user.profileImageId ? 'selected' : ''
+										}`}
+										onClick={() => handleImageSelect(id)}
+									/>
+								);
+							})}
 						</div>
 					</div>
 				</div>
@@ -214,7 +215,7 @@ const Profile: React.FC = () => {
 				<div className="profile-header flex-center">
 					<div className="content flex-center">
 						<img
-							src={getProfileImageUrl(user.profileImageId)}
+							src={getUserProfileImageUrl(user.profileImageId)}
 							alt="프로필 이미지"
 							className="avatar flex-center"
 							onClick={handleAvatarClick}
