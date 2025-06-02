@@ -51,13 +51,10 @@
 	margin-top: 0.5rem;
 }
 
-.subgoal-item {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+.subgoal-item,
+.subgoal-empty {
 	padding: 0.3rem 0.2rem;
-	// border-bottom: 1px solid #eee;
-	// font-size: 0.95rem;
+	margin-left: 25px;
 }
 
 // 수정 모드

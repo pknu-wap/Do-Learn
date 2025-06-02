@@ -21,5 +21,5 @@ export interface CreateCommonGoalRequest {
 	startDate?: string;
 	startDayOfWeek?: string;
 	mainCategory: string;
-	subGoals: SubGoal[];
+	subGoals?: SubGoal[];
 }

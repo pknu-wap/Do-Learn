@@ -81,7 +81,7 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 				referenceDate: startDate,
 				startDayOfWeek,
 			});
-			console.log('공통 목표 불러오기 성공', data);
+
 			setGoals(data);
 		} catch (e) {
 			console.error('공통 목표 불러오기 실패', e);
@@ -91,113 +91,116 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 	// 서버와 동기화 API
 	const syncGoalsWithServer = async () => {
 		const today = new Date();
-		const dateStr = today.toISOString().split('T')[0];
-		const startDayOfWeek = 'MONDAY';
+		const { startDate, startDayOfWeek } = getKoreaStartDayInfo(today);
 
 		// 1. 서버 기준 기존 목표 데이터
 		const serverGoals = await getCommonGoals({
 			studyGroupId,
-			referenceDate: dateStr,
+			referenceDate: startDate,
 			startDayOfWeek,
 		});
 		const serverDetails = await Promise.all(
 			serverGoals.map((goal: CommonGoal) => getCommonGoalDetail(goal.goalId)),
 		);
 
-		// 2. 새롭게 입력한 목표 정보
-		const localMainCategories = mainCategoryList;
-		const localSubGoals = subGoalsList;
-
-		// 3. 동기화 처리
-		for (let i = 0; i < localMainCategories.length; i++) {
-			const localMain = localMainCategories[i].trim();
-			const localSubs = localSubGoals[i]
+		// 2. 입력된 값 기준 동기화
+		for (let i = 0; i < mainCategoryList.length; i++) {
+			const localMain = mainCategoryList[i].trim();
+			const localSubs = subGoalsList[i]
 				.map((s) => s.trim())
 				.filter((s) => s !== '');
+			const goalId = goalIds[i];
 
-			const existingGoalId = goalIds[i];
-			const existingSubGoalIds = subGoalIds[i] || [];
-			const weekStartDate = goals[0]?.startDate;
-			const weekStartDayOfWeek = goals[0]?.startDayOfWeek;
+			const matchedDetail = serverDetails.find((d) => d.goalId === goalId);
+			const originalMain = matchedDetail?.mainCategory ?? '';
+			const originalSubGoals: SubGoal[] = matchedDetail?.subGoals ?? [];
 
-			if (!existingGoalId) {
-				// 새 대범주 + 소범주 생성
-				// 기존 목표가 있었다면 거기서 기준일/요일 가져오고, 아니면 현재 기준 생성
-				const { startDate, startDayOfWeek } = weekStartDate
-					? {
-							startDate: weekStartDate,
-							startDayOfWeek: weekStartDayOfWeek ?? 'MONDAY',
-						}
-					: getKoreaStartDayInfo(new Date());
-				await createCommonGoal({
+			if (!goalId) {
+				// 신규 goal 생성
+				const created = await createCommonGoal({
 					studyGroupId,
 					mainCategory: localMain,
 					startDate,
-					startDayOfWeek: startDayOfWeek ?? 'MONDAY', // null 방지
+					startDayOfWeek,
 					subGoals: localSubs.map((content) => ({ content })),
 				});
-			} else {
-				// 대범주 수정
-				await updateCommonGoal(existingGoalId, {
+
+				// const newGoalId = created.goalId;
+				// for (const sub of localSubs) {
+				// 	await createSubGoal(newGoalId, sub);
+				// }
+				continue;
+			}
+
+			// mainCategory가 변경된 경우에만 호출
+			if (localMain !== originalMain) {
+				await updateCommonGoal(goalId, {
 					studyGroupId,
 					mainCategory: localMain,
-					startDate:
-						goals[i]?.startDate || getKoreaStartDayInfo(new Date()).startDate,
-					startDayOfWeek:
-						goals[i]?.startDayOfWeek ||
-						getKoreaStartDayInfo(new Date()).startDayOfWeek,
-					subGoals: localSubs.map((content) => ({ content })),
+					startDate,
+					startDayOfWeek,
+					subGoals: originalSubGoals.map((sub) => ({
+						id: sub.id,
+						content: sub.content,
+					})),
 				});
+			}
 
-				const matchedDetail = serverDetails.find(
-					(detail) => detail.goalId === goalIds[i],
+			// 세부 목표 동기화
+			const serverGoalDetail = serverDetails.find((d) => d.goalId === goalId);
+			const serverSubGoals: SubGoal[] = serverGoalDetail?.subGoals || [];
+
+			const serverContents = serverSubGoals.map((s) => s.content.trim());
+
+			// 삭제
+			for (const sub of serverSubGoals) {
+				if (!localSubs.includes(sub.content.trim())) {
+					await deleteSubGoal(sub.id!);
+				}
+			}
+
+			// 수정
+			for (const sub of serverSubGoals) {
+				const match = localSubs.find((s) => s.trim() === sub.content.trim());
+				if (match && match !== sub.content) {
+					await updateSubGoal(sub.id!, match);
+				}
+			}
+
+			// 추가
+			for (const localSub of localSubs) {
+				const isNew = serverSubGoals.every(
+					(s) => s.content.trim() !== localSub.trim(),
 				);
-				const serverSubGoals: SubGoal[] = matchedDetail?.subGoals || [];
-
-				// 삭제
-				for (const serverSub of serverSubGoals) {
-					const existsInLocal = localSubs.includes(serverSub.content.trim());
-					if (!existsInLocal) {
-						await deleteSubGoal(serverSub.id!);
-					}
-				}
-
-				// 수정
-				for (const serverSub of serverSubGoals) {
-					const matchingLocal = localSubs.find(
-						(local) => local === serverSub.content.trim(),
-					);
-					if (matchingLocal && matchingLocal !== serverSub.content) {
-						await updateSubGoal(serverSub.id!, matchingLocal);
-					}
-				}
-
-				// 추가 (내용 기준 비교)
-				for (const localSub of localSubs) {
-					const isDuplicate = serverSubGoals.some(
-						(serverSub) => serverSub.content.trim() === localSub,
-					);
-					if (!isDuplicate) {
-						await createSubGoal(existingGoalId, localSub);
-					}
+				if (isNew) {
+					await createSubGoal(goalId, localSub);
 				}
 			}
 		}
 
-		// 4. 삭제된 대범주 처리
+		// 3. 삭제된 대범주 동기화
 		for (const serverGoal of serverDetails) {
-			if (!localMainCategories.includes(serverGoal.mainCategory)) {
+			if (!mainCategoryList.includes(serverGoal.mainCategory)) {
 				await deleteCommonGoal(serverGoal.goalId);
 			}
 		}
-
-		// 5. 삭제된 대범주 처리 (수정 모드에서 삭제된 항목들)
 		for (const deletedId of deletedGoalIds) {
 			await deleteCommonGoal(deletedId);
 		}
 
-		// 삭제된 목록 초기화
 		setDeletedGoalIds([]);
+
+		const updatedGoals: CommonGoal[] = await getCommonGoals({
+			studyGroupId,
+			referenceDate: startDate,
+			startDayOfWeek,
+		});
+
+		// goal.mainCategory 순서 기준으로 재정렬
+		const sortedGoals = mainCategoryList.map(
+			(main) => updatedGoals.find((goal) => goal.mainCategory === main)!,
+		);
+		setGoals(sortedGoals);
 	};
 
 	useEffect(() => {
@@ -224,7 +227,7 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 
 	// 수정하기 모드 시 기존 목표 불러오기
 	const handleEditMode = () => {
-		console.log('현재 goals 상태:', goals);
+		// console.log('현재 goals 상태:', goals);
 
 		if (goals.length === 0) {
 			// 여기서 직접 한 줄 만들기
