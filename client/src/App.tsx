@@ -43,7 +43,7 @@ function App() {
 						window.location.href = '/login';
 					});
 			},
-			9 * 60 * 1000,
+			39 * 60 * 1000,
 		);
 
 		return () => clearInterval(interval);

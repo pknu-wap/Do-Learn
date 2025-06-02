@@ -28,13 +28,13 @@ const GoalTab: React.FC<GoalTabProps> = ({ studyGroupId }) => {
 			{/* 탭 버튼 */}
 			<div className="goal-tab-header">
 				<button
-					className={`tab ${activeTab === 'common' ? 'active' : ''} button1`}
+					className={`tab ${activeTab === 'common' ? 'active' : ''} body3`}
 					onClick={() => setActiveTab('common')}
 				>
 					공통 목표
 				</button>
 				<button
-					className={`tab ${activeTab === 'personal' ? 'active' : ''} button1`}
+					className={`tab ${activeTab === 'personal' ? 'active' : ''} body3`}
 					onClick={() => setActiveTab('personal')}
 				>
 					개인 목표

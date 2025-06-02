@@ -9,7 +9,7 @@ import {
 	updateCommonGoal,
 	updateSubGoal,
 } from 'api/commonGoalsApi';
-import { CommonGoal } from 'types/commonGoalTypes';
+import { CommonGoal, SubGoal } from 'types/commonGoalTypes';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 import './CommonGoals.scss';
@@ -20,9 +20,6 @@ interface CommonGoalsProps {
 }
 
 const getKoreaStartDayInfo = (date: Date) => {
-	const utc = date.getTime();
-	const koreaTime = new Date(utc + 9 * 60 * 60 * 1000);
-
 	const weekdays = [
 		'SUNDAY',
 		'MONDAY',
@@ -32,24 +29,47 @@ const getKoreaStartDayInfo = (date: Date) => {
 		'FRIDAY',
 		'SATURDAY',
 	];
+
+	// 타임존을 한국으로 고정
+	const formatter = new Intl.DateTimeFormat('en-US', {
+		timeZone: 'Asia/Seoul',
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+		weekday: 'long',
+	});
+
+	const parts = formatter.formatToParts(date);
+
+	const year = parts.find((p) => p.type === 'year')!.value;
+	const month = parts.find((p) => p.type === 'month')!.value;
+	const day = parts.find((p) => p.type === 'day')!.value;
+	const weekdayStr = parts
+		.find((p) => p.type === 'weekday')!
+		.value.toUpperCase();
+
 	return {
-		startDate: koreaTime.toISOString().split('T')[0],
-		startDayOfWeek: weekdays[koreaTime.getDay()],
+		startDate: `${year}-${month}-${day}`, // KST 기준 YYYY-MM-DD
+		startDayOfWeek: weekdayStr,
 	};
 };
 
 const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 	const [goals, setGoals] = useState<CommonGoal[]>([]);
-	const [expandedGoalId, setExpandedGoalId] = useState<number | null>(null);
+	const [expandedGoalIds, setExpandedGoalIds] = useState<Set<number>>(
+		new Set(),
+	);
 	const [isEditMode, setIsEditMode] = useState(false); // 수정 모드 여부
 	const [mainCategoryList, setMainCategoryList] = useState<string[]>(['']);
 	const [subGoalsList, setSubGoalsList] = useState<string[][]>([['']]);
 	const [plusModeIndexesList, setPlusModeIndexesList] = useState<Set<number>[]>(
 		[new Set([0])],
 	);
-	const inputRefsList = useRef<Array<Array<HTMLInputElement | null>>>([[null]]);
+	const inputRefsList = useRef<Array<Array<HTMLTextAreaElement | null>>>([]);
+
 	const [goalIds, setGoalIds] = useState<number[]>([]);
 	const [subGoalIds, setSubGoalIds] = useState<number[][]>([]);
+	const [deletedGoalIds, setDeletedGoalIds] = useState<number[]>([]);
 
 	// 공통목표 조회
 	const fetchGoals = async () => {
@@ -61,7 +81,7 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 				referenceDate: startDate,
 				startDayOfWeek,
 			});
-			console.log('공통 목표 조회 결과:', data);
+			console.log('공통 목표 불러오기 성공', data);
 			setGoals(data);
 		} catch (e) {
 			console.error('공통 목표 불러오기 실패', e);
@@ -95,68 +115,72 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 				.map((s) => s.trim())
 				.filter((s) => s !== '');
 
-			const matched = serverDetails.find((d) => d.mainCategory === localMain);
+			const existingGoalId = goalIds[i];
+			const existingSubGoalIds = subGoalIds[i] || [];
+			const weekStartDate = goals[0]?.startDate;
+			const weekStartDayOfWeek = goals[0]?.startDayOfWeek;
 
-			if (!matched) {
-				const { startDate, startDayOfWeek } = getKoreaStartDayInfo(new Date());
-				const { goalId } = await createCommonGoal({
+			if (!existingGoalId) {
+				// 새 대범주 + 소범주 생성
+				// 기존 목표가 있었다면 거기서 기준일/요일 가져오고, 아니면 현재 기준 생성
+				const { startDate, startDayOfWeek } = weekStartDate
+					? {
+							startDate: weekStartDate,
+							startDayOfWeek: weekStartDayOfWeek ?? 'MONDAY',
+						}
+					: getKoreaStartDayInfo(new Date());
+				await createCommonGoal({
 					studyGroupId,
 					mainCategory: localMain,
 					startDate,
-					startDayOfWeek,
+					startDayOfWeek: startDayOfWeek ?? 'MONDAY', // null 방지
+					subGoals: localSubs.map((content) => ({ content })),
+				});
+			} else {
+				// 대범주 수정
+				await updateCommonGoal(existingGoalId, {
+					studyGroupId,
+					mainCategory: localMain,
+					startDate:
+						goals[i]?.startDate || getKoreaStartDayInfo(new Date()).startDate,
+					startDayOfWeek:
+						goals[i]?.startDayOfWeek ||
+						getKoreaStartDayInfo(new Date()).startDayOfWeek,
 					subGoals: localSubs.map((content) => ({ content })),
 				});
 
-				await Promise.all(
-					localSubs.map((content) => createSubGoal(goalId, content)),
+				const matchedDetail = serverDetails.find(
+					(detail) => detail.goalId === goalIds[i],
 				);
-			} else {
-				// 👉 수정 필요 여부 판단
-				if (matched.mainCategory !== localMain) {
-					await updateCommonGoal(matched.goalId, {
-						studyGroupId,
-						mainCategory: localMain,
-						startDate: matched.startDate, // 기존값 유지
-						startDayOfWeek: matched.startDayOfWeek, // 기존값 유지
-						subGoals: localSubs.map((content) => ({ content })),
-					});
-				}
-
-				const serverSubGoals = matched.subGoals || [];
-
-				// 추가/수정/삭제 분기
-				const existingContents = serverSubGoals.map(
-					(s: { id: number; content: string }) => s.content,
-				);
-				const existingIds = serverSubGoals.map(
-					(s: { id: number; content: string }) => s.id,
-				);
+				const serverSubGoals: SubGoal[] = matchedDetail?.subGoals || [];
 
 				// 삭제
-				for (const sub of serverSubGoals) {
-					if (!localSubs.includes(sub.content)) {
-						await deleteSubGoal(sub.id!);
+				for (const serverSub of serverSubGoals) {
+					const existsInLocal = localSubs.includes(serverSub.content.trim());
+					if (!existsInLocal) {
+						await deleteSubGoal(serverSub.id!);
 					}
 				}
 
 				// 수정
-				for (let j = 0; j < serverSubGoals.length; j++) {
-					const serverSub = serverSubGoals[j];
-					const localSub = localSubs[j];
-
-					if (serverSub && localSub && serverSub.content !== localSub) {
-						await updateSubGoal(serverSub.id!, localSub);
+				for (const serverSub of serverSubGoals) {
+					const matchingLocal = localSubs.find(
+						(local) => local === serverSub.content.trim(),
+					);
+					if (matchingLocal && matchingLocal !== serverSub.content) {
+						await updateSubGoal(serverSub.id!, matchingLocal);
 					}
 				}
 
-				// 추가
-				for (const content of localSubs) {
-					if (!existingContents.includes(content)) {
-						await createSubGoal(matched.goalId, content);
+				// 추가 (내용 기준 비교)
+				for (const localSub of localSubs) {
+					const isDuplicate = serverSubGoals.some(
+						(serverSub) => serverSub.content.trim() === localSub,
+					);
+					if (!isDuplicate) {
+						await createSubGoal(existingGoalId, localSub);
 					}
 				}
-
-				// 수정 (내용은 같은데 ID가 다르면 수정할 수도 있음 → 현재 방식은 수정 불필요)
 			}
 		}
 
@@ -166,11 +190,72 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 				await deleteCommonGoal(serverGoal.goalId);
 			}
 		}
+
+		// 5. 삭제된 대범주 처리 (수정 모드에서 삭제된 항목들)
+		for (const deletedId of deletedGoalIds) {
+			await deleteCommonGoal(deletedId);
+		}
+
+		// 삭제된 목록 초기화
+		setDeletedGoalIds([]);
 	};
+
+	useEffect(() => {
+		inputRefsList.current = subGoalsList.map((subList, i) =>
+			subList.map((_, j) => inputRefsList.current[i]?.[j] ?? null),
+		);
+	}, [subGoalsList]);
 
 	useEffect(() => {
 		fetchGoals();
 	}, [studyGroupId]);
+
+	useEffect(() => {
+		if (!isEditMode) {
+			setExpandedGoalIds(new Set(goals.map((g) => g.goalId)));
+		}
+	}, [goals, isEditMode]);
+
+	useEffect(() => {
+		if (!isEditMode && goals.length > 0) {
+			setExpandedGoalIds(new Set(goals.map((g) => g.goalId)));
+		}
+	}, [goals, isEditMode]);
+
+	// 수정하기 모드 시 기존 목표 불러오기
+	const handleEditMode = () => {
+		console.log('현재 goals 상태:', goals);
+
+		if (goals.length === 0) {
+			// 여기서 직접 한 줄 만들기
+			setMainCategoryList(['']);
+			setSubGoalsList([['']]);
+			setPlusModeIndexesList([new Set([0])]);
+			setGoalIds([]);
+			setSubGoalIds([]);
+			setIsEditMode(true);
+			return;
+		}
+
+		const mainList = goals.map((goal) => goal.mainCategory);
+		const subList = goals.map((goal) =>
+			goal.subGoals.length === 0
+				? [''] // ✅ 최소 한 줄 보이게
+				: goal.subGoals.map((sub) => sub.content),
+		);
+		const plusIndexes = subList.map(
+			(subs) => new Set([subs.length === 0 ? 0 : subs.length - 1]),
+		);
+
+		setMainCategoryList(mainList);
+		setSubGoalsList(subList);
+		setPlusModeIndexesList(plusIndexes);
+
+		setGoalIds(goals.map((goal) => goal.goalId));
+		setSubGoalIds(goals.map((goal) => goal.subGoals.map((sub) => sub.id!)));
+
+		setIsEditMode(true);
+	};
 
 	// 대범주 입력 변경
 	const handleMainCategoryChange = (mainIdx: number, value: string) => {
@@ -210,7 +295,6 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 			return updated;
 		});
 
-		// ✅ 이걸 추가!
 		inputRefsList.current.splice(mainIdx + 1, 0, [null]);
 	};
 
@@ -257,26 +341,18 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 		setPlusModeIndexesList(updatedPlus);
 
 		setTimeout(() => {
-			inputRefsList.current[mainIdx][Math.max(0, index - 1)]?.focus();
-		}, 0);
-	};
-
-	// 대범주 삭제
-	const handleRemoveMainCategory = (mainIdx: number) => {
-		if (mainCategoryList.length === 1) return; // 최소 1개 유지
-
-		setMainCategoryList((prev) => prev.filter((_, i) => i !== mainIdx));
-		setSubGoalsList((prev) => prev.filter((_, i) => i !== mainIdx));
-		setPlusModeIndexesList((prev) => prev.filter((_, i) => i !== mainIdx));
-		inputRefsList.current.splice(mainIdx, 1);
+			const ref = inputRefsList.current[mainIdx]?.[index + 1];
+			if (ref) ref.focus();
+		}, 10);
 	};
 
 	// 엔터키 → 인풋 추가, 백스페이스 → 삭제
 	const handleSubGoalKeyDown = (
-		e: React.KeyboardEvent<HTMLInputElement>,
+		e: React.KeyboardEvent<HTMLTextAreaElement>,
 		mainIdx: number,
 		index: number,
 	) => {
+		if (e.nativeEvent.isComposing) return;
 		if (e.key === 'Enter') {
 			e.preventDefault();
 			handleAddSubGoal(mainIdx, index);
@@ -286,59 +362,24 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 	};
 
 	// 소범주 보기 토글
-	const handleToggle = async (goalId: number) => {
-		if (expandedGoalId === goalId) {
-			setExpandedGoalId(null);
-		} else {
-			try {
-				const detail = await getCommonGoalDetail(goalId);
-				setGoals((prev) =>
-					prev.map((g) =>
-						g.goalId === goalId ? { ...g, subGoals: detail.subGoals } : g,
-					),
-				);
-				setExpandedGoalId(goalId);
-			} catch (e) {
-				console.error('소범주 불러오기 실패', e);
+	const handleToggle = (goalId: number) => {
+		setExpandedGoalIds((prev) => {
+			const updated = new Set(prev);
+			if (updated.has(goalId)) {
+				updated.delete(goalId); // 이미 열려있으면 닫기
+			} else {
+				updated.add(goalId); // 닫혀있으면 열기
 			}
-		}
-	};
-
-	// 대범주 삭제? 수정아닐때?
-	const handleDeleteGoal = async (goalId: number) => {
-		await deleteCommonGoal(goalId);
-		fetchGoals();
-	};
-
-	// 소범주 삭제
-	const handleDeleteSubGoal = async (goalId: number, subGoalId: number) => {
-		await deleteSubGoal(subGoalId);
-		const detail = await getCommonGoalDetail(goalId);
-		setGoals((prev) =>
-			prev.map((g) =>
-				g.goalId === goalId ? { ...g, subGoals: detail.subGoals } : g,
-			),
-		);
-	};
-
-	const getButtonLabel = () => {
-		if (isEditMode) return '확인';
-		if (goals.length === 0) return '추가';
-		return '수정하기';
+			return updated;
+		});
 	};
 
 	// 생성 or 수정 버튼 클릭 핸들러
 	const handleButtonClick = async () => {
 		if (isEditMode) {
 			// 빈 입력칸 검사
-			if (
-				mainCategoryList.some((main) => main.trim() === '') ||
-				subGoalsList.some(
-					(subGoals) =>
-						subGoals.length === 0 || subGoals.some((s) => s.trim() === ''),
-				)
-			) {
-				alert('모든 목표를 입력해주세요.');
+			if (mainCategoryList.some((main) => main.trim() === '')) {
+				alert('대범주를 입력해주세요.');
 				return;
 			}
 
@@ -351,8 +392,31 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 				console.error(e);
 			}
 		} else {
-			setIsEditMode(true);
+			handleEditMode();
 		}
+	};
+
+	// 수정 취소
+	const handleCancelEdit = async () => {
+		setIsEditMode(false);
+		await fetchGoals(); // 입력값 초기화
+	};
+
+	// 삭제
+	const handleDeleteMainCategory = (mainIdx: number) => {
+		// goalIds[mainIdx]가 있는 경우 삭제 목록에 추가
+		const goalIdToDelete = goalIds[mainIdx];
+		if (goalIdToDelete) {
+			setDeletedGoalIds((prev) => [...prev, goalIdToDelete]);
+		}
+
+		// 기존 배열들에서도 삭제
+		setMainCategoryList((prev) => prev.filter((_, idx) => idx !== mainIdx));
+		setSubGoalsList((prev) => prev.filter((_, idx) => idx !== mainIdx));
+		setGoalIds((prev) => prev.filter((_, idx) => idx !== mainIdx));
+		setSubGoalIds((prev) => prev.filter((_, idx) => idx !== mainIdx));
+		setPlusModeIndexesList((prev) => prev.filter((_, idx) => idx !== mainIdx));
+		inputRefsList.current.splice(mainIdx, 1);
 	};
 
 	return (
@@ -364,8 +428,8 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 						<div key={mainIdx} className="goal-form flex-col">
 							{/* 대범주 인풋 */}
 							<div className="main-category-wrapper">
-								<input
-									type="text"
+								<textarea
+									key={`main-${mainIdx}`}
 									placeholder="목표 입력"
 									value={mainCategory}
 									onChange={(e) =>
@@ -375,24 +439,25 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 								/>
 								<button
 									className="remove-main-button"
-									onClick={() => handleRemoveMainCategory(mainIdx)}
+									onClick={() => handleDeleteMainCategory(mainIdx)}
 									disabled={mainCategoryList.length === 1}
+									tabIndex={-1}
 								>
-									−
+									⊖
 								</button>
 							</div>
 
 							{/* 소범주 인풋 리스트 */}
 							{subGoalsList[mainIdx].map((value, index) => (
 								<div key={index} className="subgoal-input-group flex-center">
-									<input
+									<textarea
+										key={`sub-${mainIdx}-${index}`}
 										ref={(el) => {
 											if (!inputRefsList.current[mainIdx]) {
 												inputRefsList.current[mainIdx] = [];
 											}
 											inputRefsList.current[mainIdx][index] = el;
 										}}
-										type="text"
 										value={value}
 										placeholder="세부 목표 입력"
 										className="subgoal-input button3"
@@ -407,9 +472,14 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 												? handleAddSubGoal(mainIdx, index)
 												: handleRemoveSubGoal(mainIdx, index)
 										}
-										className="add-subgoal-button button3"
+										tabIndex={-1}
+										className={`add-subgoal-button button3 ${
+											plusModeIndexesList[mainIdx].has(index)
+												? 'subgoal-plus-button'
+												: 'subgoal-minus-button'
+										}`}
 									>
-										{plusModeIndexesList[mainIdx].has(index) ? '+' : '−'}
+										{plusModeIndexesList[mainIdx].has(index) ? '⊕' : '⊖'}
 									</button>
 								</div>
 							))}
@@ -441,53 +511,32 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 					<div key={goal.goalId} className="goal-card">
 						<div className="goal-header">
 							<div
-								className="goal-main"
+								className="goal-main body2"
 								onClick={() => handleToggle(goal.goalId)}
 							>
 								<div className="toggle-icon">
-									{expandedGoalId === goal.goalId ? '▾' : '▸'}
+									<img
+										src={
+											expandedGoalIds.has(goal.goalId)
+												? '/assets/toggle-open-icon.png'
+												: '/assets/toggle-close-icon.png'
+										}
+										alt="toggle"
+										className="toggle-icon-img"
+									/>
 								</div>
 								{goal.mainCategory}
-								{isLeader && (
-									<button
-										className="add-button"
-										onClick={(e) => {
-											e.stopPropagation();
-											setIsEditMode(true);
-										}}
-									>
-										+
-									</button>
-								)}
 							</div>
-							{/* {isLeader && (
-								<button
-									onClick={() => handleDeleteGoal(goal.goalId)}
-									className="delete-button"
-								>
-									삭제
-								</button>
-							)} */}
 						</div>
 
-						{expandedGoalId === goal.goalId && (
+						{expandedGoalIds.has(goal.goalId) && (
 							<div className="subgoal-list">
 								{goal.subGoals?.length === 0 ? (
-									<div className="subgoal-empty">소범주가 없습니다.</div>
+									<div className="subgoal-empty body3">소범주가 없습니다.</div>
 								) : (
 									goal.subGoals.map((sub) => (
-										<div key={sub.id} className="subgoal-item">
+										<div key={sub.id} className="subgoal-item body3">
 											<div>{sub.content}</div>
-											{isLeader && (
-												<button
-													onClick={() =>
-														handleDeleteSubGoal(goal.goalId, sub.id!)
-													}
-													className="delete-button"
-												>
-													삭제
-												</button>
-											)}
 										</div>
 									))
 								)}
@@ -499,12 +548,29 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 			{/* 하단 버튼 */}
 			{isLeader && (
 				<div className="goal-footer">
-					<button
-						className="goal-edit-button button2"
-						onClick={handleButtonClick}
-					>
-						{getButtonLabel()}
-					</button>
+					{isEditMode ? (
+						<>
+							<button
+								className="goal-cancel-button button2"
+								onClick={handleCancelEdit}
+							>
+								취소
+							</button>
+							<button
+								className="goal-edit-button button2"
+								onClick={handleButtonClick}
+							>
+								확인
+							</button>
+						</>
+					) : (
+						<button
+							className="goal-edit-button button2"
+							onClick={handleButtonClick}
+						>
+							수정하기
+						</button>
+					)}
 				</div>
 			)}
 		</div>

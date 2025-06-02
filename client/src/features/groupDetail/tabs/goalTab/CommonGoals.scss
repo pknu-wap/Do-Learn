@@ -3,12 +3,13 @@
 	// margin: 0 5%;
 }
 
+// 전체 공통 목표 목록
 .goal-card {
 	border: 1px solid #e0e0e0;
-	border-radius: 12px;
+	border-radius: 10px;
 	padding: 1rem;
 	background-color: #fff;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+	margin: 3% 8% 0 8%;
 }
 
 .goal-header {
@@ -41,20 +42,25 @@
 			}
 		}
 	}
-
-	.delete-button {
-		background: none;
-		border: none;
-		color: #999;
-		cursor: pointer;
-		font-size: 0.9rem;
-
-		&:hover {
-			color: red;
-		}
-	}
 }
 
+.subgoal-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+	margin-top: 0.5rem;
+}
+
+.subgoal-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.3rem 0.2rem;
+	// border-bottom: 1px solid #eee;
+	// font-size: 0.95rem;
+}
+
+// 수정 모드
 .goal-form {
 	gap: 0.5rem;
 	margin: 0 5%;
@@ -65,12 +71,20 @@
 // 대범주, 소범주 input
 .main-category-input,
 .subgoal-input {
+	resize: none;
 	border: none;
 	border-bottom: 1px solid #ccc;
 	outline: none;
 	padding: 0.5rem;
 	font-size: 14px;
 	width: 100%;
+	height: 35px;
+
+	line-height: 1.4;
+	// min-height: 2.2rem;
+	// max-height: 5rem;
+	overflow-y: auto;
+	// box-sizing: border-box;
 
 	&:focus {
 		border-color: #888;
@@ -85,6 +99,7 @@
 .main-category-wrapper {
 	position: relative;
 	gap: 0.5rem;
+	flex-wrap: wrap;
 
 	.remove-main-button {
 		position: absolute;
@@ -92,11 +107,11 @@
 		font-size: 18px;
 		border: none;
 		background: none;
-		color: rgb(164, 164, 164);
+		color: #ff4d4f;
 		cursor: pointer;
 
 		&:hover {
-			color: #333;
+			opacity: 0.6;
 		}
 
 		&:disabled {
@@ -111,6 +126,7 @@
 	gap: 0.5rem;
 	margin-left: 20px;
 	position: relative;
+	flex-wrap: wrap;
 
 	.add-subgoal-button {
 		position: absolute;
@@ -122,45 +138,32 @@
 		cursor: pointer;
 
 		&:hover {
-			color: #333;
+			opacity: 0.6;
 		}
+	}
+
+	.subgoal-plus-button {
+		color: #3cb371;
+	}
+
+	.subgoal-minus-button {
+		color: #ff4d4f;
 	}
 }
 
-.subgoal-preview,
-.subgoal-list {
-	display: flex;
-	flex-direction: column;
-	gap: 0.4rem;
-	margin-top: 0.5rem;
+// +, - 버튼
+.add-subgoal-button,
+.remove-main-button {
+	width: 2rem; // 고정 너비
+	height: 2rem; // 고정 높이
 }
 
-.subgoal-preview-item,
-.subgoal-item {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 0.3rem 0.2rem;
-	border-bottom: 1px solid #eee;
-	font-size: 0.95rem;
-
-	.delete-button {
-		font-size: 0.8rem;
-		color: #888;
-		border: none;
-		background: none;
-		cursor: pointer;
-
-		&:hover {
-			color: red;
-		}
-	}
-}
-
+// 하단 버튼
 .goal-footer {
 	display: flex;
 	justify-content: center;
-	margin-top: 1rem;
+	margin: 1rem auto;
+	gap: 25px;
 
 	.goal-edit-button {
 		background-color: #b6e7b6;
@@ -170,9 +173,25 @@
 		border-radius: 8px;
 		cursor: pointer;
 		font-weight: bold;
+		transition: 0.3s;
 
 		&:hover {
 			background-color: #a4d7a4;
+		}
+	}
+
+	.goal-cancel-button {
+		background-color: #dbdbdb;
+		color: #333;
+		border: none;
+		padding: 0.5rem 1.5rem;
+		border-radius: 8px;
+		cursor: pointer;
+		font-weight: bold;
+		transition: 0.3s;
+
+		&:hover {
+			background-color: #c1c1c1;
 		}
 	}
 }
@@ -181,10 +200,9 @@
 	color: #999;
 	text-align: center;
 	margin: 2rem 0;
-	font-style: italic;
 }
 
-// 대범주 추가
+// 대범주 추가 버튼
 .add-main-button {
 	text-align: center;
 	color: #aaa;
@@ -196,4 +214,12 @@
 	&:hover {
 		color: #444;
 	}
+}
+
+// 토글 이미지
+.toggle-icon-img {
+	width: 15px;
+	height: 15px;
+	margin-right: 6px;
+	vertical-align: middle;
 }
