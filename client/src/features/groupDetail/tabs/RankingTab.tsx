@@ -8,8 +8,8 @@ import { fetchGroupMembers, GroupMember } from 'api/memberListApi';
 import { getGroupMemberProfileImageUrl } from 'utils/profileImageMap';
 
 interface MemberRanking {
-	rank: number;
-	displayRank: number;
+	rank: number; // 1, 2, 3은 포디엄 자리, 4 이상은 rest-list
+	displayRank: number; // UI에 보여줄 순번
 	nickname: string;
 	avatarUrl: string;
 }
@@ -53,6 +53,7 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 				}
 			}
 
+			// 맵: studyMemberId → Ranking 객체
 			const rankedMap = new Map<number, Ranking>();
 			const rankedNickSet = new Set<string>();
 			rankingData.forEach((r) => {
@@ -68,20 +69,23 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 			members.forEach((m) => {
 				if (rankedNickSet.has(m.nickname)) {
 					const info = Array.from(rankedMap.values()).find((r) => r.nickname === m.nickname);
-					if (info && info.ranking <= 3) {
-						podiumMembers.push({
-							rank: info.ranking,
-							displayRank: info.ranking,
-							nickname: info.nickname,
-							avatarUrl: getGroupMemberProfileImageUrl(info.ranking),
-						});
-					} else {
-						restMembersTmp.push({
-							rank: 4,
-							displayRank: 0,
-							nickname: m.nickname,
-							avatarUrl: getGroupMemberProfileImageUrl(4),
-						});
+					if (info) {
+						const lvl = info.rankLevel;
+						if (lvl <= 3) {
+							podiumMembers.push({
+								rank: lvl,
+								displayRank: lvl,
+								nickname: info.nickname,
+								avatarUrl: getGroupMemberProfileImageUrl(lvl),
+							});
+						} else {
+							restMembersTmp.push({
+								rank: 4,
+								displayRank: 0,
+								nickname: m.nickname,
+								avatarUrl: getGroupMemberProfileImageUrl(4),
+							});
+						}
 					}
 				} else {
 					restMembersTmp.push({
