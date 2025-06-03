@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useLayoutEffect, useCallback } from 'react';
+import { Navigate } from 'react-router-dom';
 import { getMyPageInfo, updateMyPageInfo } from 'api/myInfoApi';
 import { Pencil } from 'lucide-react';
 import 'assets/style/_flex.scss';
@@ -6,6 +7,7 @@ import 'assets/style/_typography.scss';
 import './Profile.scss';
 
 import { userProfileImageMap, getUserProfileImageUrl } from 'utils/profileImageMap';
+import { isLoggedIn } from 'utils/auth';
 
 interface UserState {
 	profileImageId: number;
@@ -20,13 +22,15 @@ const Profile: React.FC = () => {
 	const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	// 중복 실행 방지
 	const isSavingRef = useRef(false);
 	const enterTriggeredRef = useRef(false);
 
-	// 1) 사용자 정보 불러오기
 	useEffect(() => {
 		(async () => {
+			if (!isLoggedIn()) {
+				window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+				return;
+			}
 			try {
 				const resp = await getMyPageInfo();
 				setUser({
@@ -35,9 +39,15 @@ const Profile: React.FC = () => {
 				});
 				setDraft(resp.data.nickname);
 			} catch (error: any) {
-				if (error.response?.status === 401) {
-					alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
-					window.location.href = '/login';
+				const status = error.response?.status;
+				const serverMsg = error.response?.data?.message || '';
+				if (status === 401 && serverMsg === 'access token expired') {
+					if (isLoggedIn()) {
+						alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+					} else {
+						alert('로그인 후 이용해주세요.');
+					}
+					window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
 				} else {
 					alert('사용자 정보를 불러오는 중 오류가 발생했습니다.');
 					window.location.href = '/login';
@@ -48,7 +58,6 @@ const Profile: React.FC = () => {
 		})();
 	}, []);
 
-	// 2) input width 자동 조정
 	useLayoutEffect(() => {
 		if (!inputRef.current) return;
 		const text = isEditing ? draft : user?.nickname || '';
@@ -65,13 +74,11 @@ const Profile: React.FC = () => {
 		document.body.removeChild(span);
 	}, [draft, isEditing, user?.nickname]);
 
-	// 3) 연필 클릭 → 편집 모드
 	const handleEditClick = useCallback(() => {
 		setIsEditing(true);
 		setTimeout(() => inputRef.current?.focus(), 0);
 	}, []);
 
-	// 4) 저장 로직
 	const saveNickname = useCallback(async () => {
 		if (!user || isSavingRef.current) return;
 		isSavingRef.current = true;
@@ -89,6 +96,11 @@ const Profile: React.FC = () => {
 		}
 
 		try {
+			if (!isLoggedIn()) {
+				alert('로그인 후 이용해주세요.');
+				window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+				return;
+			}
 			await updateMyPageInfo({ nickname: trimmed });
 			setUser((u) => (u ? { ...u, nickname: trimmed } : u));
 			setIsEditing(false);
@@ -103,9 +115,13 @@ const Profile: React.FC = () => {
 			} else if (status === 400) {
 				alert('잘못된 닉네임 입니다. 오류가 발생했습니다.');
 				setIsEditing(false);
-			} else if (status === 401) {
-				alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
-				window.location.href = '/login';
+			} else if (status === 401 && serverMsg === 'access token expired') {
+				if (isLoggedIn()) {
+					alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+				} else {
+					alert('로그인 후 이용해주세요.');
+				}
+				window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
 			} else {
 				alert('닉네임 변경 중 오류가 발생했습니다.');
 				setIsEditing(false);
@@ -115,7 +131,6 @@ const Profile: React.FC = () => {
 		}
 	}, [draft, user]);
 
-	// blur 핸들러: enter 이미 처리됐으면 skip
 	const handleBlur = useCallback(() => {
 		if (enterTriggeredRef.current) {
 			enterTriggeredRef.current = false;
@@ -124,7 +139,6 @@ const Profile: React.FC = () => {
 		saveNickname();
 	}, [saveNickname]);
 
-	// keydown 핸들러: Enter
 	const handleKeyDown = useCallback(
 		(e: React.KeyboardEvent<HTMLInputElement>) => {
 			if (e.key === 'Enter') {
@@ -136,17 +150,40 @@ const Profile: React.FC = () => {
 		[saveNickname],
 	);
 
-	// 5) 프로필 이미지 모달 열기/선택
-	const handleAvatarClick = () => setIsImageModalOpen(true);
+	const handleAvatarClick = () => {
+		if (!isLoggedIn()) {
+			alert('로그인 후 이용해주세요.');
+			window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+			return;
+		}
+		setIsImageModalOpen(true);
+	};
+
 	const handleImageSelect = async (id: number) => {
 		if (!user) return;
 		try {
+			if (!isLoggedIn()) {
+				alert('로그인 후 이용해주세요.');
+				window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+				return;
+			}
 			await updateMyPageInfo({ profileImage: id });
 			setUser((u) => (u ? { ...u, profileImageId: id } : u));
 			setIsImageModalOpen(false);
 		} catch (error: any) {
-			alert('프로필 이미지 변경 중 오류가 발생했습니다.');
-			console.error(error);
+			const status = error.response?.status;
+			const serverMsg = error.response?.data?.message || '';
+			if (status === 401 && serverMsg === 'access token expired') {
+				if (isLoggedIn()) {
+					alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
+				} else {
+					alert('로그인 후 이용해주세요.');
+				}
+				window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+			} else {
+				alert('프로필 이미지 변경 중 오류가 발생했습니다.');
+				console.error(error);
+			}
 		}
 	};
 
@@ -159,7 +196,6 @@ const Profile: React.FC = () => {
 
 	return (
 		<>
-			{/* 이미지 선택 모달 */}
 			{isImageModalOpen && (
 				<div className="image-modal-overlay flex-center">
 					<div className="image-modal body2">
@@ -191,7 +227,6 @@ const Profile: React.FC = () => {
 				</div>
 			)}
 
-			{/* 프로필 헤더 */}
 			<div className="profile-page flex-center">
 				<div className="profile-header flex-center">
 					<div className="content flex-center">

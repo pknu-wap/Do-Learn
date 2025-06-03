@@ -28,10 +28,10 @@
 }
 
 .dolearn {
-	width: 140%;
+	width: 137%;
 	height: auto;
 	position: relative;
-	top: 10%;
+	top: 14%;
 	left: -40%;
 	transform: rotate(13deg);
 	transition:
@@ -40,7 +40,7 @@
 	cursor: pointer;
 
 	&:hover {
-		transform: rotate(13deg) scale(1.05);
+		transform: rotate(13deg) scale(1.02);
 		filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
 	}
 }
