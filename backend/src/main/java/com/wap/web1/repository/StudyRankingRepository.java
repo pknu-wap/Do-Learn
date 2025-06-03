@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,5 +20,6 @@ public interface StudyRankingRepository extends JpaRepository<StudyRanking, Long
     @Query("DELETE FROM StudyRanking sr WHERE sr.weeklyPeriod.id = :weeklyPeriodId AND sr.studyGroup.id = :studyGroupId")
     int deleteByWeeklyPeriodAndStudyGroup(@Param("weeklyPeriodId") Long weeklyPeriodId,
                                           @Param("studyGroupId") Long studyGroupId);
+
 
 }
