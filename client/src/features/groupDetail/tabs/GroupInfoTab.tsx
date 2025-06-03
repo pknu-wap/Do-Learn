@@ -76,11 +76,11 @@ const GroupInfoTab: React.FC<GroupInfoTabProps> = ({ group }) => {
 			</div>
 
 			<div className="group-notice flex-col-center">
-				<div className="notice-header flex-row-center">
-					<Megaphone size={24} className="notice-icon" />
-					<span className="notice-label body2">공지사항</span>
+				{/* <Megaphone size={24} className="notice-icon" /> */}
+				<span className="notice-label body2">공지사항</span>
+				<div className="notice-header flex-row-left">
+					<div className="notice-content flex-center body3">{notice}</div>
 				</div>
-				<div className="notice-content flex-center body3">{notice}</div>
 			</div>
 		</div>
 	);
