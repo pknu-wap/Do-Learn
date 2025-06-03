@@ -5,6 +5,7 @@ import Header from 'features/header/Header';
 import SearchBar from 'features/searchBar/SearchBar';
 import Filter from 'features/filter/filter';
 import StudyGroupsList from 'features/studyGroupList/StudyGroupsList';
+import NavBar from 'components/NavBar';
 import { useMyGroupIds } from 'hooks/useMyGroupIds';
 import { useStudyGroups } from 'hooks/useStudyGroups';
 import { Region, Category } from 'api/createGroupFormApi';
@@ -135,6 +136,7 @@ export default function MainPage() {
 			/>
 
 			<StudyGroupsList searchResults={finalSearchResults} myGroupIds={myGroupIds} />
+			<NavBar />
 		</div>
 	);
 }

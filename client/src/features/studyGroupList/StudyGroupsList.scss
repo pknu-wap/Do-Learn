@@ -32,7 +32,7 @@
 	min-height: 100px;
 	margin: auto;
 	width: 78%;
-	border: 1.5px solid $main-color-dark-green;
+	border: 1.5px solid $sub-color-green;
 	border-radius: 20px;
 	padding-top: 5%;
 	margin-bottom: 8%;
@@ -44,7 +44,7 @@
 	}
 
 	&:hover {
-		background-color: #f6ffed;
+		background-color: #f8fdf3;
 		cursor: pointer;
 	}
 

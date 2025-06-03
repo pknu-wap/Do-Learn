@@ -106,9 +106,9 @@
 }
 
 .group-modal-button.join {
-	background-color: $main-color-dark-green;
+	background-color: $main-color-deep-green;
 	color: #fff;
 	&:hover {
-		background-color: $main-color-deep-green;
+		background-color: darken($main-color-deep-green, 5%);
 	}
 }

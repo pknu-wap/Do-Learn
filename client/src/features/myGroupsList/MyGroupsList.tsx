@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import StudyGroupItem from 'features/studyGroupList/StudyGroupItem';
 import { useMyStudyGroups } from 'hooks/useMyStudyGroups';
-import { useState } from 'react';
 import EditGroupModal from 'features/editGroups/EditGroupModal';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
@@ -9,10 +8,18 @@ import './MyGroupsList.scss';
 
 const MyGroupsList: React.FC = () => {
 	const { groups, loading, error } = useMyStudyGroups();
-	const [activeTab, setActiveTab] = useState<'leader' | 'member'>('leader');
-	const filteredGroups = groups.filter((group) => (activeTab === 'leader' ? group.isLeader : !group.isLeader));
+	const [activeTab, setActiveTab] = useState<'leader' | 'member'>('member');
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [selectedGroup, setSelectedGroup] = useState<any>(null);
+
+	useEffect(() => {
+		if (!loading && groups.length > 0) {
+			const hasLeaderGroup = groups.some((g) => g.isLeader);
+			setActiveTab(hasLeaderGroup ? 'leader' : 'member');
+		}
+	}, [loading, groups]);
+
+	const filteredGroups = groups.filter((group) => (activeTab === 'leader' ? group.isLeader : !group.isLeader));
 
 	if (loading) {
 		return (

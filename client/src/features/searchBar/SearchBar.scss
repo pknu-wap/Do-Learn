@@ -5,6 +5,7 @@
 }
 
 .searchbar-wrapper {
+	box-shadow: 0 -5px 5px rgba(179, 179, 179, 0.2);
 	border-radius: 50px 50px 0 0;
 	padding: 35px 0 0 0;
 	background-color: white;
@@ -24,12 +25,6 @@
 		width: 78%;
 		max-width: 400px;
 		background-color: white;
-	}
-
-	svg {
-		color: $main-color-deep-green;
-		width: 20px;
-		height: 20px;
 	}
 
 	input {
