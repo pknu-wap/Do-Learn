@@ -20,7 +20,6 @@ public class ScrollPaginationCollection<T> {
     public List<T> getCurrentScrollItems() {
         return isLastScroll() ? itemsWithNextCursor : itemsWithNextCursor.subList(0,countPerScroll);
     }
-
     public T getNextCursor() {
         return itemsWithNextCursor.get(countPerScroll-1);
     }

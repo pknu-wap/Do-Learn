@@ -12,25 +12,10 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface StudyGroupRepository extends JpaRepository<StudyGroup,Long> {
+public interface StudyGroupRepository extends JpaRepository<StudyGroup,Long>, StudyGroupRepositoryCustom {
     Optional<StudyGroup> findByName(String name);
 
     List<StudyGroup> findByRecruitStatus(RecruitStatus recruitStatus);
-
-    // 그룹리스트 ( 필터링 + 정원체크 )
-    @Query("SELECT sg FROM StudyGroup sg " +
-            "WHERE (:categories IS NULL OR sg.category IN :categories) " +
-            "AND (:regions IS NULL OR sg.region IN :regions) " +
-            "AND sg.id > :cursor " +
-            "AND sg.maxMembers > (" +
-            "   SELECT COUNT(sm) FROM StudyMember sm " +
-            "   WHERE sm.studyGroup = sg AND sm.status = 'ACTIVE') " +
-            "ORDER BY sg.id ASC")
-    List<StudyGroup> findByFilters(
-            @Param("categories") List<Category> categories,
-            @Param("regions") List<Region> regions,
-            @Param("cursor") Long cursor,
-            Pageable pageable);
 
     // 검색 + 필터링
     @Query("SELECT sg FROM StudyGroup sg " +

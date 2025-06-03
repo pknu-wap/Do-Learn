@@ -6,7 +6,7 @@ import com.wap.web1.domain.StudyGroup;
 import com.wap.web1.dto.StudyGroupResponse;
 import com.wap.web1.repository.StudyGroupRepository;
 import com.wap.web1.repository.StudyMemberRepository;
-import com.wap.web1.util.StudyGroupUtils;
+import com.wap.web1.mapper.StudyGroupMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +42,7 @@ public class StudyGroupFilterSearchService {
             return StudyGroupResponse.of("해당 데이터가 없습니다.");
         }
 
-        return StudyGroupUtils.convertToResponse(groups,size,studyMemberRepository);
+        return StudyGroupMapper.convertToResponse(groups,size,studyMemberRepository);
     }
 }
 

@@ -1,11 +1,20 @@
 import api from './instance';
 import { getAuthHeaders } from './auth';
 
-export const fetchGroupMembers = async (studyGroupId: number) => {
-	const response = await api.get(`/api/studygroup/${studyGroupId}/members`, {
-		headers: {
-			...getAuthHeaders(),
-		},
+export interface GroupMember {
+	userId: number;
+	nickname: string;
+	profileImage: number;
+}
+
+export const fetchGroupMembers = async (
+	studyGroupId: number,
+): Promise<GroupMember[]> => {
+	const response = await api.get<{
+		studyGroupId: number;
+		members: GroupMember[];
+	}>(`/api/studygroup/${studyGroupId}/members`, {
+		headers: getAuthHeaders(),
 	});
 	return response.data.members;
 };

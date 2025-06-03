@@ -44,4 +44,7 @@ public class StudyMember {
     @Column(nullable = false)
     private int AttendanceCount = 0;  // 기본값 0, 일주일치
 
+    public StudyMember(Long id) {
+        this.id = id;
+    }
 }

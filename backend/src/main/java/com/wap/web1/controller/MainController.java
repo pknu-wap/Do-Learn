@@ -1,10 +1,9 @@
 package com.wap.web1.controller;
 
-import com.wap.web1.comfig.CurrentUser;
-import com.wap.web1.domain.Category;
-import com.wap.web1.domain.Region;
+import com.wap.web1.config.CurrentUser;
 import com.wap.web1.dto.CustomUserDetails;
 import com.wap.web1.dto.StudyGroupResponse;
+import com.wap.web1.dto.StudyGroupWithMemberCountDto;
 import com.wap.web1.response.Response;
 import com.wap.web1.service.MainService;
 import com.wap.web1.service.StudyGroupListService;
@@ -13,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/main")
@@ -32,13 +32,13 @@ public class MainController {
     }
 
     @GetMapping("/grouplist")
-    public StudyGroupResponse getStudyGroups(
+    public StudyGroupResponse<StudyGroupWithMemberCountDto> getStudyGroups(
             @RequestParam(required = false) Long cursor,
             @RequestParam(defaultValue = "7") int size,
-            @RequestParam(required = false) List<Category> categories,
-            @RequestParam(required = false) List<Region> regions
-    ) {
-        return studyGroupListService.getStudyGroups(cursor, size, categories, regions);
+            @RequestParam(required = false) List<String> category,
+            @RequestParam(required = false) List<String> region) {
+
+        return studyGroupListService.getStudyGroups(cursor, size, category, region);
     }
 
     @GetMapping("/test")

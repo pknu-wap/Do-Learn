@@ -5,9 +5,7 @@ import com.wap.web1.domain.StudyGroup;
 import com.wap.web1.domain.StudyMember;
 import com.wap.web1.domain.User;
 import com.wap.web1.dto.*;
-import com.wap.web1.repository.StudyGroupRepository;
-import com.wap.web1.repository.StudyMemberRepository;
-import com.wap.web1.repository.UserRepository;
+import com.wap.web1.repository.*;
 import com.wap.web1.response.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +25,8 @@ public class UserService {
 
     private final StudyMemberRepository studyMemberRepository;
     private final StudyGroupRepository studyGroupRepository;
+    private final StudyRankingRepository studyRankingRepository;
+    private final AttendanceRepository attendanceRepository;
     public MyInfoDto getMyInfo(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
@@ -202,5 +202,23 @@ public class UserService {
         group.setLeader(newLeader.getUser());
 
         return new Response("방장이 성공적으로 변경되었습니다.");
+    }
+
+    @Transactional
+    public Response deleteStudyGroup(Long studyGroupId, Long userId) {
+        StudyGroup group = studyGroupRepository.findById(studyGroupId)
+                .orElseThrow(() -> new IllegalArgumentException("스터디 그룹을 찾을 수 없습니다."));
+
+        if (!group.getLeader().getId().equals(userId)) {
+            throw new IllegalArgumentException("방장만 스터디 그룹을 삭제할 수 있습니다.");
+        }
+
+        studyRankingRepository.deleteAllByStudyGroupId(studyGroupId);
+        attendanceRepository.deleteAllByStudyGroupId(studyGroupId);
+        studyMemberRepository.deleteAllByStudyGroupId(studyGroupId);
+
+        studyGroupRepository.delete(group);
+
+        return new Response("스터디 그룹이 성공적으로 삭제되었습니다.");
     }
 }

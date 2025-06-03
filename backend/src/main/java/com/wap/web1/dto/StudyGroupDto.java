@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 
 @Getter
@@ -24,4 +25,5 @@ public class StudyGroupDto {
     private Region region;
     private Category category;
     private String type;
+    private LocalDate startDate;
 }

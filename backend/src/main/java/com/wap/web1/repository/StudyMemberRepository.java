@@ -26,13 +26,14 @@ public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> 
 
     Optional<StudyMember> findByStudyGroupAndUser(StudyGroup studyGroup, User user);
 
+    Optional<StudyMember> findByUserIdAndStudyGroupId(Long userId, Long studyGroupId);
+
+    int countByStudyGroup_IdAndStatus(Long studyGroupId, StudyMember.Status status);
+
     //매주 초기화
     @Modifying
     @Query("UPDATE StudyMember sm SET sm.AttendanceCount = 0")
     void resetAllweeklyAttendance();
-
-    int countByStudyGroupIdAndStatus(Long studyGroupId, StudyMember.Status status);
-
 
     Optional<StudyMember> findByStudyGroupIdAndUserId(Long studyGroupId, Long userId);
 
@@ -42,4 +43,9 @@ public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> 
             "WHERE sm.status = 'ACTIVE' AND sm.studyGroup.id IN :groupIds " +
             "GROUP BY sm.studyGroup.id")
     List<GroupMemberCount> countActiveMembersByGroupIds(@Param("groupIds") List<Long> groupIds);
+
+    @Modifying
+    @Query("DELETE FROM StudyMember sm WHERE sm.studyGroup.id = :studyGroupId")
+    void deleteAllByStudyGroupId(@Param("studyGroupId") Long studyGroupId);
+
 }

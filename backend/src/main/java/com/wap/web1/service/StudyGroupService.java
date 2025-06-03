@@ -89,17 +89,28 @@ public class StudyGroupService {
                 ));
 
         List<StudyMember> members = studyMemberRepository.findByStudyGroupId(studyGroupId);
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 
         List<GroupMembersDto.MemberDto> memberDtos = members.stream()
                 .filter(member -> member.getStatus() == StudyMember.Status.ACTIVE)
                 .map(member -> {
-                    int rank = memberIdToRankMap.getOrDefault(member.getId(), 0);
-                    Integer profileImage = switch (rank){
-                        case 1 -> 1;
-                        case 2 -> 2;
-                        case 3 -> 3;
-                        default -> 4;
-                    };
+                    User user = member.getUser();
+
+                    boolean attendedToday = attendanceRepository.existsByStudyGroupAndUserAndDate(group, user, today);
+
+                    // 출석 안 했으면 무조건 5번 이미지
+                    int profileImage;
+                    if (!attendedToday) {
+                        profileImage = 5;
+                    } else {
+                        int rank = memberIdToRankMap.getOrDefault(member.getId(), 0);
+                        profileImage = switch (rank) {
+                            case 1 -> 1;
+                            case 2 -> 2;
+                            case 3 -> 3;
+                            default -> 4;
+                        };
+                    }
 
                     return GroupMembersDto.MemberDto.builder()
                             .userId(member.getUser().getId())

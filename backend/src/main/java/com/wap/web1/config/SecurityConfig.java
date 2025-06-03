@@ -1,4 +1,4 @@
-package com.wap.web1.comfig;
+package com.wap.web1.config;
 
 import com.wap.web1.jwt.CustomLogoutFilter;
 import com.wap.web1.jwt.JWTFilter;
@@ -68,6 +68,14 @@ public class SecurityConfig {
                         .requestMatchers("/auth/logout").permitAll()
                         .requestMatchers("/api/main/grouplist","/grouplist/search/**").permitAll()
                         .requestMatchers("/api/main/test").permitAll() // 테스트용
+                        .requestMatchers(
+                                "/api/weekly-goals/**",
+                                "/api/weekly-sub-goals/**",
+                                "/api/weekly-plans/**",
+                                "/api/studygroups/**",
+                                "api/ranking/**",
+                                "/api/progress/**"
+                        ).authenticated()
                         .anyRequest().authenticated()
                 );
 

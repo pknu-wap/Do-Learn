@@ -1,0 +1,13 @@
+.leave-group-button {
+	color: #888;
+	cursor: pointer;
+	background-color: white;
+	border: none;
+
+	&:hover {
+		text-decoration: underline;
+	}
+
+	margin-top: 60px;
+	margin-bottom: 1%;
+}

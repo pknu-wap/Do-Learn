@@ -37,7 +37,7 @@ public class ReissueService {
         String email = jwtUtil.getEmail(refresh);
         String role = jwtUtil.getRole(refresh);
 
-        String newAccess = jwtUtil.createJwt("access",email,role,600000L);
+        String newAccess = jwtUtil.createJwt("access",email,role,2400000L);
         String newRefresh = jwtUtil.createJwt("refresh",email,role,86400000L);
 
         //Refresh 토큰 저장 DB에 기존의 Refresh 토큰 삭제 후 새 Refresh 토큰 저장
