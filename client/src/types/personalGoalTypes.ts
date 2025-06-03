@@ -9,9 +9,17 @@ export interface WeeklyPlan {
 }
 
 export interface WeeklyPlanRequest {
-	plans: {
+	memberGoalPlans: {
+		subGoalId: number;
 		date: string;
-		taskIds: number[];
+		dayOfWeek: string;
+		completed: boolean;
+	}[];
+	personalTaskPlans: {
+		content: string;
+		date: string;
+		dayOfWeek: string;
+		completed: boolean;
 	}[];
 }
 

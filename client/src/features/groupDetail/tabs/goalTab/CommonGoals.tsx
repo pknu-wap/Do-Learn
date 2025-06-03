@@ -13,8 +13,6 @@ import { CommonGoal, SubGoal } from 'types/commonGoalTypes';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 import './CommonGoals.scss';
-import { data } from 'react-router-dom';
-
 interface CommonGoalsProps {
 	studyGroupId: number;
 	isLeader: boolean;
@@ -45,6 +43,24 @@ const getKoreaStartDayInfo = (date: Date) => {
 	};
 };
 
+// 시작일 저장용
+const STORAGE_KEY = (studyGroupId: number) => `commonGoalStartInfo-${studyGroupId}`;
+const loadStartDateInfo = (studyGroupId: number): { startDate: string; startDayOfWeek: string } | null => {
+	const data = localStorage.getItem(STORAGE_KEY(studyGroupId));
+	if (data) {
+		try {
+			const parsed = JSON.parse(data);
+			const diff = new Date().getTime() - new Date(parsed.startDate).getTime();
+			if (diff <= 7 * 24 * 60 * 60 * 1000) return parsed;
+		} catch {}
+	}
+	return null;
+};
+
+const saveStartDateInfo = (studyGroupId: number, info: { startDate: string; startDayOfWeek: string }) => {
+	localStorage.setItem(STORAGE_KEY(studyGroupId), JSON.stringify(info));
+};
+
 const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 	const [goals, setGoals] = useState<CommonGoal[]>([]);
 	const [expandedGoalIds, setExpandedGoalIds] = useState<Set<number>>(new Set());
@@ -57,11 +73,13 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 	const [goalIds, setGoalIds] = useState<number[]>([]);
 	const [subGoalIds, setSubGoalIds] = useState<number[][]>([]);
 	const [deletedGoalIds, setDeletedGoalIds] = useState<number[]>([]);
+	const [startDateInfo, setStartDateInfo] = useState<{ startDate: string; startDayOfWeek: string } | null>(null);
 
 	// 공통목표 조회
 	const fetchGoals = async () => {
 		try {
-			const { startDate, startDayOfWeek } = getKoreaStartDayInfo(new Date());
+			if (!startDateInfo) return;
+			const { startDate, startDayOfWeek } = startDateInfo;
 
 			const data = await getCommonGoals({
 				studyGroupId,
@@ -77,20 +95,17 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 
 	// 서버와 동기화 API
 	const syncGoalsWithServer = async () => {
-		const today = new Date();
-
-		// 1. 서버 기준 기존 목표 데이터 조회
-		const initialDateInfo = getKoreaStartDayInfo(today);
+		if (!startDateInfo) return;
 		const serverGoals = await getCommonGoals({
 			studyGroupId,
-			referenceDate: initialDateInfo.startDate,
-			startDayOfWeek: initialDateInfo.startDayOfWeek,
+			referenceDate: startDateInfo.startDate,
+			startDayOfWeek: startDateInfo.startDayOfWeek,
 		});
 
 		// 2. 기준 날짜 고정 (기존 데이터가 있다면 그것 기준)
 		const firstServerGoal = serverGoals[0];
-		const startDate = firstServerGoal?.startDate ?? initialDateInfo.startDate;
-		const startDayOfWeek = firstServerGoal?.startDayOfWeek ?? initialDateInfo.startDayOfWeek;
+		const startDate = firstServerGoal?.startDate ?? startDateInfo.startDate;
+		const startDayOfWeek = firstServerGoal?.startDayOfWeek ?? startDateInfo.startDayOfWeek;
 
 		// 3. 서버 세부 정보 조회
 		const serverDetails = await Promise.all(serverGoals.map((goal: CommonGoal) => getCommonGoalDetail(goal.goalId)));
@@ -206,6 +221,21 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 	useEffect(() => {
 		fetchGoals();
 	}, [studyGroupId]);
+
+	useEffect(() => {
+		const stored = loadStartDateInfo(studyGroupId);
+		if (stored) {
+			setStartDateInfo(stored);
+		} else {
+			const fallback = getKoreaStartDayInfo(new Date());
+			setStartDateInfo(fallback);
+			saveStartDateInfo(studyGroupId, fallback);
+		}
+	}, [studyGroupId]);
+
+	useEffect(() => {
+		if (startDateInfo) fetchGoals();
+	}, [startDateInfo]);
 
 	useEffect(() => {
 		if (!isEditMode) {
