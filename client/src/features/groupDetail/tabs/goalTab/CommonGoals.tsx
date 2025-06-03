@@ -13,6 +13,7 @@ import { CommonGoal, SubGoal } from 'types/commonGoalTypes';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 import './CommonGoals.scss';
+import { data } from 'react-router-dom';
 
 interface CommonGoalsProps {
 	studyGroupId: number;
@@ -91,116 +92,137 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 	// 서버와 동기화 API
 	const syncGoalsWithServer = async () => {
 		const today = new Date();
-		const { startDate, startDayOfWeek } = getKoreaStartDayInfo(today);
 
-		// 1. 서버 기준 기존 목표 데이터
+		// 1. 서버 기준 기존 목표 데이터 조회
+		const initialDateInfo = getKoreaStartDayInfo(today);
 		const serverGoals = await getCommonGoals({
 			studyGroupId,
-			referenceDate: startDate,
-			startDayOfWeek,
+			referenceDate: initialDateInfo.startDate,
+			startDayOfWeek: initialDateInfo.startDayOfWeek,
 		});
+
+		// 2. 기준 날짜 고정 (기존 데이터가 있다면 그것 기준)
+		const firstServerGoal = serverGoals[0];
+		const startDate = firstServerGoal?.startDate ?? initialDateInfo.startDate;
+		const startDayOfWeek =
+			firstServerGoal?.startDayOfWeek ?? initialDateInfo.startDayOfWeek;
+
+		// 3. 서버 세부 정보 조회
 		const serverDetails = await Promise.all(
 			serverGoals.map((goal: CommonGoal) => getCommonGoalDetail(goal.goalId)),
 		);
 
-		// 2. 입력된 값 기준 동기화
+		let failedCount = 0;
+
 		for (let i = 0; i < mainCategoryList.length; i++) {
 			const localMain = mainCategoryList[i].trim();
 			const localSubs = subGoalsList[i]
 				.map((s) => s.trim())
 				.filter((s) => s !== '');
 			const goalId = goalIds[i];
-
 			const matchedDetail = serverDetails.find((d) => d.goalId === goalId);
 			const originalMain = matchedDetail?.mainCategory ?? '';
 			const originalSubGoals: SubGoal[] = matchedDetail?.subGoals ?? [];
 
-			if (!goalId) {
-				// 신규 goal 생성
-				const created = await createCommonGoal({
-					studyGroupId,
-					mainCategory: localMain,
-					startDate,
-					startDayOfWeek,
-					subGoals: localSubs.map((content) => ({ content })),
-				});
+			try {
+				if (!goalId) {
+					// 신규 생성
+					const created = await createCommonGoal({
+						studyGroupId,
+						mainCategory: localMain,
+						startDate,
+						startDayOfWeek,
+						subGoals: [],
+					});
 
-				// const newGoalId = created.goalId;
-				// for (const sub of localSubs) {
-				// 	await createSubGoal(newGoalId, sub);
-				// }
-				continue;
-			}
+					const newGoalId = created.goalId;
 
-			// mainCategory가 변경된 경우에만 호출
-			if (localMain !== originalMain) {
-				await updateCommonGoal(goalId, {
-					studyGroupId,
-					mainCategory: localMain,
-					startDate,
-					startDayOfWeek,
-					subGoals: originalSubGoals.map((sub) => ({
-						id: sub.id,
-						content: sub.content,
-					})),
-				});
-			}
+					await Promise.all(
+						localSubs.map((sub) => createSubGoal(newGoalId, sub)),
+					);
+				} else {
+					// mainCategory 수정
+					if (localMain !== originalMain) {
+						await updateCommonGoal(goalId, {
+							studyGroupId,
+							mainCategory: localMain,
+							startDate,
+							startDayOfWeek,
+							subGoals: originalSubGoals.map((sub) => ({
+								id: sub.id,
+								content: sub.content,
+							})),
+						});
+					}
 
-			// 세부 목표 동기화
-			const serverGoalDetail = serverDetails.find((d) => d.goalId === goalId);
-			const serverSubGoals: SubGoal[] = serverGoalDetail?.subGoals || [];
+					// 세부 목표 동기화
+					const serverSubGoals: SubGoal[] =
+						serverDetails.find((d) => d.goalId === goalId)?.subGoals || [];
 
-			const serverContents = serverSubGoals.map((s) => s.content.trim());
+					// 삭제
+					for (const sub of serverSubGoals) {
+						if (!localSubs.includes(sub.content.trim())) {
+							await deleteSubGoal(sub.id!);
+						}
+					}
 
-			// 삭제
-			for (const sub of serverSubGoals) {
-				if (!localSubs.includes(sub.content.trim())) {
-					await deleteSubGoal(sub.id!);
+					// 수정
+					for (const sub of serverSubGoals) {
+						const match = localSubs.find(
+							(s) => s.trim() === sub.content.trim(),
+						);
+						if (match && match !== sub.content) {
+							await updateSubGoal(sub.id!, match);
+						}
+					}
+
+					// 추가
+					for (const localSub of localSubs) {
+						const isNew = serverSubGoals.every(
+							(s) => s.content.trim() !== localSub.trim(),
+						);
+						if (isNew) {
+							await createSubGoal(goalId, localSub);
+						}
+					}
 				}
-			}
-
-			// 수정
-			for (const sub of serverSubGoals) {
-				const match = localSubs.find((s) => s.trim() === sub.content.trim());
-				if (match && match !== sub.content) {
-					await updateSubGoal(sub.id!, match);
-				}
-			}
-
-			// 추가
-			for (const localSub of localSubs) {
-				const isNew = serverSubGoals.every(
-					(s) => s.content.trim() !== localSub.trim(),
-				);
-				if (isNew) {
-					await createSubGoal(goalId, localSub);
-				}
+			} catch (err) {
+				console.error(`❌ [${i}] 목표 처리 실패`, err);
+				failedCount++;
 			}
 		}
 
-		// 3. 삭제된 대범주 동기화
+		// 4. 삭제된 대범주 처리
+		const existingGoalIds = goalIds.filter((id) => !!id); // undefined 제외
+
 		for (const serverGoal of serverDetails) {
-			if (!mainCategoryList.includes(serverGoal.mainCategory)) {
+			if (!existingGoalIds.includes(serverGoal.goalId)) {
 				await deleteCommonGoal(serverGoal.goalId);
 			}
 		}
 		for (const deletedId of deletedGoalIds) {
 			await deleteCommonGoal(deletedId);
 		}
-
 		setDeletedGoalIds([]);
 
+		// 5. 최신 데이터 다시 조회
 		const updatedGoals: CommonGoal[] = await getCommonGoals({
 			studyGroupId,
 			referenceDate: startDate,
 			startDayOfWeek,
 		});
 
-		// goal.mainCategory 순서 기준으로 재정렬
 		const sortedGoals = mainCategoryList.map(
 			(main) => updatedGoals.find((goal) => goal.mainCategory === main)!,
 		);
 		setGoals(sortedGoals);
+
+		// 6. 결과 알림
+		// if (failedCount > 0) {
+		// 	alert(`⚠️ ${failedCount}개의 목표 설정 중 오류가 발생했습니다.`);
+		// } else {
+		// 	alert('✅ 모든 목표가 성공적으로 설정되었습니다.');
+		// }
 	};
 
 	useEffect(() => {

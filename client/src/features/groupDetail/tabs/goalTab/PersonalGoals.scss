@@ -1,0 +1,71 @@
+.personal-goal-wrapper {
+	padding: 2rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.weekly-table {
+	width: 100%;
+	max-width: 600px;
+	border-collapse: collapse;
+	margin-bottom: 1.5rem;
+
+	td {
+		border: 1px solid #ddd;
+		padding: 1rem;
+		vertical-align: top;
+	}
+}
+
+.day-label {
+	width: 60px;
+	text-align: center;
+	font-weight: bold;
+	background-color: #f5f5f5;
+}
+
+.day-tasks {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	cursor: pointer;
+}
+
+.task-row {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+
+	input[type='checkbox'] {
+		transform: scale(1.1);
+	}
+}
+
+.empty-task {
+	color: #888;
+	font-style: italic;
+	cursor: pointer;
+}
+
+.add-more {
+	color: #007aff;
+	font-weight: bold;
+	cursor: pointer;
+	margin-top: 0.5rem;
+}
+
+.confirm-btn {
+	padding: 0.7rem 1.5rem;
+	border: none;
+	background-color: #b2e5ba;
+	color: #222;
+	border-radius: 6px;
+	font-weight: bold;
+	cursor: pointer;
+	transition: background-color 0.2s;
+
+	&:hover {
+		background-color: #a1d6a9;
+	}
+}
