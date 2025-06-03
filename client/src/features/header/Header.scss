@@ -10,8 +10,12 @@
 	gap: 8px;
 }
 
+.logo-img {
+	width: 60px;
+}
+
 .title-name {
-	color: #f1ffe2;
+	color: $color-dark-green;
 	word-break: keep-all;
 }
 
@@ -21,7 +25,7 @@
 
 	.title-name {
 		font-size: 30px;
-		color: #f1ffe2;
+		color: $color-dark-green;
 		max-width: 390px;
 		width: 100%;
 		word-break: break-word;
