@@ -8,7 +8,7 @@
 	background-color: white;
 	padding: 10% 0;
 	border-radius: 50px 50px 0 0;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 -5px 5px rgba(179, 179, 179, 0.2);
 	.group-menu-item {
 		width: 76%;
 	}
@@ -16,14 +16,14 @@
 
 .menu-item {
 	border-radius: 50%;
-	background-color: $main-color-green;
+	background-color: $sub-color-green;
 	padding: 10px;
 
 	color: white;
 	width: auto;
 	&:hover {
 		cursor: pointer;
-		background-color: $main-color-dark-green;
+		background-color: darken($sub-color-green, 5%);
 		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 	}
 }
@@ -37,6 +37,6 @@
 		color: white;
 	}
 	.menu-item {
-		background-color: rgb(182, 193, 169);
+		background-color: rgb(183, 186, 178);
 	}
 }

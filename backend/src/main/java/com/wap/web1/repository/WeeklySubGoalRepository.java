@@ -2,8 +2,10 @@ package com.wap.web1.repository;
 
 import com.wap.web1.domain.WeeklySubGoal;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +39,17 @@ public interface WeeklySubGoalRepository extends JpaRepository<WeeklySubGoal, Lo
     int countSubGoalsByGroupAndWeeklyPeriodId(@Param("groupId") Long groupId, @Param("weeklyPeriodId")Long weeklyPeriodId);
 
     List<WeeklySubGoal> findByWeeklyGoalId(Long weeklyGoalId);
+
+    @Modifying
+    @Transactional
+    @Query("""
+        DELETE FROM WeeklySubGoal wsg
+        WHERE wsg.weeklyGoal.id IN (
+            SELECT wg.id FROM WeeklyGoal wg
+            WHERE wg.studyGroup.id = :studyGroupId
+        )
+    """)
+    void deleteAllByStudyGroupId(@Param("studyGroupId") Long studyGroupId);
 
 }
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './StudyGroupForm.scss';
 import 'assets/style/_flex.scss';
@@ -11,7 +11,6 @@ interface StudyGroupFormProps {
 	onSubmit?: (formData: any) => Promise<void>;
 	initialData?: any;
 	isEdit?: boolean;
-
 	recruitStatus?: 'RECRUITING' | 'CLOSED';
 	setRecruitStatus?: (status: 'RECRUITING' | 'CLOSED') => void;
 }
@@ -36,7 +35,7 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 	const [meetingDay, setMeetingDay] = useState(initialData?.meetingDays?.replace(/[^0-9]/g, '') ?? '');
 	const [memberCount, setMemberCount] = useState(initialData?.maxMembers?.toString() ?? '');
 	const [studyTypeDetail, setStudyTypeDetail] = useState(initialData?.type ?? '');
-	const [notice, setNotice] = useState('');
+	const [notice, setNotice] = useState(initialData?.notice ?? '');
 	const [region, setRegion] = useState(initialData?.region ?? '');
 	const [category, setCategory] = useState(initialData?.category ?? '');
 	const [startDate, setStartDate] = useState(initialData?.startDate ?? '');
@@ -60,7 +59,12 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		// 유효성 검사 (제출 시 한 번만 실행됨)
+		if (!isLoggedIn()) {
+			alert('로그인 후 이용해주세요.');
+			window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+			return;
+		}
+
 		if (isEdit && !recruitStatus) {
 			alert('모집 상태를 선택해주세요.');
 			return;
@@ -110,7 +114,6 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 			return;
 		}
 
-		// API 요청 바디
 		const groupData: any = {
 			name: groupName.trim(),
 			maxMembers: Number(memberCount),
@@ -124,47 +127,36 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 			region: meetingType === StudyType.오프라인 ? (region as Region) : null,
 		};
 
-		if (isEdit && onSubmit) {
-			await onSubmit(groupData); // EditGroupModal 등에서 처리
-			return;
-		}
-
-		// 수정, 생성 분기
 		try {
-			if (onSubmit) {
-				await onSubmit(groupData); // 수정
-				onClose();
-			} else {
-				const response = await createStudyGroup(groupData); // 생성
-				alert(response.message);
-				onClose();
-				navigate('/mypage');
+			if (isEdit && onSubmit) {
+				await onSubmit(groupData);
+				return;
 			}
+
+			const response = await createStudyGroup(groupData);
+			alert(response.message);
+			onClose();
+			navigate('/mypage');
 		} catch (error: any) {
 			const status = error.response?.status;
 			const serverData = error.response?.data;
 			const serverMessage = typeof serverData === 'string' ? serverData : (serverData?.message ?? '');
 
-			// 중복 그룹명
 			if (status === 400 && serverMessage.includes('존재')) {
 				alert('이미 존재하는 그룹명입니다.');
 				return;
 			}
-			// 토큰 만료
 			if (status === 401 && serverMessage === 'access token expired') {
 				const hasToken = isLoggedIn();
-
 				if (hasToken) {
 					alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
 				} else {
 					alert('로그인 후 이용해주세요.');
 				}
-
 				window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
 				return;
 			}
 
-			// 그 외의 에러
 			alert('스터디 그룹 생성에 실패했습니다.');
 			console.error('스터디 그룹 생성 실패:', error);
 		}
@@ -175,9 +167,8 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 	return (
 		<form onSubmit={handleSubmit}>
 			<div className="study-group-form">
-				<div className="title heading2 flex-center"> {isEdit ? '스터디 그룹 수정' : '스터디 그룹 생성'}</div>
+				<div className="title heading2 flex-center">{isEdit ? '스터디 그룹 수정' : '스터디 그룹 생성'}</div>
 
-				{/* 그룹 명 */}
 				<div className="group-name">
 					<input
 						type="text"
@@ -188,7 +179,6 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 					/>
 				</div>
 
-				{/* 만남 횟수 & 모집 인원 */}
 				<div className="flex-row-between">
 					<div>
 						<select
@@ -238,7 +228,6 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 					</div>
 				</div>
 
-				{/* 모집 상태 */}
 				{isEdit && (
 					<div className="recruit-status-buttons">
 						<button
@@ -258,7 +247,6 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 					</div>
 				)}
 
-				{/* 만남 방식 */}
 				<div className="meeting-method">
 					<button
 						type="button"
@@ -276,7 +264,6 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 					</button>
 				</div>
 
-				{/* 오프라인일 때만 지역 */}
 				{meetingType === StudyType.오프라인 && (
 					<div>
 						<select
@@ -298,7 +285,6 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 					</div>
 				)}
 
-				{/* 시간대 */}
 				<div className="time-option">
 					{['오전', '오후', '저녁', '새벽'].map((time) => (
 						<button
@@ -312,7 +298,6 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 					))}
 				</div>
 
-				{/* 분야 & 세부 분야 */}
 				<div className="flex-row-between">
 					<select
 						value={category}
@@ -337,7 +322,6 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 					/>
 				</div>
 
-				{/* 시작일 */}
 				<div className="start-date-section flex-between">
 					<label className="button2">스터디는</label>
 					<input
@@ -349,7 +333,6 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 					<label className="button2">부터 시작해요</label>
 				</div>
 
-				{/* 공지사항 */}
 				<div>
 					<textarea
 						placeholder="공지사항 입력"

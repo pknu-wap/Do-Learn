@@ -10,9 +10,18 @@
 	gap: 8px;
 }
 
+.logo-img {
+	width: 60px;
+}
+
 .title-name {
-	color: #f1ffe2;
-	word-break: keep-all;
+	color: $color-dark-green;
+	white-space: normal;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	// text-shadow: 2px 2px 1px rgba(167, 167, 167, 0.56);
+	// -webkit-text-stroke-width: 0.2px;
+	// -webkit-text-stroke-color: $sub-color-dark-green;
 }
 
 .header-wrapper.groupDetail {
@@ -21,12 +30,14 @@
 
 	.title-name {
 		font-size: 30px;
-		color: #f1ffe2;
+		color: $color-dark-green;
 		max-width: 390px;
 		width: 100%;
-		word-break: break-word;
 		line-height: 1.2;
 		text-align: center;
+		white-space: normal;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
 	}
 }
 
