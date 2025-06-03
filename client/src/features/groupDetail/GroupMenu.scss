@@ -16,14 +16,14 @@
 
 .menu-item {
 	border-radius: 50%;
-	background-color: $main-color-green;
+	background-color: $sub-color-green;
 	padding: 10px;
 
 	color: white;
 	width: auto;
 	&:hover {
 		cursor: pointer;
-		background-color: $main-color-dark-green;
+		background-color: $main-color-deep-green;
 		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 	}
 }
@@ -37,6 +37,6 @@
 		color: white;
 	}
 	.menu-item {
-		background-color: rgb(182, 193, 169);
+		background-color: rgb(183, 186, 178);
 	}
 }

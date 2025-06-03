@@ -17,7 +17,7 @@
 		.group-name-input {
 			width: 100%;
 			border: none;
-			border-bottom: 1px solid $main-color-green;
+			border-bottom: 1px solid $main-color-dark-green;
 			outline: none;
 			padding: 0.5rem 0;
 		}
@@ -27,7 +27,7 @@
 		width: 40px;
 		padding: 5px 0;
 		border: none;
-		border-bottom: 1px solid $main-color-green;
+		border-bottom: 1px solid $main-color-dark-green;
 		outline: none;
 		background: transparent;
 	}
@@ -36,7 +36,7 @@
 		width: 65px;
 		padding: 5px 0;
 		border: none;
-		border-bottom: 1px solid $main-color-green;
+		border-bottom: 1px solid $main-color-dark-green;
 		outline: none;
 		margin: 0 0.5rem;
 	}
@@ -48,15 +48,15 @@
 		.meeting-method-button {
 			flex: 1;
 			padding: 0.4rem;
-			border: 1px solid $main-color-green;
+			border: 1px solid $main-color-dark-green;
 			border-radius: 8px;
 			background-color: white;
 			color: #333;
 			cursor: pointer;
 
 			&.bg-green-300 {
-				background-color: $main-color-dark-green;
-				border: 1px solid $main-color-dark-green;
+				background-color: $main-color-deep-green;
+				border: 1px solid $main-color-deep-green;
 				color: white;
 			}
 		}
@@ -69,14 +69,14 @@
 
 		.time-option-button {
 			padding: 0.4rem;
-			border: 1px solid $main-color-green;
+			border: 1px solid $main-color-dark-green;
 			border-radius: 8px;
 			background-color: white;
 			cursor: pointer;
 
 			&.bg-green-300 {
-				background-color: $main-color-dark-green;
-				border: 1px solid $main-color-dark-green;
+				background-color: $main-color-deep-green;
+				border: 1px solid $main-color-deep-green;
 				color: white;
 			}
 		}
@@ -86,7 +86,7 @@
 		width: 100%;
 		padding: 5px 0;
 		border: none;
-		border-bottom: 1px solid $main-color-green;
+		border-bottom: 1px solid $main-color-dark-green;
 		background-color: transparent;
 		outline: none;
 	}
@@ -95,7 +95,7 @@
 		height: 100px;
 		padding: 10px 3px;
 		border: none;
-		border-bottom: 1px solid $main-color-green;
+		border-bottom: 1px solid $main-color-dark-green;
 		outline: none;
 		resize: none;
 	}
@@ -103,14 +103,14 @@
 	.region-select {
 		width: 100%;
 		border: none;
-		border-bottom: 1px solid $main-color-green;
+		border-bottom: 1px solid $main-color-dark-green;
 		outline: none;
 		padding: 0.5rem 0;
 	}
 
 	.category-select {
 		border: none;
-		border-bottom: 1px solid $main-color-green;
+		border-bottom: 1px solid $main-color-dark-green;
 		outline: none;
 		padding: 0.5rem 0;
 	}
@@ -118,7 +118,7 @@
 	.study-type-detail-input {
 		width: 68%;
 		border: none;
-		border-bottom: 1px solid $main-color-green;
+		border-bottom: 1px solid $main-color-dark-green;
 		outline: none;
 		padding: 0.5rem 0;
 	}
@@ -127,7 +127,7 @@
 		width: 65px;
 		padding: 5px 0;
 		border: none;
-		border-bottom: 1px solid $main-color-green;
+		border-bottom: 1px solid $main-color-dark-green;
 		outline: none;
 		margin: 0 0.5rem;
 	}
@@ -138,13 +138,13 @@
 		margin-top: 0.5rem;
 		border: none;
 		border-radius: 8px;
-		background-color: $main-color-dark-green;
+		background-color: $main-color-deep-green;
 		color: white;
 		font-weight: bold;
 		cursor: pointer;
 
 		&:hover {
-			background-color: darken($main-color-deep-green, 10%);
+			background-color: darken($main-color-deep-green, 5%);
 		}
 	}
 
@@ -154,7 +154,7 @@
 	.start-date-section {
 		input[type='date'] {
 			border: none;
-			border-bottom: 1px solid $main-color-green;
+			border-bottom: 1px solid $main-color-dark-green;
 			padding: 3px;
 			width: 47%;
 		}
@@ -167,7 +167,7 @@
 		.recruit-status-button {
 			flex: 1;
 			padding: 0.4rem;
-			border: 1px solid $main-color-green;
+			border: 1px solid $main-color-dark-green;
 			border-radius: 8px;
 			background-color: white;
 			color: #333;
@@ -175,8 +175,8 @@
 			text-align: center;
 
 			&.active {
-				background-color: $main-color-dark-green;
-				border: 1px solid $main-color-dark-green;
+				background-color: $main-color-deep-green;
+				border: 1px solid $main-color-deep-green;
 				color: white;
 			}
 		}

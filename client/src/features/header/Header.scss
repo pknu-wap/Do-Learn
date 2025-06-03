@@ -17,6 +17,9 @@
 .title-name {
 	color: $color-dark-green;
 	word-break: keep-all;
+	// text-shadow: 2px 2px 1px rgba(167, 167, 167, 0.56);
+	// -webkit-text-stroke-width: 0.2px;
+	// -webkit-text-stroke-color: $sub-color-dark-green;
 }
 
 .header-wrapper.groupDetail {

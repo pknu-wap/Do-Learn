@@ -21,20 +21,8 @@
 	}
 
 	&.mask-both {
-		-webkit-mask-image: linear-gradient(
-			to right,
-			transparent 0%,
-			black 5%,
-			black 90%,
-			transparent 100%
-		);
-		mask-image: linear-gradient(
-			to right,
-			transparent 0%,
-			black 5%,
-			black 90%,
-			transparent 100%
-		);
+		-webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 90%, transparent 100%);
+		mask-image: linear-gradient(to right, transparent 0%, black 5%, black 90%, transparent 100%);
 	}
 	&.mask-left {
 		-webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%);
@@ -49,14 +37,15 @@
 .filter-button {
 	margin-right: 12px;
 	padding: 6px 12px;
-	border: 1.5px solid $main-color-deep-green;
+	// border: 1.5px solid $main-color-deep-green;
+	border: none;
 	border-radius: 50px;
-	background: #fff;
+	background: #fdefbe;
 	color: #333;
 	white-space: nowrap;
 	cursor: pointer;
 	&:hover {
-		background-color: #f6ffed;
+		background-color: #fae9ac;
 	}
 	&.dropdown::after {
 		content: '▼';
@@ -64,9 +53,9 @@
 		margin-left: 4px;
 	}
 	&.active {
-		background-color: $sub-color-green;
-		border-color: $sub-color-green;
-		color: #fff;
+		background-color: $main-color-light-green;
+		// border-color: $sub-color-green;
+		// color: #000000;
 	}
 }
 
@@ -79,7 +68,7 @@
 	min-width: 120px !important;
 	margin-top: 5px;
 	background: #fff;
-	border: 1.5px solid $main-color-deep-green;
+	border: 1px solid $sub-color-green;
 	border-radius: 8px;
 	padding: 8px;
 	max-height: 300px;
@@ -92,15 +81,15 @@
 .dropdown-item {
 	margin: 3px;
 	padding: 5px 8px;
-	border: 1px solid $sub-color-dark-green;
+	border: 1px solid $color-dark-green;
 	border-radius: 10px;
 	background-color: white;
 	&:hover {
-		background-color: #f6ffed;
+		background-color: #f4f8f1;
 	}
 	&.selected {
-		background-color: $sub-color-green;
-		border: 1px solid $sub-color-green;
+		background-color: $main-color-deep-green;
+		border: 1px solid $main-color-deep-green;
 		color: #fff;
 	}
 }
