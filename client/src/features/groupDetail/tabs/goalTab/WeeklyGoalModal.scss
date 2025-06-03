@@ -1,0 +1,127 @@
+@import 'assets/style/_colors.scss';
+
+.weekly-goal-modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(0, 0, 0, 0.4);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1001;
+}
+
+.weekly-goal-modal-box {
+	display: flex;
+	flex-direction: column;
+	background-color: #fff;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+	min-width: 300px;
+	max-height: 80vh;
+	text-align: center;
+}
+
+.weekly-goal-modal-header {
+	position: relative;
+	margin-bottom: 30px;
+
+	.title {
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+		white-space: nowrap;
+	}
+
+	.close-btn {
+		position: absolute;
+		right: 0;
+		top: 0;
+		font-size: 1.5rem;
+		background: none;
+		border: none;
+		cursor: pointer;
+		color: #333;
+
+		&:hover {
+			color: #999;
+		}
+	}
+}
+
+// 공통 목표 목록
+.weekly-goal-modal-content {
+	flex: 1;
+	overflow-y: auto;
+	margin-bottom: 1rem;
+	margin-top: 20px;
+
+	.goal-card {
+		border-radius: 10px;
+		margin-bottom: 1rem;
+		background-color: #fff;
+		text-align: left;
+
+		.main-category {
+			font-weight: bold;
+			font-size: 1rem;
+			margin-bottom: 0.7rem;
+			padding-bottom: 5px;
+			border-bottom: 1px solid #eaeaea;
+		}
+
+		.subgoal-item {
+			padding: 0.4rem 0.6rem;
+			border-radius: 0.4rem;
+			margin-bottom: 5px;
+			background-color: #fff;
+			cursor: pointer;
+			transition: background-color 0.2s;
+
+			&:hover {
+				background-color: #f2f2f2;
+			}
+
+			&.selected {
+				background-color: #eaeaea;
+			}
+		}
+
+		.no-sub {
+			margin-left: 1rem; // 소범주 없을 때도 들여쓰기
+			color: #888;
+			font-size: 0.9rem;
+		}
+	}
+
+	/* 스크롤바 숨기기 */
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE/Edge */
+
+	&::-webkit-scrollbar {
+		display: none; /* Chrome, Safari, Edge */
+	}
+}
+
+.weekly-goal-modal-footer {
+	display: flex;
+	justify-content: center;
+
+	button {
+		padding: 0.6rem 1.2rem;
+		border-radius: 10px;
+		border: none;
+		background-color: $main-color-dark-green;
+		color: #fff;
+		font-weight: bold;
+		cursor: pointer;
+		width: 85%;
+
+		&:hover {
+			background-color: $main-color-deep-green;
+		}
+	}
+}

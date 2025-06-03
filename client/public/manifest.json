@@ -1,0 +1,53 @@
+{
+	"name": "두런두런",
+	"short_name": "두런",
+	"id": "/",
+	"start_url": ".",
+	"display": "standalone",
+	"theme_color": "#111111",
+	"background_color": "#ffffff",
+	"icons": [
+		{
+			"src": "assets/dolearn-icon/dolearn-icon-128.png",
+			"type": "image/png",
+			"sizes": "128x128",
+			"purpose": "any"
+		},
+		{
+			"src": "assets/dolearn-icon/dolearn-icon-144.png",
+			"type": "image/png",
+			"sizes": "144x144",
+			"purpose": "any"
+		},
+		{
+			"src": "assets/dolearn-icon/dolearn-icon-150.png",
+			"type": "image/png",
+			"sizes": "150x150",
+			"purpose": "any"
+		},
+		{
+			"src": "assets/dolearn-icon/dolearn-icon-270.png",
+			"type": "image/png",
+			"sizes": "270x270",
+			"purpose": "any"
+		},
+		{
+			"src": "assets/dolearn-icon/dolearn-icon-310.png",
+			"type": "image/png",
+			"sizes": "310x310",
+			"purpose": "any"
+		},
+		{
+			"src": "assets/dolearn-icon/dolearn-icon-512.png",
+			"type": "image/png",
+			"sizes": "512x512",
+			"purpose": "any"
+		},
+		{
+			"src": "assets/dolearn-icon/dolearn-icon-558.png",
+			"type": "image/png",
+			"sizes": "558x558",
+			"purpose": "any"
+		}
+	]
+}
