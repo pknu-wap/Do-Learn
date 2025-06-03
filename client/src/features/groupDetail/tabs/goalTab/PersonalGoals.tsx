@@ -6,11 +6,7 @@ import {
 	updatePersonalCompletion,
 } from 'api/personalGoalsApi';
 import { getCommonGoals } from 'api/commonGoalsApi';
-import {
-	SubGoalPlan,
-	PersonalTaskPlan,
-	MergedDayPlan,
-} from 'types/personalGoalTypes';
+import { SubGoalPlan, PersonalTaskPlan, MergedDayPlan } from 'types/personalGoalTypes';
 import WeeklyGoalModal from './WeeklyGoalModal';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
@@ -74,9 +70,7 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 			});
 
 			// 날짜 오름차순 정렬
-			const ordered = Object.values(grouped).sort(
-				(a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-			);
+			const ordered = Object.values(grouped).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
 			setWeeklyPlans(ordered);
 		} catch (err) {
@@ -115,10 +109,7 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 							<td className="day-label">{day.weekday}</td>
 							<td className="day-tasks">
 								{day.tasks.length === 0 ? (
-									<div
-										className="empty-task"
-										onClick={() => handleOpenModal(idx)}
-									>
+									<div className="empty-task" onClick={() => handleOpenModal(idx)}>
 										+ 목표 선택
 									</div>
 								) : (
@@ -128,17 +119,12 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 												<input
 													type="checkbox"
 													checked={task.completed}
-													onChange={() =>
-														handleCheckboxToggle(task.taskId, !task.completed)
-													}
+													onChange={() => handleCheckboxToggle(task.taskId, !task.completed)}
 												/>
 												<span>{task.content}</span>
 											</div>
 										))}
-										<div
-											className="add-more"
-											onClick={() => handleOpenModal(idx)}
-										>
+										<div className="add-more" onClick={() => handleOpenModal(idx)}>
 											+ 목표 추가
 										</div>
 									</>

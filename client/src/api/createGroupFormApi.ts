@@ -56,9 +56,7 @@ interface CreateGroupResponse {
 	message: string;
 }
 
-export const createStudyGroup = async (
-	data: CreateGroupParams,
-): Promise<CreateGroupResponse> => {
+export const createStudyGroup = async (data: CreateGroupParams): Promise<CreateGroupResponse> => {
 	const response = await api.post('/api/studygroup/create', data, {
 		headers: {
 			...getAuthHeaders(),

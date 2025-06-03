@@ -10,20 +10,14 @@ import './MyGroupsList.scss';
 const MyGroupsList: React.FC = () => {
 	const { groups, loading, error } = useMyStudyGroups();
 	const [activeTab, setActiveTab] = useState<'leader' | 'member'>('leader');
-	const filteredGroups = groups.filter((group) =>
-		activeTab === 'leader' ? group.isLeader : !group.isLeader,
-	);
+	const filteredGroups = groups.filter((group) => (activeTab === 'leader' ? group.isLeader : !group.isLeader));
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [selectedGroup, setSelectedGroup] = useState<any>(null);
 
 	if (loading) {
 		return (
 			<div className="flex-center" style={{ padding: '20px 0' }}>
-				<img
-					src="/assets/spinner.gif"
-					alt="로딩 중"
-					style={{ width: '40px', height: '40px' }}
-				/>
+				<img src="/assets/spinner.gif" alt="로딩 중" style={{ width: '40px', height: '40px' }} />
 			</div>
 		);
 	}
@@ -73,9 +67,7 @@ const MyGroupsList: React.FC = () => {
 					))
 				) : (
 					<div className="empty-message button2">
-						{activeTab === 'leader'
-							? '생성한 그룹이 없습니다.'
-							: '가입한 그룹이 없습니다.'}
+						{activeTab === 'leader' ? '생성한 그룹이 없습니다.' : '가입한 그룹이 없습니다.'}
 					</div>
 				)}
 			</div>

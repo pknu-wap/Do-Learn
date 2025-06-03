@@ -18,10 +18,7 @@ type GroupType = {
 	maxMembers: number;
 };
 
-const StudyGroupsList: React.FC<StudyGroupsListProps> = ({
-	searchResults,
-	myGroupIds,
-}) => {
+const StudyGroupsList: React.FC<StudyGroupsListProps> = ({ searchResults, myGroupIds }) => {
 	const { groups, loadMore, hasMore, loading, message } = useStudyGroups();
 	const [visibleCount, setVisibleCount] = useState(10);
 	const observer = useRef<IntersectionObserver | null>(null);
@@ -84,10 +81,7 @@ const StudyGroupsList: React.FC<StudyGroupsListProps> = ({
 			{visibleGroups.map((group, index) => {
 				const isLast = index === visibleGroups.length - 1;
 				return (
-					<div
-						key={group.id}
-						ref={!searchResults && isLast ? lastGroupElementRef : undefined}
-					>
+					<div key={group.id} ref={!searchResults && isLast ? lastGroupElementRef : undefined}>
 						<StudyGroupItem group={group} />
 					</div>
 				);
@@ -95,11 +89,7 @@ const StudyGroupsList: React.FC<StudyGroupsListProps> = ({
 
 			{!searchResults && loading && (
 				<div className="flex-center" style={{ padding: '20px 0' }}>
-					<img
-						src="/assets/spinner.gif"
-						alt="로딩 중"
-						style={{ width: '40px', height: '40px' }}
-					/>
+					<img src="/assets/spinner.gif" alt="로딩 중" style={{ width: '40px', height: '40px' }} />
 				</div>
 			)}
 		</div>

@@ -28,10 +28,7 @@ const LogoutButton = () => {
 
 	return (
 		<>
-			<div
-				onClick={() => handleLogout()}
-				className="flex-center logout-text button2"
-			>
+			<div onClick={() => handleLogout()} className="flex-center logout-text button2">
 				로그아웃
 			</div>
 		</>

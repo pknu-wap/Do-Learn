@@ -49,10 +49,7 @@ export const getCommonGoalDetail = async (goalId: number) => {
 };
 
 // 대범주 수정(PUT)
-export const updateCommonGoal = async (
-	goalId: number,
-	payload: CreateCommonGoalRequest,
-) => {
+export const updateCommonGoal = async (goalId: number, payload: CreateCommonGoalRequest) => {
 	const headers = {
 		...getAuthHeaders(),
 		'Content-Type': 'application/json',
@@ -83,11 +80,7 @@ export const createSubGoal = async (goalId: number, content: string) => {
 		'Content-Type': 'application/json',
 	};
 
-	const response = await api.post(
-		`/api/weekly-sub-goals/${goalId}`,
-		{ content },
-		{ headers },
-	);
+	const response = await api.post(`/api/weekly-sub-goals/${goalId}`, { content }, { headers });
 
 	return response.data;
 };
@@ -99,11 +92,7 @@ export const updateSubGoal = async (subGoalId: number, content: string) => {
 		'Content-Type': 'application/json',
 	};
 
-	const response = await api.put(
-		`/api/weekly-sub-goals/${subGoalId}`,
-		{ content },
-		{ headers },
-	);
+	const response = await api.put(`/api/weekly-sub-goals/${subGoalId}`, { content }, { headers });
 
 	return response.data;
 };

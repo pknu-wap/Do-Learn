@@ -67,9 +67,7 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 
 			members.forEach((m) => {
 				if (rankedNickSet.has(m.nickname)) {
-					const info = Array.from(rankedMap.values()).find(
-						(r) => r.nickname === m.nickname,
-					);
+					const info = Array.from(rankedMap.values()).find((r) => r.nickname === m.nickname);
 					if (info && info.ranking <= 3) {
 						podiumMembers.push({
 							rank: info.ranking,

@@ -26,12 +26,7 @@ interface Props {
 	mode?: 'joined' | 'browse';
 }
 
-const GroupInfoModal: React.FC<Props> = ({
-	group,
-	onClose,
-	onJoin,
-	mode = 'browse',
-}) => {
+const GroupInfoModal: React.FC<Props> = ({ group, onClose, onJoin, mode = 'browse' }) => {
 	const [notice, setNotice] = useState('');
 	const navigate = useNavigate();
 
@@ -48,10 +43,7 @@ const GroupInfoModal: React.FC<Props> = ({
 	}, [group.id]);
 
 	return (
-		<div
-			className="group-modal-backdrop flex-center"
-			onClick={(e) => e.stopPropagation()}
-		>
+		<div className="group-modal-backdrop flex-center" onClick={(e) => e.stopPropagation()}>
 			<div
 				style={{
 					background: 'white',
@@ -115,10 +107,7 @@ const GroupInfoModal: React.FC<Props> = ({
 
 				<div className="group-modal-actions">
 					{mode === 'joined' ? (
-						<div
-							className="group-modal-button join button1"
-							onClick={() => navigate(`/group-detail/${group.id}`)}
-						>
+						<div className="group-modal-button join button1" onClick={() => navigate(`/group-detail/${group.id}`)}>
 							입장하기
 						</div>
 					) : (

@@ -47,10 +47,7 @@ const NavBar = () => {
 	return (
 		<>
 			<nav className="nav-bar flex-center">
-				<button
-					onClick={() => navigate('/')}
-					className={isActive('/') ? 'active' : ''}
-				>
+				<button onClick={() => navigate('/')} className={isActive('/') ? 'active' : ''}>
 					<Home />
 				</button>
 
@@ -64,10 +61,7 @@ const NavBar = () => {
 					</button>
 				)}
 
-				<button
-					onClick={handleMypageClick}
-					className={isActive('/mypage') ? 'active' : ''}
-				>
+				<button onClick={handleMypageClick} className={isActive('/mypage') ? 'active' : ''}>
 					<User />
 				</button>
 			</nav>

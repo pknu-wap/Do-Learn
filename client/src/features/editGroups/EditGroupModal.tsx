@@ -12,14 +12,8 @@ interface EditGroupModalProps {
 	onClose: () => void;
 }
 
-const EditGroupModal: React.FC<EditGroupModalProps> = ({
-	studyGroupId,
-	initialData,
-	onClose,
-}) => {
-	const [recruitStatus, setRecruitStatus] = useState<'RECRUITING' | 'CLOSED'>(
-		initialData.recruitStatus,
-	);
+const EditGroupModal: React.FC<EditGroupModalProps> = ({ studyGroupId, initialData, onClose }) => {
+	const [recruitStatus, setRecruitStatus] = useState<'RECRUITING' | 'CLOSED'>(initialData.recruitStatus);
 	const [fullInitialData, setFullInitialData] = useState<any>(initialData);
 	const navigate = useNavigate();
 
@@ -65,11 +59,7 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
 	};
 
 	const handleDelete = async () => {
-		if (
-			!window.confirm(
-				'정말 이 스터디 그룹을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
-			)
-		) {
+		if (!window.confirm('정말 이 스터디 그룹을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
 			return;
 		}
 
@@ -91,10 +81,7 @@ const EditGroupModal: React.FC<EditGroupModalProps> = ({
 
 	return (
 		<div className="edit-group-modal-overlay" onClick={onClose}>
-			<div
-				className="edit-group-modal-box"
-				onClick={(e) => e.stopPropagation()}
-			>
+			<div className="edit-group-modal-box" onClick={(e) => e.stopPropagation()}>
 				<button className="edit-group-modal-close" onClick={onClose}>
 					✕
 				</button>

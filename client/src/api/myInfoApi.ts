@@ -8,14 +8,9 @@ export interface MyPageInfo {
 	profileImage: number;
 }
 
-type UpdateMyPageInfoPayload = Partial<
-	Pick<MyPageInfo, 'nickname' | 'profileImage'>
->;
+type UpdateMyPageInfoPayload = Partial<Pick<MyPageInfo, 'nickname' | 'profileImage'>>;
 
-const getAccessToken = () =>
-	localStorage.getItem('accessToken') ||
-	sessionStorage.getItem('accessToken') ||
-	'';
+const getAccessToken = () => localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken') || '';
 
 // 내 정보 조회
 export const getMyPageInfo = () => {

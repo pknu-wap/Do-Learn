@@ -20,15 +20,9 @@ export default function MainPage() {
 	const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
 	const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
 
-	const [selectedMeetingCycle, setSelectedMeetingCycle] = useState<
-		'월' | '주' | null
-	>(null);
-	const [selectedMeetingCount, setSelectedMeetingCount] = useState<
-		number | null
-	>(null);
-	const [meetingComparison, setMeetingComparison] = useState<'above' | 'below'>(
-		'above',
-	);
+	const [selectedMeetingCycle, setSelectedMeetingCycle] = useState<'월' | '주' | null>(null);
+	const [selectedMeetingCount, setSelectedMeetingCount] = useState<number | null>(null);
+	const [meetingComparison, setMeetingComparison] = useState<'above' | 'below'>('above');
 
 	const [displayedGroups, setDisplayedGroups] = useState<APIGroup[]>([]);
 
@@ -50,52 +44,31 @@ export default function MainPage() {
 	useEffect(() => {
 		if (
 			searchResults === null &&
-			selectedRegions.length +
-				selectedCategories.length +
-				selectedTimes.length ===
-				0 &&
+			selectedRegions.length + selectedCategories.length + selectedTimes.length === 0 &&
 			selectedMeetingCycle === null
 		) {
 			setDisplayedGroups(groups);
 		}
-	}, [
-		groups,
-		searchResults,
-		selectedRegions,
-		selectedCategories,
-		selectedTimes,
-		selectedMeetingCycle,
-	]);
+	}, [groups, searchResults, selectedRegions, selectedCategories, selectedTimes, selectedMeetingCycle]);
 
 	// 필터 적용 로직
 	useEffect(() => {
 		if (searchResults !== null) return;
 
-		if (
-			selectedRegions.length ||
-			selectedCategories.length ||
-			selectedTimes.length ||
-			selectedMeetingCycle !== null
-		) {
+		if (selectedRegions.length || selectedCategories.length || selectedTimes.length || selectedMeetingCycle !== null) {
 			let filtered = groups;
 
 			// 지역 필터
 			if (selectedRegions.length) {
-				filtered = filtered.filter((g) =>
-					selectedRegions.includes(g.region as Region),
-				);
+				filtered = filtered.filter((g) => selectedRegions.includes(g.region as Region));
 			}
 			// 분야 필터
 			if (selectedCategories.length) {
-				filtered = filtered.filter((g) =>
-					selectedCategories.includes(g.category as Category),
-				);
+				filtered = filtered.filter((g) => selectedCategories.includes(g.category as Category));
 			}
 			// 시간대 필터
 			if (selectedTimes.length) {
-				filtered = filtered.filter((g) =>
-					selectedTimes.includes(g.meetingTime),
-				);
+				filtered = filtered.filter((g) => selectedTimes.includes(g.meetingTime));
 			}
 			// 만남 횟수 필터
 			if (selectedMeetingCycle && selectedMeetingCount != null) {
@@ -103,9 +76,7 @@ export default function MainPage() {
 					const [cycle, countStr] = g.meetingDays.split(' ');
 					const cnt = Number(countStr.replace(/\D/g, ''));
 					if (cycle !== selectedMeetingCycle) return false;
-					return meetingComparison === 'above'
-						? cnt >= selectedMeetingCount
-						: cnt <= selectedMeetingCount;
+					return meetingComparison === 'above' ? cnt >= selectedMeetingCount : cnt <= selectedMeetingCount;
 				});
 			}
 
@@ -139,9 +110,7 @@ export default function MainPage() {
 					groups: displayedGroups,
 					nextCursor: null,
 					message:
-						filterActive && !loading && displayedGroups.length === 0
-							? '조건에 맞는 스터디그룹이 없습니다.'
-							: message,
+						filterActive && !loading && displayedGroups.length === 0 ? '조건에 맞는 스터디그룹이 없습니다.' : message,
 				}
 			: null;
 
@@ -165,10 +134,7 @@ export default function MainPage() {
 				setMeetingComparison={setMeetingComparison}
 			/>
 
-			<StudyGroupsList
-				searchResults={finalSearchResults}
-				myGroupIds={myGroupIds}
-			/>
+			<StudyGroupsList searchResults={finalSearchResults} myGroupIds={myGroupIds} />
 		</div>
 	);
 }

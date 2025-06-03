@@ -36,17 +36,13 @@ const SignupForm = () => {
 				if (!emailRegex.test(value)) return '이메일 형식이 올바르지 않습니다.';
 				return '';
 			case 'password':
-				return /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{6,15}$/.test(
-					value,
-				)
+				return /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]).{6,15}$/.test(value)
 					? ''
 					: '6~15자, 소문자/대문자/특수문자 각각 1개 이상 포함해야 합니다.';
 			case 'passwordConfirm':
 				return value !== password ? '비밀번호가 일치하지 않습니다.' : '';
 			case 'nickname':
-				return value.length < 1 || value.length > 20
-					? '닉네임은 1자 이상 20자 이하로 입력해주세요.'
-					: '';
+				return value.length < 1 || value.length > 20 ? '닉네임은 1자 이상 20자 이하로 입력해주세요.' : '';
 			default:
 				return '';
 		}
@@ -115,16 +111,10 @@ const SignupForm = () => {
 					...serverErrors,
 				}));
 				setSubmitError('');
-			} else if (
-				typeof data === 'string' &&
-				data.includes('Email is already registered')
-			) {
+			} else if (typeof data === 'string' && data.includes('Email is already registered')) {
 				setErrors((prev) => ({ ...prev }));
 				setSubmitError('이미 등록된 이메일입니다.');
-			} else if (
-				typeof data === 'string' &&
-				data.includes('Nickname is already registered')
-			) {
+			} else if (typeof data === 'string' && data.includes('Nickname is already registered')) {
 				setNicknameDuplicateError('이미 사용 중인 닉네임입니다.');
 				setSubmitError('');
 			} else {
@@ -166,8 +156,7 @@ const SignupForm = () => {
 				<div
 					className="signup-error"
 					style={{
-						visibility:
-							touched.password && errors.password ? 'visible' : 'hidden',
+						visibility: touched.password && errors.password ? 'visible' : 'hidden',
 					}}
 				>
 					{errors.password || ' '}
@@ -184,10 +173,7 @@ const SignupForm = () => {
 				<div
 					className="signup-error"
 					style={{
-						visibility:
-							touched.passwordConfirm && errors.passwordConfirm
-								? 'visible'
-								: 'hidden',
+						visibility: touched.passwordConfirm && errors.passwordConfirm ? 'visible' : 'hidden',
 					}}
 				>
 					{errors.passwordConfirm || ' '}
@@ -204,8 +190,7 @@ const SignupForm = () => {
 				<div
 					className="signup-error"
 					style={{
-						visibility:
-							errors.nickname || nicknameDuplicateError ? 'visible' : 'hidden',
+						visibility: errors.nickname || nicknameDuplicateError ? 'visible' : 'hidden',
 					}}
 				>
 					{nicknameDuplicateError || errors.nickname || ' '}

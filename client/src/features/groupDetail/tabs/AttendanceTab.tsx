@@ -3,11 +3,7 @@ import React, { useEffect, useState } from 'react';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 import './AttendanceTab.scss';
-import {
-	fetchAttendanceCalendar,
-	markAttendance,
-	AttendanceRecord,
-} from 'api/attendanceApi';
+import { fetchAttendanceCalendar, markAttendance, AttendanceRecord } from 'api/attendanceApi';
 
 interface AttendanceTabProps {
 	studyGroupId: number;
@@ -18,9 +14,7 @@ const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const AttendanceTab: React.FC<AttendanceTabProps> = ({ studyGroupId }) => {
 	const [today] = useState(new Date());
 	const [displayDate, setDisplayDate] = useState<Date>(new Date());
-	const [attendanceDates, setAttendanceDates] = useState<Set<string>>(
-		new Set(),
-	);
+	const [attendanceDates, setAttendanceDates] = useState<Set<string>>(new Set());
 	const [loading, setLoading] = useState(false);
 
 	const todayYear = today.getFullYear();
@@ -31,22 +25,17 @@ const AttendanceTab: React.FC<AttendanceTabProps> = ({ studyGroupId }) => {
 	const displayYear = displayDate.getFullYear();
 	const displayMonth = displayDate.getMonth() + 1;
 
-	const isCurrentMonthView =
-		todayYear === displayYear && todayMonth === displayMonth;
+	const isCurrentMonthView = todayYear === displayYear && todayMonth === displayMonth;
 
-	const handlePrev = () =>
-		setDisplayDate(new Date(displayYear, displayDate.getMonth() - 1, 1));
-	const handleNext = () =>
-		setDisplayDate(new Date(displayYear, displayDate.getMonth() + 1, 1));
+	const handlePrev = () => setDisplayDate(new Date(displayYear, displayDate.getMonth() - 1, 1));
+	const handleNext = () => setDisplayDate(new Date(displayYear, displayDate.getMonth() + 1, 1));
 	const handleToday = () => setDisplayDate(new Date());
 
 	// 출석 현황 조회
 	useEffect(() => {
 		fetchAttendanceCalendar(studyGroupId, displayYear, displayMonth)
 			.then((res) => {
-				setAttendanceDates(
-					new Set(res.data.map((r: AttendanceRecord) => r.date)),
-				);
+				setAttendanceDates(new Set(res.data.map((r: AttendanceRecord) => r.date)));
 			})
 			.catch(() => {
 				setAttendanceDates(new Set());
@@ -124,11 +113,7 @@ const AttendanceTab: React.FC<AttendanceTabProps> = ({ studyGroupId }) => {
 
 			{/* 하단 버튼: 현재 월이면 출석 체크, 아니면 오늘로 돌아가기 */}
 			{isCurrentMonthView ? (
-				<button
-					className="attendance-button body2"
-					onClick={handleCheck}
-					disabled={disableCheckButton}
-				>
+				<button className="attendance-button body2" onClick={handleCheck} disabled={disableCheckButton}>
 					출석하기
 				</button>
 			) : (

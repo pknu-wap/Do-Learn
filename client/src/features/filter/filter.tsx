@@ -1,10 +1,4 @@
-import React, {
-	useRef,
-	useEffect,
-	useState,
-	useCallback,
-	ReactNode,
-} from 'react';
+import React, { useRef, useEffect, useState, useCallback, ReactNode } from 'react';
 import ReactDOM from 'react-dom';
 import { Region, Category } from 'api/createGroupFormApi';
 import 'assets/style/_flex.scss';
@@ -23,9 +17,7 @@ interface FilterProps {
 	selectedTimes: string[];
 	setSelectedTimes: React.Dispatch<React.SetStateAction<string[]>>;
 	selectedMeetingCycle: '월' | '주' | null;
-	setSelectedMeetingCycle: React.Dispatch<
-		React.SetStateAction<'월' | '주' | null>
-	>;
+	setSelectedMeetingCycle: React.Dispatch<React.SetStateAction<'월' | '주' | null>>;
 	selectedMeetingCount: number | null;
 	setSelectedMeetingCount: React.Dispatch<React.SetStateAction<number | null>>;
 	meetingComparison: 'above' | 'below';
@@ -74,10 +66,7 @@ const Filter: React.FC<FilterProps> = ({
 	useEffect(() => {
 		const onClickOutside = (e: MouseEvent) => {
 			const target = e.target as Node;
-			if (
-				containerRef.current?.contains(target) ||
-				menuRef.current?.contains(target)
-			) {
+			if (containerRef.current?.contains(target) || menuRef.current?.contains(target)) {
 				// 필터 영역 또는 드롭다운 영역 클릭 시엔 닫지 않음
 				return;
 			}
@@ -170,14 +159,9 @@ const Filter: React.FC<FilterProps> = ({
 	}, []);
 
 	// (5) 배열 토글 헬퍼
-	const toggleItem = useCallback(
-		<T,>(arr: T[], item: T, setter: (v: T[]) => void) => {
-			setter(
-				arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item],
-			);
-		},
-		[],
-	);
+	const toggleItem = useCallback(<T,>(arr: T[], item: T, setter: (v: T[]) => void) => {
+		setter(arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item]);
+	}, []);
 
 	const handleReset = () => {
 		setSelectedRegions([]);
@@ -190,11 +174,10 @@ const Filter: React.FC<FilterProps> = ({
 		setAnchorEl(null);
 	};
 
-	const handleButtonClick =
-		(type: DropdownType) => (e: React.MouseEvent<HTMLButtonElement>) => {
-			setOpenDropdown(openDropdown === type ? null : type);
-			setAnchorEl(openDropdown === type ? null : e.currentTarget);
-		};
+	const handleButtonClick = (type: DropdownType) => (e: React.MouseEvent<HTMLButtonElement>) => {
+		setOpenDropdown(openDropdown === type ? null : type);
+		setAnchorEl(openDropdown === type ? null : e.currentTarget);
+	};
 
 	const renderMenu = useCallback(() => {
 		if (!openDropdown || !menuPos) return null;
@@ -203,16 +186,11 @@ const Filter: React.FC<FilterProps> = ({
 		switch (openDropdown) {
 			case 'regions': {
 				const noneKey = Region.해당없음;
-				const regionsOrdered = [
-					noneKey,
-					...Object.values(Region).filter((r) => r !== noneKey),
-				];
+				const regionsOrdered = [noneKey, ...Object.values(Region).filter((r) => r !== noneKey)];
 				items = regionsOrdered.map((r) => (
 					<button
 						key={r}
-						className={`dropdown-item button2 ${
-							selectedRegions.includes(r) ? 'selected' : ''
-						}`}
+						className={`dropdown-item button2 ${selectedRegions.includes(r) ? 'selected' : ''}`}
 						onClick={() => toggleItem(selectedRegions, r, setSelectedRegions)}
 					>
 						{r === noneKey ? '비대면' : r}
@@ -224,12 +202,8 @@ const Filter: React.FC<FilterProps> = ({
 				items = Object.values(Category).map((c) => (
 					<button
 						key={c}
-						className={`dropdown-item button2 ${
-							selectedCategories.includes(c) ? 'selected' : ''
-						}`}
-						onClick={() =>
-							toggleItem(selectedCategories, c, setSelectedCategories)
-						}
+						className={`dropdown-item button2 ${selectedCategories.includes(c) ? 'selected' : ''}`}
+						onClick={() => toggleItem(selectedCategories, c, setSelectedCategories)}
 					>
 						{c}
 					</button>
@@ -239,9 +213,7 @@ const Filter: React.FC<FilterProps> = ({
 				items = MEETING_TIMES.map((t) => (
 					<button
 						key={t}
-						className={`dropdown-item button2 ${
-							selectedTimes.includes(t) ? 'selected' : ''
-						}`}
+						className={`dropdown-item button2 ${selectedTimes.includes(t) ? 'selected' : ''}`}
 						onClick={() => toggleItem(selectedTimes, t, setSelectedTimes)}
 					>
 						{t}
@@ -253,11 +225,7 @@ const Filter: React.FC<FilterProps> = ({
 					<>
 						<div className="cycle-selector flex-center">
 							{CYCLE_OPTIONS.map((cycle) => (
-								<button
-									key={cycle}
-									className="dropdown-item button2"
-									onClick={() => setSelectedMeetingCycle(cycle)}
-								>
+								<button key={cycle} className="dropdown-item button2" onClick={() => setSelectedMeetingCycle(cycle)}>
 									{cycle}
 								</button>
 							))}
@@ -269,28 +237,20 @@ const Filter: React.FC<FilterProps> = ({
 									type="number"
 									min={1}
 									value={selectedMeetingCount ?? ''}
-									onChange={(e) =>
-										setSelectedMeetingCount(
-											e.target.value ? +e.target.value : null,
-										)
-									}
+									onChange={(e) => setSelectedMeetingCount(e.target.value ? +e.target.value : null)}
 									className="button2 count-input"
 								/>
 								<span className="button2">회</span>
 							</div>
 							<div className="comparison-selector flex-center">
 								<button
-									className={`dropdown-item button2 ${
-										meetingComparison === 'above' ? 'selected' : ''
-									}`}
+									className={`dropdown-item button2 ${meetingComparison === 'above' ? 'selected' : ''}`}
 									onClick={() => setMeetingComparison('above')}
 								>
 									이상
 								</button>
 								<button
-									className={`dropdown-item button2 ${
-										meetingComparison === 'below' ? 'selected' : ''
-									}`}
+									className={`dropdown-item button2 ${meetingComparison === 'below' ? 'selected' : ''}`}
 									onClick={() => setMeetingComparison('below')}
 								>
 									이하
@@ -331,13 +291,7 @@ const Filter: React.FC<FilterProps> = ({
 	]);
 
 	const maskClass =
-		showFadeLeft && showFadeRight
-			? 'mask-both'
-			: showFadeLeft
-				? 'mask-left'
-				: showFadeRight
-					? 'mask-right'
-					: '';
+		showFadeLeft && showFadeRight ? 'mask-both' : showFadeLeft ? 'mask-left' : showFadeRight ? 'mask-right' : '';
 
 	return (
 		<>
@@ -348,27 +302,20 @@ const Filter: React.FC<FilterProps> = ({
 					</button>
 					<div className="dropdown-wrapper">
 						<button
-							className={`filter-button dropdown button2 ${
-								isRegionActive ? 'active' : ''
-							}`}
+							className={`filter-button dropdown button2 ${isRegionActive ? 'active' : ''}`}
 							onClick={handleButtonClick('regions')}
 						>
 							만남장소
 						</button>
 					</div>
 					<div className="dropdown-wrapper">
-						<button
-							className="filter-button dropdown button2"
-							onClick={handleButtonClick('days')}
-						>
+						<button className="filter-button dropdown button2" onClick={handleButtonClick('days')}>
 							만남횟수
 						</button>
 					</div>
 					<div className="dropdown-wrapper">
 						<button
-							className={`filter-button dropdown button2 ${
-								isCategoryActive ? 'active' : ''
-							}`}
+							className={`filter-button dropdown button2 ${isCategoryActive ? 'active' : ''}`}
 							onClick={handleButtonClick('categories')}
 						>
 							분야
@@ -376,9 +323,7 @@ const Filter: React.FC<FilterProps> = ({
 					</div>
 					<div className="flex-center dropdown-wrapper">
 						<button
-							className={`filter-button dropdown button2 ${
-								isTimeActive ? 'active' : ''
-							}`}
+							className={`filter-button dropdown button2 ${isTimeActive ? 'active' : ''}`}
 							onClick={handleButtonClick('times')}
 						>
 							시간대

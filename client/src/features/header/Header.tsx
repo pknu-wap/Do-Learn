@@ -8,17 +8,11 @@ interface HeaderProps {
 	variant?: 'default' | 'groupDetail';
 }
 
-const Header = ({
-	title = '두런두런',
-	showLogo = true,
-	variant = 'default',
-}: HeaderProps) => {
+const Header = ({ title = '두런두런', showLogo = true, variant = 'default' }: HeaderProps) => {
 	return (
 		<div className={`header-wrapper flex-center heading1 ${variant}`}>
 			<div className="header-item flex-row-center">
-				{showLogo && (
-					<img src="/assets/logo.png" className="logo-img" alt="logo" />
-				)}
+				{showLogo && <img src="/assets/logo.png" className="logo-img" alt="logo" />}
 				<div className="title-name">{title}</div>
 			</div>
 		</div>

@@ -15,18 +15,11 @@ interface EditGroupPayload {
 	recruitStatus?: 'RECRUITING' | 'CLOSED';
 }
 
-export const editMyGroupApi = async (
-	studyGroupId: number,
-	payload: Partial<EditGroupPayload>,
-) => {
-	const response = await api.patch(
-		`/api/mypage/studygroups/${studyGroupId}`,
-		payload,
-		{
-			headers: {
-				...getAuthHeaders(),
-			},
+export const editMyGroupApi = async (studyGroupId: number, payload: Partial<EditGroupPayload>) => {
+	const response = await api.patch(`/api/mypage/studygroups/${studyGroupId}`, payload, {
+		headers: {
+			...getAuthHeaders(),
 		},
-	);
+	});
 	return response.data;
 };

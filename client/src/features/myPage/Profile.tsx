@@ -1,20 +1,11 @@
-import React, {
-	useState,
-	useEffect,
-	useRef,
-	useLayoutEffect,
-	useCallback,
-} from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect, useCallback } from 'react';
 import { getMyPageInfo, updateMyPageInfo } from 'api/myInfoApi';
 import { Pencil } from 'lucide-react';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
 import './Profile.scss';
 
-import {
-	userProfileImageMap,
-	getUserProfileImageUrl,
-} from 'utils/profileImageMap';
+import { userProfileImageMap, getUserProfileImageUrl } from 'utils/profileImageMap';
 
 interface UserState {
 	profileImageId: number;
@@ -163,11 +154,7 @@ const Profile: React.FC = () => {
 		return <div className="profile-header body2 flex-center">로딩중…</div>;
 	}
 	if (!user) {
-		return (
-			<div className="profile-header body2 flex-center">
-				유저 정보를 불러올 수 없습니다.
-			</div>
-		);
+		return <div className="profile-header body2 flex-center">유저 정보를 불러올 수 없습니다.</div>;
 	}
 
 	return (
@@ -177,9 +164,7 @@ const Profile: React.FC = () => {
 				<div className="image-modal-overlay flex-center">
 					<div className="image-modal body2">
 						<div className="image-title heading2 flex-center">프로필 사진</div>
-						<div className="image-sub-title body3 flex-center">
-							마음에 드는 두런이 선택하기
-						</div>
+						<div className="image-sub-title body3 flex-center">마음에 드는 두런이 선택하기</div>
 						<button
 							type="button"
 							className="modal-close-button"
@@ -189,18 +174,14 @@ const Profile: React.FC = () => {
 							✕
 						</button>
 						<div className="image-options flex-row-center">
-							{(
-								Object.entries(userProfileImageMap) as Array<[string, string]>
-							).map(([key, src]) => {
+							{(Object.entries(userProfileImageMap) as Array<[string, string]>).map(([key, src]) => {
 								const id = Number(key);
 								return (
 									<img
 										key={id}
 										src={src}
 										alt={`profile-${id}`}
-										className={`image-option ${
-											id === user.profileImageId ? 'selected' : ''
-										}`}
+										className={`image-option ${id === user.profileImageId ? 'selected' : ''}`}
 										onClick={() => handleImageSelect(id)}
 									/>
 								);
@@ -224,9 +205,7 @@ const Profile: React.FC = () => {
 							<input
 								type="text"
 								ref={inputRef}
-								className={`body3 nickname-input ${
-									isEditing ? 'editable' : ''
-								}`}
+								className={`body3 nickname-input ${isEditing ? 'editable' : ''}`}
 								value={isEditing ? draft : user.nickname}
 								readOnly={!isEditing}
 								onChange={(e) => setDraft(e.target.value)}
@@ -234,12 +213,7 @@ const Profile: React.FC = () => {
 								onKeyDown={handleKeyDown}
 							/>
 							<div className="edit-box">
-								<button
-									type="button"
-									className="edit-button"
-									onClick={handleEditClick}
-									aria-label="닉네임 수정"
-								>
+								<button type="button" className="edit-button" onClick={handleEditClick} aria-label="닉네임 수정">
 									<Pencil size={12} />
 								</button>
 							</div>

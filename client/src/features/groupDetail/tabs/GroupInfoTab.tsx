@@ -41,10 +41,8 @@ const GroupInfoTab: React.FC<GroupInfoTabProps> = ({ group }) => {
 		loadNotice();
 	}, [group.id]);
 
-	if (loading)
-		return <div className="group-info-container flex-center">로딩 중...</div>;
-	if (error)
-		return <div className="group-info-container body3 error-text">{error}</div>;
+	if (loading) return <div className="group-info-container flex-center">로딩 중...</div>;
+	if (error) return <div className="group-info-container body3 error-text">{error}</div>;
 
 	return (
 		<div className="group-info-container flex-col-center">

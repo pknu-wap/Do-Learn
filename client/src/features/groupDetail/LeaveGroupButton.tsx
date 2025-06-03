@@ -9,9 +9,7 @@ interface LeaveGroupButtonProps {
 	studyGroupId: number;
 }
 
-const LeaveGroupButton: React.FC<LeaveGroupButtonProps> = ({
-	studyGroupId,
-}) => {
+const LeaveGroupButton: React.FC<LeaveGroupButtonProps> = ({ studyGroupId }) => {
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -34,12 +32,7 @@ const LeaveGroupButton: React.FC<LeaveGroupButtonProps> = ({
 
 	return (
 		<div className="flex-center">
-			<button
-				type="button"
-				className="leave-group-button button2"
-				onClick={handleLeave}
-				disabled={isLoading}
-			>
+			<button type="button" className="leave-group-button button2" onClick={handleLeave} disabled={isLoading}>
 				{isLoading ? '탈퇴 중…' : '그룹 탈퇴하기'}
 			</button>
 		</div>

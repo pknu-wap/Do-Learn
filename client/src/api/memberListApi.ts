@@ -7,9 +7,7 @@ export interface GroupMember {
 	profileImage: number;
 }
 
-export const fetchGroupMembers = async (
-	studyGroupId: number,
-): Promise<GroupMember[]> => {
+export const fetchGroupMembers = async (studyGroupId: number): Promise<GroupMember[]> => {
 	const response = await api.get<{
 		studyGroupId: number;
 		members: GroupMember[];

@@ -17,9 +17,7 @@ const GroupMenu: React.FC<Props> = ({ selected, onSelectMenu }) => {
 			<div className="group-menu flex-center">
 				<div className="group-menu-item flex-row-between">
 					<div
-						className={`menu-item-group flex-col-center ${
-							selected === 'attendance' ? 'active' : ''
-						}`}
+						className={`menu-item-group flex-col-center ${selected === 'attendance' ? 'active' : ''}`}
 						onClick={() => onSelectMenu('attendance')}
 					>
 						<div className="menu-item flex-center">
@@ -29,9 +27,7 @@ const GroupMenu: React.FC<Props> = ({ selected, onSelectMenu }) => {
 					</div>
 
 					<div
-						className={`menu-item-group flex-col-center ${
-							selected === 'info' ? 'active' : ''
-						}`}
+						className={`menu-item-group flex-col-center ${selected === 'info' ? 'active' : ''}`}
 						onClick={() => onSelectMenu('info')}
 					>
 						<div className="menu-item flex-center">
@@ -41,9 +37,7 @@ const GroupMenu: React.FC<Props> = ({ selected, onSelectMenu }) => {
 					</div>
 
 					<div
-						className={`menu-item-group flex-col-center ${
-							selected === 'goal' ? 'active' : ''
-						}`}
+						className={`menu-item-group flex-col-center ${selected === 'goal' ? 'active' : ''}`}
 						onClick={() => onSelectMenu('goal')}
 					>
 						<div className="menu-item flex-center">
@@ -53,9 +47,7 @@ const GroupMenu: React.FC<Props> = ({ selected, onSelectMenu }) => {
 					</div>
 
 					<div
-						className={`menu-item-group flex-col-center ${
-							selected === 'ranking' ? 'active' : ''
-						}`}
+						className={`menu-item-group flex-col-center ${selected === 'ranking' ? 'active' : ''}`}
 						onClick={() => onSelectMenu('ranking')}
 					>
 						<div className="menu-item flex-center">

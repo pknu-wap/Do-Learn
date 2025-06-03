@@ -15,9 +15,7 @@ export const joinGroupApi = async (studyGroupId: number): Promise<string> => {
 	}
 };
 
-export const leaveStudyGroup = async (
-	studyGroupId: number,
-): Promise<string> => {
+export const leaveStudyGroup = async (studyGroupId: number): Promise<string> => {
 	try {
 		const res = await api.delete(`/api/studygroup/${studyGroupId}/leave`, {
 			headers: {
@@ -30,9 +28,7 @@ export const leaveStudyGroup = async (
 
 		const responseData = error.response?.data;
 		const serverMsg =
-			typeof responseData === 'string'
-				? responseData
-				: (responseData?.message ?? '알 수 없는 서버 오류');
+			typeof responseData === 'string' ? responseData : (responseData?.message ?? '알 수 없는 서버 오류');
 
 		throw new Error(serverMsg);
 	}

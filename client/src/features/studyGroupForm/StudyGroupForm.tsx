@@ -3,12 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './StudyGroupForm.scss';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
-import {
-	createStudyGroup,
-	Category,
-	Region,
-	StudyType,
-} from 'api/createGroupFormApi';
+import { createStudyGroup, Category, Region, StudyType } from 'api/createGroupFormApi';
 import { isLoggedIn } from 'utils/auth';
 
 interface StudyGroupFormProps {
@@ -33,24 +28,14 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 }) => {
 	const navigate = useNavigate();
 	const [groupName, setGroupName] = useState(initialData?.name ?? '');
-	const [meetingType, setMeetingType] = useState<StudyType | ''>(
-		initialData?.meetingType ?? '',
-	);
-	const [meetingTime, setMeetingTime] = useState(
-		initialData?.meetingTime ?? '',
-	);
+	const [meetingType, setMeetingType] = useState<StudyType | ''>(initialData?.meetingType ?? '');
+	const [meetingTime, setMeetingTime] = useState(initialData?.meetingTime ?? '');
 	const [meetingCycle, setMeetingCycle] = useState<'월' | '주'>(
 		initialData?.meetingDays?.startsWith('주') ? '주' : '월',
 	);
-	const [meetingDay, setMeetingDay] = useState(
-		initialData?.meetingDays?.replace(/[^0-9]/g, '') ?? '',
-	);
-	const [memberCount, setMemberCount] = useState(
-		initialData?.maxMembers?.toString() ?? '',
-	);
-	const [studyTypeDetail, setStudyTypeDetail] = useState(
-		initialData?.type ?? '',
-	);
+	const [meetingDay, setMeetingDay] = useState(initialData?.meetingDays?.replace(/[^0-9]/g, '') ?? '');
+	const [memberCount, setMemberCount] = useState(initialData?.maxMembers?.toString() ?? '');
+	const [studyTypeDetail, setStudyTypeDetail] = useState(initialData?.type ?? '');
 	const [notice, setNotice] = useState('');
 	const [region, setRegion] = useState(initialData?.region ?? '');
 	const [category, setCategory] = useState(initialData?.category ?? '');
@@ -158,10 +143,7 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 		} catch (error: any) {
 			const status = error.response?.status;
 			const serverData = error.response?.data;
-			const serverMessage =
-				typeof serverData === 'string'
-					? serverData
-					: (serverData?.message ?? '');
+			const serverMessage = typeof serverData === 'string' ? serverData : (serverData?.message ?? '');
 
 			// 중복 그룹명
 			if (status === 400 && serverMessage.includes('존재')) {
@@ -193,10 +175,7 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 	return (
 		<form onSubmit={handleSubmit}>
 			<div className="study-group-form">
-				<div className="title heading2 flex-center">
-					{' '}
-					{isEdit ? '스터디 그룹 수정' : '스터디 그룹 생성'}
-				</div>
+				<div className="title heading2 flex-center"> {isEdit ? '스터디 그룹 수정' : '스터디 그룹 생성'}</div>
 
 				{/* 그룹 명 */}
 				<div className="group-name">
@@ -284,18 +263,14 @@ const StudyGroupForm: React.FC<StudyGroupFormProps> = ({
 					<button
 						type="button"
 						onClick={() => setMeetingType(StudyType.온라인)}
-						className={`meeting-method-button button2 ${
-							meetingType === StudyType.온라인 ? 'bg-green-300' : ''
-						}`}
+						className={`meeting-method-button button2 ${meetingType === StudyType.온라인 ? 'bg-green-300' : ''}`}
 					>
 						온라인
 					</button>
 					<button
 						type="button"
 						onClick={() => setMeetingType(StudyType.오프라인)}
-						className={`meeting-method-button button2 ${
-							meetingType === StudyType.오프라인 ? 'bg-green-300' : ''
-						}`}
+						className={`meeting-method-button button2 ${meetingType === StudyType.오프라인 ? 'bg-green-300' : ''}`}
 					>
 						오프라인
 					</button>

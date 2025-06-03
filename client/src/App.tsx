@@ -13,9 +13,7 @@ function App() {
 	useEffect(() => {
 		const interval = setInterval(
 			() => {
-				const refreshToken =
-					localStorage.getItem('refreshToken') ||
-					sessionStorage.getItem('refreshToken');
+				const refreshToken = localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
 				if (!refreshToken) return;
 
 				reissue()

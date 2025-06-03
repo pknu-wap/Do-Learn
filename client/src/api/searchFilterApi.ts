@@ -28,9 +28,7 @@ export interface SearchGroupResponse {
 	message: string | null;
 }
 
-export const searchGroups = async (
-	params: SearchGroupParams,
-): Promise<SearchGroupResponse> => {
+export const searchGroups = async (params: SearchGroupParams): Promise<SearchGroupResponse> => {
 	try {
 		const { keyword, categories, regions, cursor, size = 10 } = params;
 
@@ -39,15 +37,11 @@ export const searchGroups = async (
 		if (regions) queryParams.append('regions', regions);
 		if (cursor != null) queryParams.append('cursor', String(cursor));
 
-		const response = await api.get<SearchGroupResponse>(
-			`/grouplist/search?${queryParams.toString()}`,
-		);
+		const response = await api.get<SearchGroupResponse>(`/grouplist/search?${queryParams.toString()}`);
 
 		return response.data;
 	} catch (error) {
-		console.error(
-			(error as AxiosError).response?.data || (error as Error).message,
-		);
+		console.error((error as AxiosError).response?.data || (error as Error).message);
 		return {
 			groups: null,
 			nextCursor: null,

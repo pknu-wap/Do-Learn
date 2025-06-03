@@ -64,18 +64,12 @@ const LoginForm = () => {
 					placeholder="비밀번호"
 				/>
 
-				<div
-					className="auto-login-radio"
-					onClick={() => setAutoLogin(!autoLogin)}
-				>
+				<div className="auto-login-radio" onClick={() => setAutoLogin(!autoLogin)}>
 					<span className={`circle ${autoLogin ? 'selected' : ''}`} />
 					<label className="button2">자동 로그인</label>
 				</div>
 
-				<div
-					className="login-error button2"
-					style={{ visibility: errorMsg ? 'visible' : 'hidden' }}
-				>
+				<div className="login-error button2" style={{ visibility: errorMsg ? 'visible' : 'hidden' }}>
 					{errorMsg || '　'}
 				</div>
 

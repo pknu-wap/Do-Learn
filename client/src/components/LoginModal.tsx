@@ -9,19 +9,12 @@ interface LoginModalProps {
 	onConfirm: () => void;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({
-	visible,
-	onClose,
-	onConfirm,
-}) => {
+const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose, onConfirm }) => {
 	if (!visible) return null;
 
 	return (
 		<div className="login-modal-overlay">
-			<div
-				className="login-modal-box flex-col-center"
-				onClick={(e) => e.stopPropagation()}
-			>
+			<div className="login-modal-box flex-col-center" onClick={(e) => e.stopPropagation()}>
 				<p className="login-modal-message body3">로그인이 필요한 기능입니다.</p>
 				<div className="login-modal-buttons">
 					<button className="confirm-button body3" onClick={onConfirm}>

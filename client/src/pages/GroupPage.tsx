@@ -6,9 +6,7 @@ import { useParams } from 'react-router-dom';
 import Header from 'features/header/Header';
 import GroupMenu from 'features/groupDetail/GroupMenu';
 import AttendanceTab from 'features/groupDetail/tabs/AttendanceTab';
-import GroupInfoTab, {
-	StudyGroup,
-} from 'features/groupDetail/tabs/GroupInfoTab';
+import GroupInfoTab, { StudyGroup } from 'features/groupDetail/tabs/GroupInfoTab';
 import GoalTab from 'features/groupDetail/tabs/goalTab/GoalTab';
 import RankingTab from 'features/groupDetail/tabs/RankingTab';
 import GroupMemberList from 'features/groupDetail/GroupMemberList';
@@ -45,8 +43,7 @@ const GroupPage: React.FC = () => {
 			try {
 				const groups: StudyGroup[] = await fetchMyGroups();
 				const found = groups.find((g) => g.id === groupIdNum) || null;
-				if (!found)
-					throw new Error(`그룹 ID=${groupIdNum} 정보를 찾을 수 없습니다.`);
+				if (!found) throw new Error(`그룹 ID=${groupIdNum} 정보를 찾을 수 없습니다.`);
 				setCurrentGroup(found);
 			} catch (e: any) {
 				console.error('GroupPage 그룹 조회 실패:', e);
@@ -58,29 +55,18 @@ const GroupPage: React.FC = () => {
 		if (groupIdNum) loadGroup();
 	}, [groupIdNum]);
 
-	if (loading)
-		return <div className="group-info-container flex-center">로딩 중...</div>;
-	if (error)
-		return <div className="group-info-container body3 error-text">{error}</div>;
+	if (loading) return <div className="group-info-container flex-center">로딩 중...</div>;
+	if (error) return <div className="group-info-container body3 error-text">{error}</div>;
 
 	return (
 		<div>
 			<Header title={groupName} showLogo={false} variant="groupDetail" />
 
-			<GroupMenu
-				selected={selectedTab}
-				onSelectMenu={(key) =>
-					setSelectedTab((prev) => (prev === key ? null : key))
-				}
-			/>
+			<GroupMenu selected={selectedTab} onSelectMenu={(key) => setSelectedTab((prev) => (prev === key ? null : key))} />
 
 			<div className="detail-content">
-				{selectedTab === 'attendance' && (
-					<AttendanceTab studyGroupId={groupIdNum} />
-				)}
-				{selectedTab === 'info' && currentGroup && (
-					<GroupInfoTab group={currentGroup} />
-				)}
+				{selectedTab === 'attendance' && <AttendanceTab studyGroupId={groupIdNum} />}
+				{selectedTab === 'info' && currentGroup && <GroupInfoTab group={currentGroup} />}
 				{selectedTab === 'goal' && <GoalTab studyGroupId={groupIdNum} />}
 				{selectedTab === 'ranking' && <RankingTab studyGroupId={groupIdNum} />}
 

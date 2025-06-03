@@ -30,12 +30,7 @@ interface StudyGroupItemProps {
 	onEditClick?: (group: StudyGroup) => void;
 }
 
-const StudyGroupItem: React.FC<StudyGroupItemProps> = ({
-	group,
-	mode = 'browse',
-	showEdit,
-	onEditClick,
-}) => {
+const StudyGroupItem: React.FC<StudyGroupItemProps> = ({ group, mode = 'browse', showEdit, onEditClick }) => {
 	const navigate = useNavigate();
 	const [showModal, setShowModal] = useState(false);
 	const [showGroupModal, setShowGroupModal] = useState(false);
@@ -60,18 +55,13 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({
 			setShowGroupModal(false);
 			navigate(`/group-detail/${group.id}`);
 		} catch (error: any) {
-			const msg =
-				error?.response?.data?.message ||
-				'가입 요청 중 예상치 못한 오류가 발생했습니다.';
+			const msg = error?.response?.data?.message || '가입 요청 중 예상치 못한 오류가 발생했습니다.';
 			alert(msg);
 		}
 	};
 
 	return (
-		<div
-			className={`list-box ${group.region === '해당없음' ? 'border-virtual' : ''}`}
-			onClick={handleClick}
-		>
+		<div className={`list-box ${group.region === '해당없음' ? 'border-virtual' : ''}`} onClick={handleClick}>
 			<div className="top-row flex-between">
 				<div className="left-group flex-left">
 					{mode === 'joined' && group.recruitStatus === 'RECRUITING' && (
@@ -86,9 +76,7 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({
 				</div>
 
 				<div className="meeting-type button3">
-					{group.region?.trim() && group.region !== '해당없음'
-						? group.region
-						: '비대면'}
+					{group.region?.trim() && group.region !== '해당없음' ? group.region : '비대면'}
 				</div>
 			</div>
 
@@ -111,8 +99,7 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({
 						<div className="button2">{group.meetingTime}</div>
 					</div>
 					<div className="flex-left second-col-category">
-						<span className="info-label button1">{group.category}</span>{' '}
-						<div className="button2">{group.type}</div>
+						<span className="info-label button1">{group.category}</span> <div className="button2">{group.type}</div>
 					</div>
 				</div>
 			</div>
@@ -127,12 +114,7 @@ const StudyGroupItem: React.FC<StudyGroupItemProps> = ({
 			/>
 
 			{showGroupModal && (
-				<GroupInfoModal
-					group={group}
-					onClose={() => setShowGroupModal(false)}
-					onJoin={handleJoin}
-					mode={mode}
-				/>
+				<GroupInfoModal group={group} onClose={() => setShowGroupModal(false)} onJoin={handleJoin} mode={mode} />
 			)}
 
 			{showEdit && (

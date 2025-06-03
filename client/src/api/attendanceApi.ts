@@ -11,20 +11,11 @@ interface CheckAttendanceResponse {
 }
 
 export const markAttendance = (studyGroupId: number) =>
-	api.post<CheckAttendanceResponse>(
-		`api/studygroup/${studyGroupId}/attendance`,
-		null,
-		{ headers: getAuthHeaders() },
-	);
+	api.post<CheckAttendanceResponse>(`api/studygroup/${studyGroupId}/attendance`, null, { headers: getAuthHeaders() });
 
-export const fetchAttendanceCalendar = (
-	studyGroupId: number,
-	year: number,
-	month: number,
-) => {
+export const fetchAttendanceCalendar = (studyGroupId: number, year: number, month: number) => {
 	const mm = String(month).padStart(2, '0');
-	return api.get<AttendanceRecord[]>(
-		`api/studygroup/${studyGroupId}/attendance/calendar?year=${year}&month=${mm}`,
-		{ headers: getAuthHeaders() },
-	);
+	return api.get<AttendanceRecord[]>(`api/studygroup/${studyGroupId}/attendance/calendar?year=${year}&month=${mm}`, {
+		headers: getAuthHeaders(),
+	});
 };

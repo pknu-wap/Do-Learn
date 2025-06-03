@@ -33,11 +33,7 @@ const GroupMemberList = ({ studyGroupId }: { studyGroupId: number }) => {
 			<div className="group-member-grid">
 				{members.map((member) => (
 					<div key={member.userId} className="member-card flex-col">
-						<img
-							className="avatar"
-							src={getGroupMemberProfileImageUrl(member.profileImage)}
-							alt="profile"
-						/>
+						<img className="avatar" src={getGroupMemberProfileImageUrl(member.profileImage)} alt="profile" />
 						<div className="nickname button2">{member.nickname}</div>
 					</div>
 				))}

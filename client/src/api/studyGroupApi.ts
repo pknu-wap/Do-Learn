@@ -39,14 +39,9 @@ export const fetchStudyGroups = async (
 	return response.data;
 };
 
-export const deleteStudyGroup = async (
-	studyGroupId: number,
-): Promise<{ message: string }> => {
-	const response = await api.delete<{ message: string }>(
-		`/api/mypage/studygroups/${studyGroupId}/delete`,
-		{
-			headers: getAuthHeaders(),
-		},
-	);
+export const deleteStudyGroup = async (studyGroupId: number): Promise<{ message: string }> => {
+	const response = await api.delete<{ message: string }>(`/api/mypage/studygroups/${studyGroupId}/delete`, {
+		headers: getAuthHeaders(),
+	});
 	return response.data;
 };

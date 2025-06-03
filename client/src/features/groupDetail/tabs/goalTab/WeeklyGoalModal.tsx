@@ -9,12 +9,7 @@ interface WeeklyGoalModalProps {
 	onClose: () => void;
 }
 
-const WeeklyGoalModal: React.FC<WeeklyGoalModalProps> = ({
-	groupId,
-	dayIndex,
-	referenceDate,
-	onClose,
-}) => {
+const WeeklyGoalModal: React.FC<WeeklyGoalModalProps> = ({ groupId, dayIndex, referenceDate, onClose }) => {
 	return (
 		<div>
 			{/* 모달 내부 UI 구현 */}
