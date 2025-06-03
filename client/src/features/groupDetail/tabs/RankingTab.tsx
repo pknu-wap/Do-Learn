@@ -22,8 +22,15 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 	const [rankings, setRankings] = useState<MemberRanking[]>([]);
 
 	useEffect(() => {
-		const fetchRankings = async () => {
-			// 오늘 날짜를 yyyy-MM-dd 형식으로 계산
+		const fetchAndMerge = async () => {
+			let members: GroupMember[] = [];
+			try {
+				members = await fetchGroupMembers(studyGroupId);
+			} catch {
+				members = [];
+			}
+
+			let rankingData: Ranking[] = [];
 			const today = new Date();
 			const year = today.getFullYear();
 			const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -32,122 +39,86 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 
 			try {
 				const res = await viewRanking(studyGroupId, dateString);
-				const data: Ranking[] = res.data;
-
-				if (Array.isArray(data) && data.length > 0) {
-					const members: GroupMember[] = await fetchGroupMembers(studyGroupId);
-					const rankedMap = new Map<number, Ranking>();
-					data.forEach((r) => {
-						rankedMap.set(r.studyMemberId, r);
-					});
-					const rankedMembers: MemberRanking[] = data.map((r) => {
-						const imageId = r.ranking <= 3 ? r.ranking : 4;
-						return {
-							rank: r.ranking,
-							displayRank: r.ranking,
-							nickname: r.nickname,
-							avatarUrl: getGroupMemberProfileImageUrl(imageId),
-						};
-					});
-					rankedMembers.sort((a, b) => a.rank - b.rank);
-
-					const nextDisplayStart =
-						rankedMembers.length > 0
-							? Math.max(...rankedMembers.map((m) => m.displayRank)) + 1
-							: 1;
-
-					const unranked = members.filter((m) => !rankedMap.has(m.userId));
-
-					const unrankedMembers: MemberRanking[] = unranked.map((m, idx) => ({
-						rank: 4,
-						displayRank: nextDisplayStart + idx,
-						nickname: m.nickname,
-						avatarUrl: getGroupMemberProfileImageUrl(4),
-					}));
-
-					setRankings([...rankedMembers, ...unrankedMembers]);
-				} else {
-					throw new Error('no-ranking-data');
+				if (Array.isArray(res.data)) {
+					rankingData = res.data;
 				}
-			} catch (viewErr) {
-				console.warn('viewRanking 실패 또는 빈 데이터:', viewErr);
-
+			} catch {
 				try {
-					// 2) 랭킹 갱신 시도
 					const updRes = await updateRanking(studyGroupId, dateString);
-					const updatedData: Ranking[] = updRes.data;
-
-					if (Array.isArray(updatedData) && updatedData.length > 0) {
-						// 그룹원 전체 조회
-						const members: GroupMember[] =
-							await fetchGroupMembers(studyGroupId);
-						const rankedMap = new Map<number, Ranking>();
-						updatedData.forEach((r) => {
-							rankedMap.set(r.studyMemberId, r);
-						});
-						const rankedMembers: MemberRanking[] = updatedData.map((r) => {
-							const imageId = r.ranking <= 3 ? r.ranking : 4;
-							return {
-								rank: r.ranking,
-								displayRank: r.ranking,
-								nickname: r.nickname,
-								avatarUrl: getGroupMemberProfileImageUrl(imageId),
-							};
-						});
-						rankedMembers.sort((a, b) => a.rank - b.rank);
-						const nextDisplayStart =
-							rankedMembers.length > 0
-								? Math.max(...rankedMembers.map((m) => m.displayRank)) + 1
-								: 1;
-						const unranked = members.filter((m) => !rankedMap.has(m.userId));
-						const unrankedMembers: MemberRanking[] = unranked.map((m, idx) => ({
-							rank: 4,
-							displayRank: nextDisplayStart + idx,
-							nickname: m.nickname,
-							avatarUrl: getGroupMemberProfileImageUrl(4),
-						}));
-						setRankings([...rankedMembers, ...unrankedMembers]);
-					} else {
-						throw new Error('no-ranking-after-update');
+					if (Array.isArray(updRes.data)) {
+						rankingData = updRes.data;
 					}
-				} catch (updateErr) {
-					console.warn('updateRanking 실패 또는 빈 배열:', updateErr);
-
-					try {
-						const members: GroupMember[] =
-							await fetchGroupMembers(studyGroupId);
-						const fallbackMembers: MemberRanking[] = members.map((m, idx) => ({
-							rank: 4,
-							displayRank: idx + 1,
-							nickname: m.nickname,
-							avatarUrl: getGroupMemberProfileImageUrl(4),
-						}));
-						setRankings(fallbackMembers);
-					} catch (memberErr) {
-						console.error('fetchGroupMembers 실패:', memberErr);
-						setRankings([]);
-					}
+				} catch {
+					rankingData = [];
 				}
 			}
+
+			const rankedMap = new Map<number, Ranking>();
+			const rankedNickSet = new Set<string>();
+			rankingData.forEach((r) => {
+				if (!rankedMap.has(r.studyMemberId)) {
+					rankedMap.set(r.studyMemberId, r);
+					rankedNickSet.add(r.nickname);
+				}
+			});
+
+			const podiumMembers: MemberRanking[] = [];
+			const restMembersTmp: MemberRanking[] = [];
+
+			members.forEach((m) => {
+				if (rankedNickSet.has(m.nickname)) {
+					const info = Array.from(rankedMap.values()).find(
+						(r) => r.nickname === m.nickname,
+					);
+					if (info && info.ranking <= 3) {
+						podiumMembers.push({
+							rank: info.ranking,
+							displayRank: info.ranking,
+							nickname: info.nickname,
+							avatarUrl: getGroupMemberProfileImageUrl(info.ranking),
+						});
+					} else {
+						restMembersTmp.push({
+							rank: 4,
+							displayRank: 0,
+							nickname: m.nickname,
+							avatarUrl: getGroupMemberProfileImageUrl(4),
+						});
+					}
+				} else {
+					restMembersTmp.push({
+						rank: 4,
+						displayRank: 0,
+						nickname: m.nickname,
+						avatarUrl: getGroupMemberProfileImageUrl(4),
+					});
+				}
+			});
+
+			podiumMembers.sort((a, b) => a.rank - b.rank);
+			const podiumCount = podiumMembers.length;
+
+			restMembersTmp.forEach((m, idx) => {
+				m.displayRank = podiumCount + idx + 1;
+			});
+
+			setRankings([...podiumMembers, ...restMembersTmp]);
 		};
 
-		fetchRankings();
+		fetchAndMerge();
 	}, [studyGroupId]);
 
 	const top3 = rankings.filter((m) => m.rank <= 3);
 	const others = rankings.filter((m) => m.rank > 3);
-
 	const podiumOrder = [2, 1, 3] as const;
 
 	return (
 		<div className="container">
 			<div className="ranking-container">
-				{/* ── 포디엄 (1~3등) ── */}
 				<div className="top-three flex-row-center">
 					{podiumOrder.map((rankNum) => {
 						const member = top3.find((m) => m.rank === rankNum);
 						if (!member) return null;
-
 						return (
 							<div key={rankNum} className="flex-col-center top-container">
 								<div className={`rank-card flex-col-between rank-${rankNum}`}>
@@ -162,8 +133,6 @@ const RankingTab: React.FC<RankingTabProps> = ({ studyGroupId }) => {
 						);
 					})}
 				</div>
-
-				{/* ── 4등 이하 리스트 ── */}
 				<div className="rest-list">
 					{others.map((member) => (
 						<div key={member.displayRank} className="rest-item flex-center">
