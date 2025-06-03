@@ -66,7 +66,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/", "/auth/login", "/auth/reissue", "/auth/join").permitAll()  // /auth/login 경로 허용
                         .requestMatchers("/auth/logout").permitAll()
-                        .requestMatchers("/api/main/grouplist","/grouplist/search/**").permitAll()
+                        .requestMatchers("/api/main/grouplist","/grouplist/search/**","/api/weekly-periods/reslove").permitAll()
                         .requestMatchers("/api/main/test").permitAll() // 테스트용
                         .requestMatchers(
                                 "/api/weekly-goals/**",
