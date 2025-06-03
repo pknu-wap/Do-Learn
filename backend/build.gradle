@@ -74,12 +74,4 @@ clean {
     delete file(querydslDir)
 }
 
-tasks.register("compileQuerydsl", JavaCompile) {
-    group = "build"
-    description = "Generate QueryDSL Q-types"
-    source = sourceSets.main.java
-    classpath = sourceSets.main.compileClasspath
-    destinationDirectory.set(file(querydslDir))
-    options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
-}
 
