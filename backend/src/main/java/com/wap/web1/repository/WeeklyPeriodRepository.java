@@ -28,4 +28,10 @@ public interface WeeklyPeriodRepository extends JpaRepository<WeeklyPeriod, Long
     @Query("DELETE FROM WeeklyPeriod wp WHERE wp.studyGroup.id = :studyGroupId")
     void deleteAllByStudyGroupId(Long studyGroupId);
 
+    @Query("SELECT wp FROM WeeklyPeriod wp WHERE wp.studyGroup.id = :groupId AND :date BETWEEN wp.startDate AND wp.endDate")
+    Optional<WeeklyPeriod> findByStudyGroupIdAndDateWithinPeriod(
+            @Param("groupId") Long groupId,
+            @Param("date") LocalDate date
+    );
+
 }
