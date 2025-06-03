@@ -41,7 +41,7 @@ export const getWeeklyPlans = async (
 };
 
 // 대범주 계획 완료 상태 변경 (대범주 완료 여부까지 응답)
-export const updateMemberGoalCompletion = async (
+export const updateCommonCompletion = async (
 	planId: number,
 	completed: boolean,
 ) => {
@@ -63,7 +63,7 @@ export const updateMemberGoalCompletion = async (
 };
 
 // 개인 목표 완료 상태 변경
-export const updatePersonalTaskCompletion = async (
+export const updatePersonalCompletion = async (
 	taskId: number,
 	completed: boolean,
 ) => {
