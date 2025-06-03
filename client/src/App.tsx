@@ -5,6 +5,7 @@ import LoginPage from 'pages/LoginPage';
 import SignupPage from 'pages/SignupPage';
 import MyPage from 'pages/MyPage';
 import GroupPage from 'pages/GroupPage';
+import StartPage from 'pages/StartPage';
 import Layout from 'components/Layout';
 import { useEffect } from 'react';
 import { reissue } from 'api/auth';
@@ -57,6 +58,7 @@ function App() {
 						<Route path="/signup" element={<SignupPage />} />
 						<Route path="/mypage" element={<MyPage />} />
 						<Route path="/group-detail/:studyGroupId" element={<GroupPage />} />
+						<Route path="/startpage" element={<StartPage />} />
 					</Routes>
 				</Layout>
 			</BrowserRouter>
