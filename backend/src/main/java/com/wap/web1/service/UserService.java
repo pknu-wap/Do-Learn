@@ -27,6 +27,12 @@ public class UserService {
     private final StudyGroupRepository studyGroupRepository;
     private final StudyRankingRepository studyRankingRepository;
     private final AttendanceRepository attendanceRepository;
+    private final PersonalTaskRepository personalTaskRepository;
+    private final MemberWeeklyPlanRepository memberWeeklyPlanRepository;
+    private final WeeklySubGoalRepository weeklySubGoalRepository;
+    private final WeeklyGoalRepository weeklyGoalRepository;
+    private final WeeklyPeriodRepository weeklyPeriodRepository;
+
     public MyInfoDto getMyInfo(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
@@ -213,9 +219,16 @@ public class UserService {
             throw new IllegalArgumentException("방장만 스터디 그룹을 삭제할 수 있습니다.");
         }
 
+        personalTaskRepository.deleteAllByStudyGroupId(studyGroupId);
+        memberWeeklyPlanRepository.deleteAllByStudyGroupId(studyGroupId);
+        weeklySubGoalRepository.deleteAllByStudyGroupId(studyGroupId);
+        weeklyGoalRepository.deleteAllByStudyGroupId(studyGroupId);
+        weeklyPeriodRepository.deleteAllByStudyGroupId(studyGroupId);
+
         studyRankingRepository.deleteAllByStudyGroupId(studyGroupId);
         attendanceRepository.deleteAllByStudyGroupId(studyGroupId);
         studyMemberRepository.deleteAllByStudyGroupId(studyGroupId);
+
 
         studyGroupRepository.delete(group);
 
