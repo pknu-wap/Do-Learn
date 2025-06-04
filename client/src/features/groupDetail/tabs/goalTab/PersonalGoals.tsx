@@ -1,12 +1,12 @@
+// src/features/groupDetail/tabs/goalTab/PersonalGoals.tsx
+
 import { useEffect, useState } from 'react';
 import {
 	getWeeklyPlans,
 	createOrUpdateWeeklyPlan,
-	updateCommonCompletion,
 	updatePersonalCompletion,
+	deletePersonalTask,
 } from 'api/personalGoalsApi';
-import { getCommonGoals } from 'api/commonGoalsApi';
-import { SubGoalPlan, PersonalTaskPlan, MergedDayPlan } from 'types/personalGoalTypes';
 import WeeklyGoalModal from './WeeklyGoalModal';
 import 'assets/style/_flex.scss';
 import 'assets/style/_typography.scss';
@@ -20,72 +20,82 @@ interface Task {
 
 interface DayPlan {
 	date: string;
-	weekday: string;
+	weekday: string; // 화면에 표시용: "1일 차", "2일 차", …
+	dayOfWeek: string; // 서버 스펙용 요일(enum): "MONDAY", "TUESDAY", …
 	tasks: Task[];
 }
 
 const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
-	const [referenceDate, setReferenceDate] = useState('2025-06-04');
+	const [referenceDate] = useState('2025-06-04');
 	const [weeklyPlans, setWeeklyPlans] = useState<DayPlan[]>([]);
 	const [showModal, setShowModal] = useState(false);
 	const [selectedDayIndex, setSelectedDayIndex] = useState<number | null>(null);
 	const [isEditMode, setIsEditMode] = useState(false);
 	const [selectedSubGoalsMap, setSelectedSubGoalsMap] = useState<Record<number, { id: number; content: string }[]>>({});
 
+	// "YYYY-MM-DD" → "YY.MM.DD"
 	const formatDateKOR = (dateStr: string): string => (dateStr ? dateStr.slice(2).replace(/-/g, '.') : '');
 
 	useEffect(() => {
 		fetchPlans();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	useEffect(() => {
-		if (weeklyPlans.length === 0) {
-			setWeeklyPlans(getDefaultWeeklyPlans());
-		}
-	}, [weeklyPlans]);
-
-	// 📌 개인 주간 목표 및 개인 태스크를 조회하고 요일별로 정리된 상태로 setWeeklyPlans에 저장
 	const fetchPlans = async () => {
 		try {
 			const res = await getWeeklyPlans(studyGroupId, referenceDate);
-			console.log('[getWeeklyPlans] 호출', studyGroupId, referenceDate);
-
-			// API 응답에서 두 리스트 추출
 			const { memberWeeklyPlans, personalTasks } = res;
-
-			// 두 목록을 하나로 합치고
 			const all = [...memberWeeklyPlans, ...personalTasks];
 
-			// 요일(dayOfWeek) 기준으로 묶기
-			const grouped: { [dayOfWeek: string]: MergedDayPlan } = {};
-
-			all.forEach((item) => {
+			// 서버에서 내려온 데이터를 dayOfWeek 기준으로 그룹핑
+			const grouped: Record<string, { date: string; tasks: Task[] }> = {};
+			all.forEach((item: any) => {
+				// item.dayOfWeek은 "MONDAY", "TUESDAY" 등 서버 스펙
+				const serverDayOfWeek = item.dayOfWeek;
 				const isSubGoal = 'subGoalContent' in item;
 				const content = isSubGoal ? item.subGoalContent : item.content;
 
-				if (!grouped[item.dayOfWeek]) {
-					grouped[item.dayOfWeek] = {
-						dayOfWeek: item.dayOfWeek,
-						weekday: item.dayOfWeek,
+				if (!grouped[serverDayOfWeek]) {
+					grouped[serverDayOfWeek] = {
 						date: item.date,
 						tasks: [],
 					};
 				}
-
-				grouped[item.dayOfWeek].tasks.push({
+				grouped[serverDayOfWeek].tasks.push({
 					taskId: item.id,
 					content,
 					completed: item.completed,
 				});
 			});
 
-			// 날짜 오름차순 정렬
-			const ordered = Object.values(grouped).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+			// 7일치 배열로 합치기: referenceDate 기준
+			const fullWeek: DayPlan[] = Array.from({ length: 7 }, (_, idx) => {
+				// idx일 후 날짜 문자열
+				const dateStr = getDateByStart(referenceDate, idx);
+				// 요일(enum) 계산
+				const realDayOfWeek = new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase(); // ex) "MONDAY"
+				// 그룹핑된 객체에서 해당 요일이 있으면 tasks와 date 사용
+				if (grouped[realDayOfWeek]) {
+					return {
+						date: grouped[realDayOfWeek].date,
+						weekday: `${idx + 1}일 차`,
+						dayOfWeek: realDayOfWeek,
+						tasks: grouped[realDayOfWeek].tasks,
+					};
+				}
+				// 없으면 빈 tasks
+				return {
+					date: dateStr,
+					weekday: `${idx + 1}일 차`,
+					dayOfWeek: realDayOfWeek,
+					tasks: [],
+				};
+			});
 
-			setWeeklyPlans(ordered);
+			setWeeklyPlans(fullWeek);
 		} catch (err) {
-			// console.error(err);
-			setWeeklyPlans([]); // 조회 실패 시 빈 UI라도 표시
+			// 실패 시에도 기본 7일 표시
+			setWeeklyPlans(getDefaultWeeklyPlans());
 		}
 	};
 
@@ -99,44 +109,83 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 		setShowModal(true);
 	};
 
+	const handleDeleteTask = async (taskId: number, dayIndex: number) => {
+		// 서버에 개인 목표 삭제 요청 (DELETE)
+		await deletePersonalTask(taskId);
+
+		// 화면에서도 해당 task를 제거
+		setWeeklyPlans((prev) => {
+			const updated = prev.map((day, idx) => {
+				if (idx === dayIndex) {
+					return {
+						...day,
+						tasks: day.tasks.filter((t) => t.taskId !== taskId),
+					};
+				}
+				return day;
+			});
+			return updated;
+		});
+
+		// 선택된 subGoals 맵 업데이트 (삭제된 item 제거)
+		setSelectedSubGoalsMap((prev) => {
+			const copy = { ...prev };
+			if (copy[dayIndex]) {
+				copy[dayIndex] = copy[dayIndex].filter((g) => g.id !== taskId);
+				if (copy[dayIndex].length === 0) {
+					delete copy[dayIndex];
+				}
+			}
+			return copy;
+		});
+	};
+
 	const handleConfirmUpdate = async () => {
 		if (!isEditMode) {
-			setIsEditMode(true); // 수정 모드 진입
+			// 편집 모드로 전환할 때 기존 선택 기록 초기화
+			setSelectedSubGoalsMap({});
+			setIsEditMode(true);
 			return;
 		}
-
-		// memberGoalPlans 구성
+		// 선택된 목표가 하나도 없으면, 아무 요청 없이 편집 모드만 종료
+		if (Object.keys(selectedSubGoalsMap).length === 0) {
+			setIsEditMode(false);
+			return;
+		}
+		// 서버에 전송할 payload 구성
 		const memberGoalPlans = Object.entries(selectedSubGoalsMap).flatMap(([dayIndex, goals]) => {
-			const dayPlan = weeklyPlans[Number(dayIndex)];
-
-			// 날짜, 요일이 없는 경우 예외 처리 (기본값 또는 로컬스토리지에서 계산 필요)
+			const idx = Number(dayIndex);
+			const dayPlan = weeklyPlans[idx];
 			if (!dayPlan?.date) return [];
-
-			const dateStr = dayPlan.date; // 예: "2025-05-21"
-			const dayOfWeek = dayPlan.weekday.toUpperCase(); // 예: "WEDNESDAY"
 
 			return goals.map((goal) => ({
 				subGoalId: goal.id,
-				date: dateStr,
-				dayOfWeek,
+				date: dayPlan.date,
+				dayOfWeek: dayPlan.dayOfWeek,
 				completed: false,
 			}));
 		});
 
-		// 요청 payload 구성
 		const payload = {
 			memberGoalPlans,
-			personalTaskPlans: [], // 비워서 보내도 됨(임시)
+			personalTaskPlans: [],
 		};
 
-		await createOrUpdateWeeklyPlan(studyGroupId, referenceDate, payload);
-		await fetchPlans();
-		setIsEditMode(false); // 수정 모드 종료
+		// 새로운 계획이 있을 때만 호출
+		if (memberGoalPlans.length > 0) {
+			try {
+				await createOrUpdateWeeklyPlan(studyGroupId, referenceDate, payload);
+				await fetchPlans();
+			} catch (err) {
+				console.error('주간 계획 저장 중 오류:', err);
+				// 필요하다면 사용자에게 알림 추가 가능 (예: alert)
+			}
+		}
+		setIsEditMode(false);
 	};
 
 	const handleModalConfirm = (dayIndex: number, selectedGoals: { id: number; content: string }[]) => {
-		// 1. weeklyPlans 업데이트 (화면에 즉시 반영)
-		const newTaskObjs = selectedGoals.map((goal) => ({
+		const newTaskObjs: Task[] = selectedGoals.map((goal) => ({
 			taskId: goal.id,
 			content: goal.content,
 			completed: false,
@@ -144,25 +193,21 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 
 		setWeeklyPlans((prev) => {
 			const updated = [...prev];
-
 			if (!updated[dayIndex]) {
-				const weekdayLabel = `${dayIndex + 1}일 차`;
+				// 새롭게 추가해야 할 경우, 날짜와 요일 계산
+				const dateStr = getDateByStart(referenceDate, dayIndex);
+				const realDayOfWeek = new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
 				updated[dayIndex] = {
-					date: '',
-					weekday: weekdayLabel,
+					date: dateStr,
+					weekday: `${dayIndex + 1}일 차`,
+					dayOfWeek: realDayOfWeek,
 					tasks: [],
 				};
 			}
-
-			updated[dayIndex] = {
-				...updated[dayIndex],
-				tasks: [...updated[dayIndex].tasks, ...newTaskObjs],
-			};
-
+			updated[dayIndex].tasks.push(...newTaskObjs);
 			return updated;
 		});
 
-		// 🟡 2. 나중에 API 요청용으로 따로 저장
 		setSelectedSubGoalsMap((prev) => ({
 			...prev,
 			[dayIndex]: selectedGoals,
@@ -171,22 +216,23 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 		setShowModal(false);
 	};
 
-	// 날짜 계산
 	const getDateByStart = (startDateStr: string, dayIndex: number) => {
-		const baseDate = new Date(startDateStr); // 한국 시간 기준이면 KST 고려 필요
+		const baseDate = new Date(startDateStr);
 		baseDate.setDate(baseDate.getDate() + dayIndex);
-		return baseDate.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+		return baseDate.toISOString().split('T')[0]; // "YYYY-MM-DD"
 	};
 
-	// 기본 데이터 함수
 	const getDefaultWeeklyPlans = (): DayPlan[] => {
-		const labels = ['1일 차', '2일 차', '3일 차', '4일 차', '5일 차', '6일 차', '7일 차'];
-
-		return labels.map((label) => ({
-			weekday: label,
-			date: '', // 날짜가 있으면 표시, 없으면 생략
-			tasks: [],
-		}));
+		return Array.from({ length: 7 }, (_, idx) => {
+			const dateStr = getDateByStart(referenceDate, idx);
+			const realDayOfWeek = new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+			return {
+				date: dateStr,
+				weekday: `${idx + 1}일 차`,
+				dayOfWeek: realDayOfWeek,
+				tasks: [],
+			};
+		});
 	};
 
 	return (
@@ -199,7 +245,14 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 								<td className="day-label">{day.weekday}</td>
 								<td className="day-tasks">
 									{day.date && (
-										<div className="task-date" style={{ color: '#aaa', fontSize: '0.8rem', marginBottom: '0.3rem' }}>
+										<div
+											className="task-date"
+											style={{
+												color: '#aaa',
+												fontSize: '0.8rem',
+												marginBottom: '0.3rem',
+											}}
+										>
 											{formatDateKOR(day.date)}
 										</div>
 									)}
@@ -218,7 +271,25 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 														checked={task.completed}
 														onChange={() => handleCheckboxToggle(task.taskId, !task.completed)}
 													/>
-													<span>{task.content}</span>
+													<span style={{ flexGrow: 1 }}>{task.content}</span>
+													{isEditMode && (
+														/* 삭제 버튼 주석 처리 */
+														// <button
+														// 	className="delete-btn"
+														// 	onClick={() => handleDeleteTask(task.taskId, idx)}
+														// 	style={{
+														// 		background: 'transparent',
+														// 		border: 'none',
+														// 		color: 'red',
+														// 		fontWeight: 'bold',
+														// 		marginLeft: '0.5rem',
+														// 		cursor: 'pointer',
+														// 	}}
+														// >
+														// 	–
+														// </button>
+														<></>
+													)}
 												</div>
 											))}
 											{isEditMode && (
@@ -239,19 +310,22 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 				{isEditMode ? '확인' : '수정하기'}
 			</button>
 
-			{/* 목표 모달창 */}
-			{showModal && selectedDayIndex !== null && (
-				<WeeklyGoalModal
-					groupId={studyGroupId}
-					dayIndex={selectedDayIndex}
-					referenceDate={referenceDate}
-					onClose={() => {
-						setShowModal(false);
-						fetchPlans();
-					}}
-					onConfirm={handleModalConfirm}
-				/>
-			)}
+			{showModal &&
+				selectedDayIndex !== null &&
+				(() => {
+					// 해당 날짜에 이미 추가된 subGoal IDs
+					const existingTaskIds = weeklyPlans[selectedDayIndex]?.tasks.map((t) => t.taskId) ?? [];
+					return (
+						<WeeklyGoalModal
+							groupId={studyGroupId}
+							dayIndex={selectedDayIndex}
+							referenceDate={referenceDate}
+							existingTaskIds={existingTaskIds}
+							onClose={() => setShowModal(false)}
+							onConfirm={handleModalConfirm}
+						/>
+					);
+				})()}
 		</div>
 	);
 };
