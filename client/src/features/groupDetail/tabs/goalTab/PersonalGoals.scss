@@ -33,14 +33,12 @@
 .day-tasks {
 	position: relative; // 날짜 절대위치용
 	padding-left: 0.5rem;
-	padding-top: 1.2rem; // 날짜 뜰 공간 확보 (원하는 만큼 조절)
+	padding-top: 2rem; // 날짜 뜰 공간 확보 (원하는 만큼 조절)
 
 	.task-date {
 		color: #aaa;
 		font-size: 0.75rem;
-		position: absolute;
-		top: 10%;
-		right: 5%;
+		margin-bottom: 5px;
 	}
 
 	.task-row {
@@ -100,5 +98,18 @@
 		&:hover {
 			background-color: #c1c1c1;
 		}
+	}
+}
+
+.x-btn {
+	background-color: transparent;
+	border: none;
+	color: rgb(234, 37, 37);
+	font-size: 13px;
+	cursor: pointer;
+	transition: color 0.3s;
+
+	&:hover {
+		color: #444;
 	}
 }

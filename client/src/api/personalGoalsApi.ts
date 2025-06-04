@@ -1,5 +1,3 @@
-// src/api/personalGoalsApi.ts
-
 import api from './instance';
 import { getAuthHeaders } from './auth';
 import { WeeklyPlanRequest } from 'types/personalGoalTypes';

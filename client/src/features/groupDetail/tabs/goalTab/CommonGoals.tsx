@@ -204,12 +204,10 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 		const sortedGoals = mainCategoryList.map((main) => updatedGoals.find((goal) => goal.mainCategory === main)!);
 		setGoals(sortedGoals);
 
-		// 6. 결과 알림
-		// if (failedCount > 0) {
-		// 	alert(`⚠️ ${failedCount}개의 목표 설정 중 오류가 발생했습니다.`);
-		// } else {
-		// 	alert('✅ 모든 목표가 성공적으로 설정되었습니다.');
-		// }
+		// 목표가 성공적으로 생성된 경우에만 시작일 저장
+		if (!loadStartDateInfo(studyGroupId)) {
+			saveStartDateInfo(studyGroupId, { startDate, startDayOfWeek });
+		}
 	};
 
 	useEffect(() => {
@@ -229,7 +227,6 @@ const CommonGoals = ({ studyGroupId, isLeader }: CommonGoalsProps) => {
 		} else {
 			const fallback = getKoreaStartDayInfo(new Date());
 			setStartDateInfo(fallback);
-			saveStartDateInfo(studyGroupId, fallback);
 		}
 	}, [studyGroupId]);
 

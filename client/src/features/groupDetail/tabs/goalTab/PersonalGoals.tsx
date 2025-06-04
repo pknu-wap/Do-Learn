@@ -26,7 +26,7 @@ interface DayPlan {
 }
 
 const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
-	const [referenceDate] = useState('2025-06-04');
+	const [referenceDate, setReferenceDate] = useState('');
 	const [weeklyPlans, setWeeklyPlans] = useState<DayPlan[]>([]);
 	const [initialPlans, setInitialPlans] = useState<DayPlan[]>([]);
 	const [showModal, setShowModal] = useState(false);
@@ -36,13 +36,26 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 	const formatDateKOR = (dateStr: string): string => (dateStr ? dateStr.slice(2).replace(/-/g, '.') : '');
 
 	useEffect(() => {
-		fetchPlans();
-	}, []);
+		const localKey = `commonGoalStartInfo-${studyGroupId}`;
+		const startInfoRaw = localStorage.getItem(localKey);
+		if (!startInfoRaw) {
+			alert('공통 목표를 먼저 생성해주세요.');
+			return;
+		}
+		const startInfo = JSON.parse(startInfoRaw);
+		setReferenceDate(startInfo.startDate); // 공통 목표 시작일을 기준으로 설정
+	}, [studyGroupId]);
+
+	useEffect(() => {
+		if (referenceDate) {
+			fetchPlans();
+		}
+	}, [referenceDate]);
 
 	const fetchPlans = async () => {
 		try {
 			const res = await getWeeklyPlans(studyGroupId, referenceDate);
-			console.log('✅ [조회 응답] 개인 목표 + 공통 목표:', res);
+			console.log('조회 응답:', res);
 
 			const { memberWeeklyPlans, personalTasks } = res;
 			const all = [...memberWeeklyPlans, ...personalTasks];
@@ -67,25 +80,22 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 			const fullWeek: DayPlan[] = Array.from({ length: 7 }, (_, idx) => {
 				const dateStr = getDateByStart(referenceDate, idx);
 				const realDayOfWeek = new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
-				if (grouped[realDayOfWeek]) {
-					return {
-						date: grouped[realDayOfWeek].date,
-						weekday: `${idx + 1}일 차`,
-						dayOfWeek: realDayOfWeek,
-						tasks: grouped[realDayOfWeek].tasks,
-					};
-				}
+				const groupedData = grouped?.[realDayOfWeek];
+
 				return {
-					date: dateStr,
+					date: groupedData?.date ?? dateStr,
 					weekday: `${idx + 1}일 차`,
 					dayOfWeek: realDayOfWeek,
-					tasks: [],
+					tasks: groupedData?.tasks ?? [], // undefined 방지
 				};
 			});
 			setWeeklyPlans(fullWeek);
 			setInitialPlans(fullWeek);
-		} catch {
-			setWeeklyPlans(getDefaultWeeklyPlans());
+		} catch (err) {
+			console.error('[fetchPlans] 조회 실패:', err);
+			const fallback = getDefaultWeeklyPlans();
+			setWeeklyPlans(fallback);
+			setInitialPlans(fallback); // 🔥 이 줄이 꼭 필요합니다
 		}
 	};
 
@@ -114,25 +124,16 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 	};
 
 	const handleConfirmUpdate = async () => {
-		if (!isEditMode) {
-			setIsEditMode(true);
+		const localKey = `commonGoalStartInfo-${studyGroupId}`;
+		const startInfoRaw = localStorage.getItem(localKey);
+
+		if (!startInfoRaw) {
+			alert('공통 목표를 먼저 생성해주세요.');
 			return;
 		}
 
-		const isUnchanged =
-			JSON.stringify(weeklyPlans.map((d) => d.tasks.map((t) => [t.taskId, t.completed]))) ===
-			JSON.stringify(initialPlans.map((d) => d.tasks.map((t) => [t.taskId, t.completed])));
+		const isUnchanged = JSON.stringify(weeklyPlans) === JSON.stringify(initialPlans);
 
-		if (isUnchanged) {
-			alert('변경된 내용이 없습니다.');
-			setIsEditMode(false);
-			return;
-		}
-
-		if (!isEditMode) {
-			setIsEditMode(true);
-			return;
-		}
 		if (JSON.stringify(weeklyPlans) === JSON.stringify(initialPlans)) {
 			setIsEditMode(false);
 			return;
@@ -143,6 +144,7 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 
 		weeklyPlans.forEach((day, idx) => {
 			const initialDay = initialPlans[idx];
+			if (!initialDay || !Array.isArray(day.tasks) || !Array.isArray(initialDay.tasks)) return;
 
 			// 삭제 포함까지 체크하는 비교
 			const isTasksUnchanged =
@@ -168,21 +170,25 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 			});
 		});
 
-		console.log('📦 [요청 바디] 생성/수정 payload:', {
+		console.log('요청 바디:', {
 			memberGoalPlans,
 			personalTaskPlans,
 		});
-		await createOrUpdateWeeklyPlan(studyGroupId, referenceDate, {
-			memberGoalPlans,
-			personalTaskPlans,
-		});
-		await fetchPlans();
-		setIsEditMode(false);
 
-		// 1. 삭제된 subGoal (공통 목표)
-		initialPlans.forEach((initialDay, idx) => {
-			const currentDay = weeklyPlans[idx];
+		// 1. 삭제된 subGoal (공통 목표) + personalTask (개인 목표)
+		const initialMap = new Map(initialPlans.map((day) => [day.dayOfWeek, day]));
+		const currentMap = new Map(weeklyPlans.map((day) => [day.dayOfWeek, day]));
+		const allDayOfWeeks = new Set([...Array.from(initialMap.keys()), ...Array.from(currentMap.keys())]);
 
+		Array.from(allDayOfWeeks).forEach((dayOfWeek) => {
+			const initialDay = initialMap.get(dayOfWeek);
+			const currentDay = currentMap.get(dayOfWeek);
+
+			if (!initialDay || !currentDay) return;
+			if (initialDay.tasks.length === 0) return;
+			if (!currentDay.tasks || !Array.isArray(currentDay.tasks)) return;
+
+			// 공통 목표 삭제 확인
 			const deletedSubGoals = initialDay.tasks.filter(
 				(initialTask) => initialTask.subGoalId && !currentDay.tasks.some((t) => t.taskId === initialTask.taskId),
 			);
@@ -197,7 +203,7 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 				});
 			});
 
-			// 2. 삭제된 personalTask
+			// 개인 목표 삭제 확인
 			const deletedPersonalTasks = initialDay.tasks.filter(
 				(initialTask) => !initialTask.subGoalId && !currentDay.tasks.some((t) => t.taskId === initialTask.taskId),
 			);
@@ -212,6 +218,42 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 				});
 			});
 		});
+		// ✅ 여기에 넣어! 요청 전 실제 상태 확인
+		console.log('weeklyPlans:', weeklyPlans);
+
+		// 그리고 memberGoalPlans, personalTaskPlans도 로깅
+		console.log('📡 요청 보낸다:', {
+			memberGoalPlans,
+			personalTaskPlans,
+		});
+		try {
+			await createOrUpdateWeeklyPlan(studyGroupId, referenceDate, {
+				memberGoalPlans,
+				personalTaskPlans,
+			});
+			console.log('✅ 생성/수정 성공');
+		} catch (err: any) {
+			console.error('❌ 생성/수정 실패:', err.response?.data || err.message || err);
+		}
+
+		await fetchPlans();
+		setIsEditMode(false);
+	};
+
+	const handleEnterEditMode = () => {
+		const localKey = `commonGoalStartInfo-${studyGroupId}`;
+		const startInfoRaw = localStorage.getItem(localKey);
+
+		if (!startInfoRaw) {
+			alert('공통 목표를 먼저 생성해주세요.');
+			return;
+		}
+		setIsEditMode(true);
+	};
+
+	const handleCancelEdit = () => {
+		setWeeklyPlans(initialPlans);
+		setIsEditMode(false);
 	};
 
 	const handleModalConfirm = (dayIndex: number, selectedGoals: { id: number; content: string }[]) => {
@@ -260,13 +302,19 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 									<div className="task-date flex-right button3">{formatDateKOR(day.date)}</div>
 									{day.tasks.map((task) => (
 										<div key={task.taskId} className="task-row">
-											<input
-												type="checkbox"
-												checked={task.completed}
-												onChange={() => handleCheckboxToggle(task.taskId, !task.completed)}
-											/>
+											{(!isEditMode || !task.subGoalId) && (
+												<input
+													type="checkbox"
+													checked={task.completed}
+													onChange={() => handleCheckboxToggle(task.taskId, !task.completed)}
+												/>
+											)}
 											<span style={{ flexGrow: 1 }}>{task.content}</span>
-											{isEditMode && <button onClick={() => handleDeleteTask(task.taskId, idx)}>삭제</button>}
+											{isEditMode && (
+												<button className="x-btn button2" onClick={() => handleDeleteTask(task.taskId, idx)}>
+													x
+												</button>
+											)}
 										</div>
 									))}
 									{isEditMode && (
@@ -285,21 +333,17 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 			<div className="bottom-btn">
 				{isEditMode ? (
 					<div className="bottom-btn">
-						<button
-							className="cancel-btn button2"
-							onClick={() => {
-								setWeeklyPlans(initialPlans); // 상태 초기화
-								setIsEditMode(false);
-							}}
-						>
-							취소
-						</button>
-						<button className="confirm-btn button2" onClick={handleConfirmUpdate}>
-							확인
-						</button>
+						<div className="bottom-btn">
+							<button className="cancel-btn button2" onClick={handleCancelEdit}>
+								취소
+							</button>
+							<button className="confirm-btn button2" onClick={handleConfirmUpdate}>
+								확인
+							</button>
+						</div>
 					</div>
 				) : (
-					<button className="confirm-btn button2" onClick={handleConfirmUpdate}>
+					<button className="confirm-btn button2" onClick={handleEnterEditMode}>
 						수정하기
 					</button>
 				)}
