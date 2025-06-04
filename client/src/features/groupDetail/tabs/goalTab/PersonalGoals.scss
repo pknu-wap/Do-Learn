@@ -31,12 +31,16 @@
 }
 
 .day-tasks {
+	position: relative; // 날짜 절대위치용
 	padding-left: 0.5rem;
+	padding-top: 1.2rem; // 날짜 뜰 공간 확보 (원하는 만큼 조절)
 
 	.task-date {
 		color: #aaa;
 		font-size: 0.75rem;
-		margin-bottom: 0.5rem;
+		position: absolute;
+		top: 10%;
+		right: 5%;
 	}
 
 	.task-row {
@@ -61,20 +65,40 @@
 	}
 }
 
-// 수정&확인 버튼
-.confirm-btn {
-	display: block;
-	margin: 30px auto;
-	background-color: #b6e7b6;
-	color: #333;
-	border: none;
-	padding: 0.5rem 1.5rem;
-	border-radius: 8px;
-	cursor: pointer;
-	font-weight: bold;
-	transition: 0.3s;
+// 하단 버튼
+.bottom-btn {
+	display: flex;
+	justify-content: center;
+	margin: 1rem auto;
+	gap: 25px;
 
-	&:hover {
-		background-color: #a4d7a4;
+	.confirm-btn {
+		background-color: #b6e7b6;
+		color: #333;
+		border: none;
+		padding: 0.5rem 1.5rem;
+		border-radius: 8px;
+		cursor: pointer;
+		font-weight: bold;
+		transition: 0.3s;
+
+		&:hover {
+			background-color: #a4d7a4;
+		}
+	}
+
+	.cancel-btn {
+		background-color: #dbdbdb;
+		color: #333;
+		border: none;
+		padding: 0.5rem 1.5rem;
+		border-radius: 8px;
+		cursor: pointer;
+		font-weight: bold;
+		transition: 0.3s;
+
+		&:hover {
+			background-color: #c1c1c1;
+		}
 	}
 }

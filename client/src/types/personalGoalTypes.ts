@@ -14,12 +14,14 @@ export interface WeeklyPlanRequest {
 		date: string;
 		dayOfWeek: string;
 		completed: boolean;
+		deleted?: boolean;
 	}[];
 	personalTaskPlans: {
 		content: string;
 		date: string;
 		dayOfWeek: string;
 		completed: boolean;
+		deleted?: boolean;
 	}[];
 }
 
