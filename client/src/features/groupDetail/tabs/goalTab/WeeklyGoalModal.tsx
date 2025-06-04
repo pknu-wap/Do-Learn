@@ -1,3 +1,5 @@
+// src/features/groupDetail/tabs/goalTab/WeeklyGoalModal.tsx
+
 import { useEffect, useState } from 'react';
 import { getCommonGoals } from 'api/commonGoalsApi';
 import 'assets/style/_flex.scss';
@@ -8,6 +10,7 @@ interface WeeklyGoalModalProps {
 	groupId: number;
 	dayIndex: number;
 	referenceDate: string;
+	existingTaskIds: number[]; // 추가된 subGoal ID 목록
 	onClose: () => void;
 	onConfirm: (dayIndex: number, selectedGoals: { id: number; content: string }[]) => void;
 }
@@ -24,11 +27,17 @@ interface CommonGoal {
 	subGoals: SubGoal[];
 }
 
-const WeeklyGoalModal: React.FC<WeeklyGoalModalProps> = ({ groupId, dayIndex, referenceDate, onClose, onConfirm }) => {
+const WeeklyGoalModal: React.FC<WeeklyGoalModalProps> = ({
+	groupId,
+	dayIndex,
+	referenceDate,
+	existingTaskIds,
+	onClose,
+	onConfirm,
+}) => {
 	const [commonGoals, setCommonGoals] = useState<CommonGoal[]>([]);
 	const [selectedSubGoalIds, setSelectedSubGoalIds] = useState<number[]>([]);
 
-	// 목표 불러오기
 	useEffect(() => {
 		const fetchCommonGoals = async () => {
 			const localKey = `commonGoalStartInfo-${groupId}`;
@@ -44,7 +53,7 @@ const WeeklyGoalModal: React.FC<WeeklyGoalModalProps> = ({ groupId, dayIndex, re
 			try {
 				const goals = await getCommonGoals({
 					studyGroupId: groupId,
-					referenceDate: startDate, // referenceDate를 로컬에서 가져온 걸로 대체
+					referenceDate: startDate,
 					startDayOfWeek,
 				});
 				setCommonGoals(goals);
@@ -56,15 +65,19 @@ const WeeklyGoalModal: React.FC<WeeklyGoalModalProps> = ({ groupId, dayIndex, re
 		fetchCommonGoals();
 	}, [groupId]);
 
-	// 선택된 서브 목표 전달
-	const handleConfirm = () => {
-		const selected = commonGoals.flatMap((goal) => goal.subGoals.filter((sub) => selectedSubGoalIds.includes(sub.id)));
-		onConfirm(dayIndex, selected);
-	};
-
-	// 선택 토글 함수
 	const toggleSubGoal = (id: number) => {
 		setSelectedSubGoalIds((prev) => (prev.includes(id) ? prev.filter((gid) => gid !== id) : [...prev, id]));
+	};
+
+	const handleConfirm = () => {
+		const selected = commonGoals.flatMap((goal) =>
+			goal.subGoals
+				.filter(
+					(sub) => selectedSubGoalIds.includes(sub.id) && !existingTaskIds.includes(sub.id), // 이미 추가된 subGoal은 제외
+				)
+				.map((sub) => ({ id: sub.id, content: sub.content })),
+		);
+		onConfirm(dayIndex, selected);
 	};
 
 	return (
@@ -77,21 +90,22 @@ const WeeklyGoalModal: React.FC<WeeklyGoalModalProps> = ({ groupId, dayIndex, re
 					</button>
 				</div>
 
-				{/* 목표 불러오기 */}
 				<div className="weekly-goal-modal-content body3">
 					{commonGoals.map((goal) => (
 						<div key={goal.goalId} className="goal-card">
 							<div className="main-category">{goal.mainCategory}</div>
 							{goal.subGoals.length > 0 ? (
-								goal.subGoals.map((sub: SubGoal) => (
-									<div
-										key={sub.id}
-										className={`subgoal-item ${selectedSubGoalIds.includes(sub.id) ? 'selected' : ''}`}
-										onClick={() => toggleSubGoal(sub.id)}
-									>
-										{sub.content}
-									</div>
-								))
+								goal.subGoals
+									.filter((sub) => !existingTaskIds.includes(sub.id)) // 이미 추가된 subGoal은 리스트에서 제거
+									.map((sub: SubGoal) => (
+										<div
+											key={sub.id}
+											className={`subgoal-item ${selectedSubGoalIds.includes(sub.id) ? 'selected' : ''}`}
+											onClick={() => toggleSubGoal(sub.id)}
+										>
+											{sub.content}
+										</div>
+									))
 							) : (
 								<div className="no-sub">소범주가 없습니다.</div>
 							)}
@@ -99,7 +113,6 @@ const WeeklyGoalModal: React.FC<WeeklyGoalModalProps> = ({ groupId, dayIndex, re
 					))}
 				</div>
 
-				{/* 하단 버튼 */}
 				<div className="weekly-goal-modal-footer">
 					<button
 						className="body3"
