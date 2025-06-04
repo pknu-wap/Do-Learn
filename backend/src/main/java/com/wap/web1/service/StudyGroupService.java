@@ -82,10 +82,10 @@ public class StudyGroupService {
         List<StudyRanking> rankings = studyRankingRepository.findByStudyMember_StudyGroupId(studyGroupId);
 
         //랭킹 정보를 Map<studyMemberId, ranking>으로 변환
-        Map<Long, Integer> memberIdToRankMap = rankings.stream()
+        Map<Long, Integer> memberIdToRankLevelMap = rankings.stream()
                 .collect(Collectors.toMap(
                         r -> r.getStudyMember().getId(),
-                        StudyRanking::getRanking
+                        StudyRanking::getRankLevel
                 ));
 
         List<StudyMember> members = studyMemberRepository.findByStudyGroupId(studyGroupId);
@@ -99,18 +99,9 @@ public class StudyGroupService {
                     boolean attendedToday = attendanceRepository.existsByStudyGroupAndUserAndDate(group, user, today);
 
                     // 출석 안 했으면 무조건 5번 이미지
-                    int profileImage;
-                    if (!attendedToday) {
-                        profileImage = 5;
-                    } else {
-                        int rank = memberIdToRankMap.getOrDefault(member.getId(), 0);
-                        profileImage = switch (rank) {
-                            case 1 -> 1;
-                            case 2 -> 2;
-                            case 3 -> 3;
-                            default -> 4;
-                        };
-                    }
+                    int profileImage = !attendedToday
+                            ? 5
+                            : memberIdToRankLevelMap.getOrDefault(member.getId(), 4);
 
                     return GroupMembersDto.MemberDto.builder()
                             .userId(member.getUser().getId())
