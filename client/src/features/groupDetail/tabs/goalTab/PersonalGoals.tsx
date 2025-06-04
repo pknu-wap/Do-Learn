@@ -16,6 +16,8 @@ interface Task {
 	subGoalId?: number;
 	content: string;
 	completed: boolean;
+	date: string;
+	dayOfWeek: string;
 }
 
 interface DayPlan {
@@ -70,6 +72,8 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 					subGoalId: isSubGoal ? item.subGoalId : undefined,
 					content,
 					completed: item.completed,
+					date: item.date,
+					dayOfWeek: item.dayOfWeek,
 				};
 				if (!grouped[serverDayOfWeek]) {
 					grouped[serverDayOfWeek] = { date: item.date, tasks: [] };
@@ -133,12 +137,6 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 		}
 
 		const isUnchanged = JSON.stringify(weeklyPlans) === JSON.stringify(initialPlans);
-
-		if (JSON.stringify(weeklyPlans) === JSON.stringify(initialPlans)) {
-			setIsEditMode(false);
-			return;
-		}
-
 		const memberGoalPlans: WeeklyPlanRequest['memberGoalPlans'] = [];
 		const personalTaskPlans: WeeklyPlanRequest['personalTaskPlans'] = [];
 
@@ -154,18 +152,14 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 			if (isTasksUnchanged && day.tasks.length === initialDay.tasks.length) return;
 
 			day.tasks.forEach((task) => {
-				const planDate = day.date;
-				const planDayOfWeek = day.dayOfWeek;
 				const plan = {
-					date: planDate,
-					dayOfWeek: planDayOfWeek,
+					date: task.date,
+					dayOfWeek: task.dayOfWeek,
 					completed: task.completed,
 				};
 
 				if (task.subGoalId) {
 					memberGoalPlans.push({ ...plan, subGoalId: task.subGoalId });
-				} else {
-					personalTaskPlans.push({ ...plan, content: task.content });
 				}
 			});
 		});
@@ -218,14 +212,20 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 				});
 			});
 		});
-		// ✅ 여기에 넣어! 요청 전 실제 상태 확인
-		console.log('weeklyPlans:', weeklyPlans);
+		console.log('🧩 전체 weeklyPlans:', weeklyPlans);
+		console.log('🧩 전체 initialPlans:', initialPlans);
+		console.log(
+			'📤 보낼 요청 바디:',
+			JSON.stringify(
+				{
+					memberGoalPlans,
+					personalTaskPlans,
+				},
+				null,
+				2,
+			),
+		);
 
-		// 그리고 memberGoalPlans, personalTaskPlans도 로깅
-		console.log('📡 요청 보낸다:', {
-			memberGoalPlans,
-			personalTaskPlans,
-		});
 		try {
 			await createOrUpdateWeeklyPlan(studyGroupId, referenceDate, {
 				memberGoalPlans,
@@ -257,17 +257,20 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 	};
 
 	const handleModalConfirm = (dayIndex: number, selectedGoals: { id: number; content: string }[]) => {
+		const dayPlan = weeklyPlans[dayIndex];
 		const newTasks: Task[] = selectedGoals.map((goal) => ({
 			taskId: goal.id,
 			subGoalId: goal.id,
 			content: goal.content,
 			completed: false,
+			date: dayPlan.date,
+			dayOfWeek: dayPlan.dayOfWeek,
 		}));
-		setWeeklyPlans((prev) => {
-			const updated = [...prev];
-			updated[dayIndex].tasks.push(...newTasks);
-			return updated;
-		});
+
+		const updated = [...weeklyPlans];
+		updated[dayIndex].tasks.push(...newTasks);
+		setWeeklyPlans(updated);
+
 		setShowModal(false);
 	};
 
