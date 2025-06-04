@@ -100,8 +100,16 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 	};
 
 	const handleCheckboxToggle = async (taskId: number, completed: boolean) => {
-		await updatePersonalCompletion(taskId, completed);
-		await fetchPlans();
+		try {
+			await updatePersonalCompletion(taskId, completed);
+			await fetchPlans();
+		} catch (err: any) {
+			if (err.response?.status === 400) {
+				alert('오류가 발생하였습니다.');
+			} else {
+				console.error(err);
+			}
+		}
 	};
 
 	const handleOpenModal = (dayIndex: number) => {
@@ -110,34 +118,42 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 	};
 
 	const handleDeleteTask = async (taskId: number, dayIndex: number) => {
-		// 서버에 개인 목표 삭제 요청 (DELETE)
-		await deletePersonalTask(taskId);
+		try {
+			// 서버에 개인 목표 삭제 요청 (DELETE)
+			await deletePersonalTask(taskId);
 
-		// 화면에서도 해당 task를 제거
-		setWeeklyPlans((prev) => {
-			const updated = prev.map((day, idx) => {
-				if (idx === dayIndex) {
-					return {
-						...day,
-						tasks: day.tasks.filter((t) => t.taskId !== taskId),
-					};
-				}
-				return day;
+			// 화면에서도 해당 task를 제거
+			setWeeklyPlans((prev) => {
+				const updated = prev.map((day, idx) => {
+					if (idx === dayIndex) {
+						return {
+							...day,
+							tasks: day.tasks.filter((t) => t.taskId !== taskId),
+						};
+					}
+					return day;
+				});
+				return updated;
 			});
-			return updated;
-		});
 
-		// 선택된 subGoals 맵 업데이트 (삭제된 item 제거)
-		setSelectedSubGoalsMap((prev) => {
-			const copy = { ...prev };
-			if (copy[dayIndex]) {
-				copy[dayIndex] = copy[dayIndex].filter((g) => g.id !== taskId);
-				if (copy[dayIndex].length === 0) {
-					delete copy[dayIndex];
+			// 선택된 subGoals 맵 업데이트 (삭제된 item 제거)
+			setSelectedSubGoalsMap((prev) => {
+				const copy = { ...prev };
+				if (copy[dayIndex]) {
+					copy[dayIndex] = copy[dayIndex].filter((g) => g.id !== taskId);
+					if (copy[dayIndex].length === 0) {
+						delete copy[dayIndex];
+					}
 				}
+				return copy;
+			});
+		} catch (err: any) {
+			if (err.response?.status === 400) {
+				alert('오류가 발생하였습니다.');
+			} else {
+				console.error(err);
 			}
-			return copy;
-		});
+		}
 	};
 
 	const handleConfirmUpdate = async () => {
@@ -176,9 +192,12 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 			try {
 				await createOrUpdateWeeklyPlan(studyGroupId, referenceDate, payload);
 				await fetchPlans();
-			} catch (err) {
-				console.error('주간 계획 저장 중 오류:', err);
-				// 필요하다면 사용자에게 알림 추가 가능 (예: alert)
+			} catch (err: any) {
+				if (err.response?.status === 400) {
+					alert('오류가 발생하였습니다.');
+				} else {
+					console.error(err);
+				}
 			}
 		}
 		setIsEditMode(false);
@@ -274,20 +293,6 @@ const PersonalGoals = ({ studyGroupId }: { studyGroupId: number }) => {
 													<span style={{ flexGrow: 1 }}>{task.content}</span>
 													{isEditMode && (
 														/* 삭제 버튼 주석 처리 */
-														// <button
-														// 	className="delete-btn"
-														// 	onClick={() => handleDeleteTask(task.taskId, idx)}
-														// 	style={{
-														// 		background: 'transparent',
-														// 		border: 'none',
-														// 		color: 'red',
-														// 		fontWeight: 'bold',
-														// 		marginLeft: '0.5rem',
-														// 		cursor: 'pointer',
-														// 	}}
-														// >
-														// 	–
-														// </button>
 														<></>
 													)}
 												</div>
